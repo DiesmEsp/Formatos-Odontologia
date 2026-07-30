@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cat&aacute;logos — Mockup</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Formatos Odontol&oacute;gicos</h1>
+      <p>Cl&iacute;nica UNMSM</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="catalogos.html" class="sidebar-link active"><span class="icon">📋</span> Cat&aacute;logos</a>
+      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
+      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
+      <a href="reportes.html" class="sidebar-link"><span class="icon">📄</span> Reportes</a>
+    </nav>
+    <div class="sidebar-footer">Mockups v0.1</div>
+  </aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h2>Cat&aacute;logos</h2>
+        <p class="subtitle">Gesti&oacute;n centralizada de cat&aacute;logos del sistema</p>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary" onclick="abrirModal('modal-material')">+ Material</button>
+        <button class="btn btn-secondary" onclick="abrirModal('modal-docente')">+ Docente</button>
+        <button class="btn btn-secondary" onclick="abrirModal('modal-especialista')">+ Especialista</button>
+        <button class="btn btn-secondary" onclick="abrirModal('modal-tratamiento')">+ Trat. Predef.</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="tab-materiales">Materiales</button>
+        <button class="tab" data-tab="tab-docentes">Docentes</button>
+        <button class="tab" data-tab="tab-especialistas">Especialistas</button>
+        <button class="tab" data-tab="tab-tratamientos">Tratamientos Predef.</button>
+      </div>
+
+      <!-- Tab: Materiales -->
+      <div class="tab-panel active" id="tab-materiales">
+        <div class="filter-bar">
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar material..." oninput="filtrarTabla(this, 'tabla-materiales', 1)">
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <span class="text-muted text-sm" id="count-materiales">Mostrando 10 de 238</span>
+        </div>
+        <div class="table-container">
+          <table id="tabla-materiales">
+            <thead><tr><th style="width:60px">ID</th><th>Nombre</th><th style="width:120px">Unidad</th><th style="width:100px">Estado</th><th style="width:100px" class="text-center">Acciones</th></tr></thead>
+            <tbody>
+              <tr><td>001</td><td>Guantes descartables talla M</td><td>Caja (50u)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>002</td><td>Gasas est&eacute;riles 10x10</td><td>Paquete (25u)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>003</td><td>Anestesia Lidoca&iacute;na 2%</td><td>Cartucho (1.8ml)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>004</td><td>Algod&oacute;n en rollo</td><td>Rollo (500g)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>005</td><td>Cemento de ion&oacute;mero v&iacute;treo</td><td>Kit</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>006</td><td>Resina compuesta A1</td><td>Jeringa (4g)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>007</td><td>Hilo de sutura seda 3-0</td><td>Unidad</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>008</td><td>Bistur&iacute; hoja #15</td><td>Unidad</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>009</td><td>Compresa quir&uacute;rgica</td><td>Paquete (10u)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>010</td><td>Barbijo triple capa</td><td>Caja (50u)</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Docentes -->
+      <div class="tab-panel" id="tab-docentes">
+        <div class="filter-bar">
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar docente..." oninput="filtrarTabla(this, 'tabla-docentes', 1)">
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <span class="text-muted text-sm" id="count-docentes">Mostrando 14 docentes</span>
+        </div>
+        <div class="table-container">
+          <table id="tabla-docentes">
+            <thead><tr><th style="width:60px">ID</th><th>Nombre</th><th>Apellido</th><th style="width:130px">Tel&eacute;fono</th><th style="width:100px">Estado</th><th style="width:100px" class="text-center">Acciones</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Mar&iacute;a</td><td>Gonz&aacute;lez Rivas</td><td>999 111 222</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>2</td><td>Carlos</td><td>Mendoza Paredes</td><td>999 333 444</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>3</td><td>Ana</td><td>Huam&aacute;n Torres</td><td>&mdash;</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>4</td><td>Luis</td><td>Quispe Condori</td><td>999 555 666</td><td><span class="badge badge-danger">Inactivo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Especialistas (con Periodo + filtros) -->
+      <div class="tab-panel" id="tab-especialistas">
+        <div class="filter-bar">
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar especialista..." oninput="filtrarEspecialistas()" id="filtro-esp-texto">
+            </div>
+          </div>
+          <div class="filtro-selectores">
+            <select id="filtro-esp-ano" onchange="filtrarEspecialistas()">
+              <option value="">Todos los a&ntilde;os</option>
+              <option>2025</option>
+              <option selected>2026</option>
+            </select>
+            <select id="filtro-esp-estado" onchange="filtrarEspecialistas()">
+              <option value="">Todos</option>
+              <option>Activo</option>
+              <option>Inactivo</option>
+            </select>
+          </div>
+          <div class="spacer"></div>
+          <span class="text-muted text-sm" id="count-especialistas">Mostrando 4 especialistas</span>
+        </div>
+        <div class="table-container">
+          <table id="tabla-especialistas">
+            <thead><tr><th style="width:60px">ID</th><th>Nombre</th><th>Apellido</th><th style="width:90px">DNI</th><th style="width:60px">Grado</th><th style="width:60px">Tipo</th><th style="width:80px">Periodo</th><th style="width:80px">Estado</th><th style="width:80px" class="text-center">Acc.</th></tr></thead>
+            <tbody>
+              <tr data-ano="2026" data-estado="Activo"><td>1</td><td>Pedro</td><td>Ram&iacute;rez</td><td>72456123</td><td><span class="badge badge-info">PRE</span></td><td>4</td><td>2026</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr data-ano="2026" data-estado="Activo"><td>2</td><td>Sof&iacute;a</td><td>L&oacute;pez</td><td>73542189</td><td><span class="badge badge-info">POS</span></td><td>R1</td><td>2026</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr data-ano="2025" data-estado="Activo"><td>3</td><td>Diego</td><td>M&aacute;rquez</td><td>70123567</td><td><span class="badge badge-info">PRE</span></td><td>5</td><td>2025</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr data-ano="2026" data-estado="Inactivo"><td>4</td><td>Luc&iacute;a</td><td>Fern&aacute;ndez</td><td>74523190</td><td><span class="badge badge-info">POS</span></td><td>R3</td><td>2026</td><td><span class="badge badge-danger">Inactivo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Tratamientos Predefinidos -->
+      <div class="tab-panel" id="tab-tratamientos">
+        <div class="filter-bar">
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar tratamiento..." oninput="filtrarTabla(this, 'tabla-tratamientos', 1)">
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <span class="text-muted text-sm">Mostrando 12 tratamientos</span>
+        </div>
+        <div class="table-container">
+          <table id="tabla-tratamientos">
+            <thead><tr><th>ID</th><th>Nombre</th><th style="width:120px">Costo Sugerido</th><th style="width:70px">Materiales</th><th style="width:100px">Estado</th><th style="width:100px" class="text-center">Acciones</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Exodoncia simple</td><td>S/ 30.00</td><td>4</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>2</td><td>Obturaci&oacute;n amalgama</td><td>S/ 25.00</td><td>3</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>3</td><td>Profilaxis dental</td><td>S/ 15.00</td><td>2</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>4</td><td>Endodoncia unirradicular</td><td>S/ 80.00</td><td>6</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>5</td><td>Corona met&aacute;lica</td><td>S/ 120.00</td><td>5</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+              <tr><td>6</td><td>Limpieza y revisi&oacute;n</td><td>S/ 0.00</td><td>0</td><td><span class="badge badge-success">Activo</span></td><td class="text-center"><button class="btn btn-sm btn-ghost">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Material (sin cambios) -->
+  <div class="modal-overlay" id="modal-material">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuevo Material</h3><button class="modal-close" onclick="cerrarModal('modal-material')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Nombre del material *</label><input class="form-input" type="text" placeholder="Ej: Guantes descartables talla M"></div>
+        <div class="form-group"><label class="form-label">Unidad de medida *</label><input class="form-input" type="text" placeholder="Ej: Caja (50u), Unidad, Paquete"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal('modal-material')">Cancelar</button><button class="btn btn-primary">Guardar Material</button></div>
+    </div>
+  </div>
+
+  <!-- Modal: Docente (sin cambios) -->
+  <div class="modal-overlay" id="modal-docente">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuevo Docente</h3><button class="modal-close" onclick="cerrarModal('modal-docente')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text"></div><div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" type="text"></div></div>
+        <div class="form-group"><label class="form-label">Tel&eacute;fono</label><input class="form-input" type="text" placeholder="Opcional"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal('modal-docente')">Cancelar</button><button class="btn btn-primary">Guardar Docente</button></div>
+    </div>
+  </div>
+
+  <!-- Modal: Especialista (CON PERIODO) -->
+  <div class="modal-overlay" id="modal-especialista">
+    <div class="modal" style="width:460px;">
+      <div class="modal-header"><h3>Nuevo Especialista</h3><button class="modal-close" onclick="cerrarModal('modal-especialista')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-row"><div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text"></div><div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" type="text"></div></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">DNI *</label><input class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">Periodo (a&ntilde;o) *</label><input class="form-input" type="text" value="2026"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Grado *</label><select class="form-select"><option>PRE</option><option>POS</option></select></div>
+          <div class="form-group"><label class="form-label">Tipo *</label><select class="form-select"><option value="">Seleccionar grado</option></select></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal('modal-especialista')">Cancelar</button><button class="btn btn-primary">Guardar Especialista</button></div>
+    </div>
+  </div>
+
+  <!-- Modal: Tratamiento Predef (sin cambios) -->
+  <div class="modal-overlay" id="modal-tratamiento">
+    <div class="modal" style="width:540px;">
+      <div class="modal-header"><h3>Nuevo Tratamiento Predefinido</h3><button class="modal-close" onclick="cerrarModal('modal-tratamiento')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text" placeholder="Ej: Exodoncia simple"></div>
+        <div class="form-group"><label class="form-label">Costo sugerido (S/)</label><input class="form-input" type="text" placeholder="0.00"></div>
+        <div class="form-group">
+          <label class="form-label">Materiales sugeridos</label>
+          <div style="border:1px solid #e2e8f0; border-radius:6px; padding:12px;">
+            <div class="flex gap-8 mb-8">
+              <div class="autocomplete-wrapper" style="flex:1;">
+                <div class="search-box"><span class="search-icon">🔎</span><input type="text" placeholder="Buscar y agregar material..."></div>
+                <div class="autocomplete-dropdown"></div>
+              </div>
+              <button class="btn btn-sm btn-primary">Agregar</button>
+            </div>
+            <table style="font-size:0.8rem;">
+              <thead><tr><th>Material</th><th style="width:100px">Cantidad</th><th style="width:60px"></th></tr></thead>
+              <tbody>
+                <tr><td>Guantes descartables talla M</td><td><input class="form-input" type="number" value="1" style="width:80px"></td><td><button class="btn btn-sm btn-ghost" style="color:#ef4444;">✕</button></td></tr>
+                <tr><td>Gasas est&eacute;riles 10x10</td><td><input class="form-input" type="number" value="2" style="width:80px"></td><td><button class="btn btn-sm btn-ghost" style="color:#ef4444;">✕</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal('modal-tratamiento')">Cancelar</button><button class="btn btn-primary">Guardar Tratamiento</button></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var tabs = document.querySelectorAll('.tab');
+      tabs.forEach(function(t) {
+        t.addEventListener('click', function() {
+          tabs.forEach(function(tab) { tab.classList.remove('active'); });
+          document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+          this.classList.add('active');
+          document.getElementById(this.dataset.tab).classList.add('active');
+        });
+      });
+
+      function filtrarTabla(input, tablaId, colIdx) {
+        var val = input.value.toLowerCase();
+        var rows = document.querySelectorAll('#' + tablaId + ' tbody tr');
+        var visibles = 0;
+        rows.forEach(function(r) {
+          var text = (r.cells[colIdx] ? r.cells[colIdx].textContent.toLowerCase() : '');
+          var match = text.indexOf(val) !== -1;
+          r.style.display = match ? '' : 'none';
+          if (match) visibles++;
+        });
+        var count = document.getElementById('count-' + tablaId.replace('tabla-', ''));
+        if (count) count.textContent = 'Mostrando ' + visibles + ' de ' + rows.length;
+      }
+
+      window.filtrarTabla = filtrarTabla;
+
+      function filtrarEspecialistas() {
+        var texto = document.getElementById('filtro-esp-texto').value.toLowerCase();
+        var ano = document.getElementById('filtro-esp-ano').value;
+        var estado = document.getElementById('filtro-esp-estado').value;
+        var rows = document.querySelectorAll('#tabla-especialistas tbody tr');
+        var visibles = 0;
+        rows.forEach(function(r) {
+          var matchTexto = true;
+          if (texto) {
+            matchTexto = false;
+            for (var i = 0; i < r.cells.length; i++) {
+              if (r.cells[i].textContent.toLowerCase().indexOf(texto) !== -1) { matchTexto = true; break; }
+            }
+          }
+          var matchAno = !ano || r.dataset.ano === ano;
+          var matchEstado = !estado || r.dataset.estado === estado;
+          var show = matchTexto && matchAno && matchEstado;
+          r.style.display = show ? '' : 'none';
+          if (show) visibles++;
+        });
+        document.getElementById('count-especialistas').textContent = 'Mostrando ' + visibles + ' de ' + rows.length;
+      }
+
+      window.filtrarEspecialistas = filtrarEspecialistas;
+
+      function abrirModal(id) { document.getElementById(id).classList.add('show'); }
+      function cerrarModal(id) { document.getElementById(id).classList.remove('show'); }
+      window.abrirModal = abrirModal;
+      window.cerrarModal = cerrarModal;
+
+      document.querySelectorAll('.modal-overlay').forEach(function(m) {
+        m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+      });
+    })();
+  </script>
+</body>
+</html>

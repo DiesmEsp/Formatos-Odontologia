@@ -1,0 +1,523 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tratamientos — Mockup</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <style>
+    .modulos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .modulo-card {
+      background: #fff; border: 2px solid #e2e8f0; border-radius: 10px;
+      padding: 20px; position: relative; min-height: 200px;
+    }
+    .modulo-card.libre { border-color: #a7f3d0; background: #f0fdf4; }
+    .modulo-card.ocupado { border-color: #fde68a; background: #fffbeb; }
+    .modulo-card .modulo-nro {
+      position: absolute; top: 10px; right: 14px;
+      font-size: 0.7rem; font-weight: 700; color: #94a3b8;
+      background: #f1f5f9; padding: 2px 10px; border-radius: 10px;
+    }
+    .modulo-status { font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
+    .modulo-status .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .modulo-status .dot.green { background: #10b981; }
+    .modulo-status .dot.yellow { background: #f59e0b; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Formatos Odontol&oacute;gicos</h1>
+      <p>Cl&iacute;nica UNMSM</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="tratamiento.html" class="sidebar-link active"><span class="icon">🦷</span> Tratamientos</a>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
+      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
+      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
+      <a href="reportes.html" class="sidebar-link"><span class="icon">📄</span> Reportes</a>
+    </nav>
+    <div class="sidebar-footer">Mockups v0.1</div>
+  </aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h2>Tratamientos en Curso</h2>
+        <p class="subtitle">Seleccione un m&oacute;dulo libre para iniciar un nuevo tratamiento</p>
+      </div>
+      <div class="flex gap-8">
+        <span class="text-muted text-sm" id="status-modulos">—</span>
+        <a href="modulos.html" class="btn btn-secondary">⚙️ Gestionar M&oacute;dulos</a>
+      </div>
+    </div>
+
+    <div id="modulos-container"></div>
+  </div>
+
+  <!-- ======= MODAL: CREAR TRATAMIENTO ======= -->
+  <div class="modal-overlay" id="modal-crear">
+    <div class="modal" style="width:560px;">
+      <div class="modal-header">
+        <h3>Nuevo tratamiento</h3>
+        <button class="modal-close" onclick="cerrarModal('modal-crear')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">M&oacute;dulo *</label>
+            <input class="form-input" id="crear-modulo" readonly style="background:#f8fafc; font-weight:600;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input class="form-input" type="text" value="30/07/2026" readonly style="background:#f8fafc;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Paciente *</label>
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar paciente..." oninput="filtrarAutocomplete(this, pacientes, 'autocomplete-paciente')">
+            </div>
+            <div class="autocomplete-dropdown" id="autocomplete-paciente"></div>
+          </div>
+          <span class="creacion-onboarding" onclick="cerrarModal('modal-crear'); abrirModal('modal-crear-paciente');">+ Nuevo paciente</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Especialista *</label>
+          <div class="autocomplete-wrapper">
+            <div class="search-box"><span class="search-icon">🔎</span>
+              <input type="text" placeholder="Buscar especialista..." oninput="filtrarAutocomplete(this, especialistas, 'autocomplete-especialista')">
+            </div>
+            <div class="autocomplete-dropdown" id="autocomplete-especialista"></div>
+          </div>
+          <span class="creacion-onboarding" onclick="cerrarModal('modal-crear'); abrirModal('modal-crear-especialista');">+ Nuevo especialista</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tipo de tratamiento *</label>
+            <div class="autocomplete-wrapper">
+              <div class="search-box"><span class="search-icon">🔎</span>
+                <input type="text" placeholder="Buscar tipo..." oninput="filtrarAutocomplete(this, tratamientosPredef, 'autocomplete-tratamiento')">
+              </div>
+              <div class="autocomplete-dropdown" id="autocomplete-tratamiento"></div>
+            </div>
+            <span class="creacion-onboarding" onclick="cerrarModal('modal-crear'); abrirModal('modal-crear-tratpredef');">+ Nuevo tipo</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Monto total (S/)</label>
+            <input class="form-input" type="text" placeholder="0.00">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear')">Cancelar</button>
+        <button class="btn btn-success" onclick="guardarTratamiento()">Guardar e iniciar tratamiento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= SUBVENTANA: DETALLE DE TRATAMIENTO ======= -->
+  <div class="subventana-overlay" id="subventana-detalle">
+    <div class="subventana">
+      <div class="subventana-header">
+        <h3 id="detalle-titulo">Detalle del Tratamiento</h3>
+        <button class="btn-cerrar-modal" onclick="cerrarDetalle()">&times;</button>
+      </div>
+      <div class="subventana-body">
+        <div class="sv-fila">
+          <div><div class="sv-label">Paciente</div><div class="sv-valor" id="detalle-paciente">Juan P&eacute;rez</div></div>
+          <div><div class="sv-label">Especialista</div><div class="sv-valor" id="detalle-especialista">Pedro R. <span class="badge badge-info" style="font-size:0.65rem;">PRE-4</span> <span class="text-xs text-muted">Periodo 2026</span></div></div>
+        </div>
+        <div class="sv-fila">
+          <div><div class="sv-label">Tratamiento</div><div class="sv-valor" id="detalle-tipo">Exodoncia simple</div></div>
+          <div><div class="sv-label">M&oacute;dulo</div><div class="sv-valor" id="detalle-modulo">M&oacute;dulo 2</div></div>
+        </div>
+        <div class="sv-fila">
+          <div><div class="sv-label">Monto total</div><div class="sv-valor" id="detalle-monto">S/ 30.00</div></div>
+          <div><div class="sv-label">Estado</div><div class="sv-valor"><span class="badge badge-warning" id="detalle-estado">ABIERTO</span></div></div>
+        </div>
+        <hr style="border:none; border-top:1px solid #e2e8f0; margin:16px 0;">
+        <h4 style="font-size:0.85rem; font-weight:600; margin-bottom:12px;">Materiales del tratamiento</h4>
+        <div class="table-container" id="detalle-tabla-materiales">
+          <table>
+            <thead>
+              <tr><th>Material</th><th style="width:90px">Cantidad</th><th style="width:110px">Unidad</th><th style="width:90px">Tipo</th><th style="width:50px"></th></tr>
+            </thead>
+            <tbody id="detalle-materiales-body">
+              <tr>
+                <td>Guantes descartables talla M</td>
+                <td><input class="form-input" type="number" value="1" style="width:70px;" onchange="marcarModificado(this)"></td>
+                <td>Caja (50u)</td>
+                <td><span class="badge badge-info">Predef</span></td>
+                <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;" onclick="this.closest('tr').remove(); marcarModificado(this);">✕</button></td>
+              </tr>
+              <tr>
+                <td>Gasas est&eacute;riles 10x10</td>
+                <td><input class="form-input" type="number" value="2" style="width:70px;" onchange="marcarModificado(this)"></td>
+                <td>Paquete (25u)</td>
+                <td><span class="badge badge-info">Predef</span></td>
+                <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;" onclick="this.closest('tr').remove(); marcarModificado(this);">✕</button></td>
+              </tr>
+              <tr>
+                <td>Anestesia Lidoca&iacute;na 2%</td>
+                <td><input class="form-input" type="number" value="1" style="width:70px;" onchange="marcarModificado(this)"></td>
+                <td>Cartucho (1.8ml)</td>
+                <td><span class="badge badge-info">Predef</span></td>
+                <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;" onclick="this.closest('tr').remove(); marcarModificado(this);">✕</button></td>
+              </tr>
+              <tr>
+                <td>Bistur&iacute; hoja #15</td>
+                <td><input class="form-input" type="number" value="1" style="width:70px;" onchange="marcarModificado(this)"></td>
+                <td>Unidad</td>
+                <td><span class="badge badge-info">Predef</span></td>
+                <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;" onclick="this.closest('tr').remove(); marcarModificado(this);">✕</button></td>
+              </tr>
+              <tr>
+                <td>Hilo de sutura seda 3-0</td>
+                <td><input class="form-input" type="number" value="1" style="width:70px;" onchange="marcarModificado(this)"></td>
+                <td>Unidad</td>
+                <td><span class="badge badge-warning">Adicional</span></td>
+                <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;" onclick="this.closest('tr').remove(); marcarModificado(this);">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-16" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
+          <h5 style="font-size:0.8rem; font-weight:600; color:#475569; margin-bottom:8px;">Agregar material</h5>
+          <div class="mat-add-row">
+            <div class="autocomplete-wrapper" style="flex:1; min-width:200px;">
+              <div class="search-box"><span class="search-icon">🔎</span>
+                <input type="text" placeholder="Buscar material..." oninput="filtrarAutocomplete(this, materiales, 'autocomplete-material-detalle')">
+              </div>
+              <div class="autocomplete-dropdown" id="autocomplete-material-detalle"></div>
+            </div>
+            <input class="form-input" type="number" placeholder="Cant." style="width:80px;" value="1">
+            <button class="btn btn-sm btn-success">+ Agregar</button>
+            <span class="creacion-onboarding" onclick="abrirModal('modal-crear-material')">+ Nuevo material</span>
+          </div>
+        </div>
+      </div>
+      <div class="subventana-footer">
+        <div><span class="text-muted text-sm" id="detalle-modificado" style="display:none; color:#f59e0b;">✏️ Se hicieron cambios</span></div>
+        <div class="flex gap-8">
+          <button class="btn btn-ghost" onclick="abrirModal('modal-confirmar-anulacion-tr')">Anular</button>
+          <button class="btn btn-success" onclick="cerrarTratamiento()">✔ Cerrar tratamiento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: CONFIRMAR ANULACIÓN ======= -->
+  <div class="modal-overlay" id="modal-confirmar-anulacion-tr">
+    <div class="modal" style="width:420px;">
+      <div class="modal-header">
+        <h3>Anular tratamiento</h3>
+        <button class="modal-close" onclick="cerrarModal('modal-confirmar-anulacion-tr')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-banner alert-danger" style="margin-bottom:16px;">
+          <span>⚠️</span>
+          <span>Esta acci&oacute;n no se puede deshacer. El tratamiento quedar&aacute; excluido de reportes.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tu nombre *</label>
+          <input class="form-input" type="text" placeholder="Nombre del asistente">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Motivo de la anulaci&oacute;n</label>
+          <textarea class="form-textarea" placeholder="Describe el motivo (opcional)"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-confirmar-anulacion-tr')">Cancelar</button>
+        <button class="btn btn-danger" onclick="anularTratamiento()">S&iacute;, anular</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: CREAR PACIENTE (on-the-fly) ======= -->
+  <div class="modal-overlay" id="modal-crear-paciente">
+    <div class="modal" style="width:420px;">
+      <div class="modal-header"><h3>Nuevo paciente</h3><button class="modal-close" onclick="cerrarModal('modal-crear-paciente')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text" placeholder="Nombre"></div>
+          <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" type="text" placeholder="Apellido"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Nro. Historia (opcional)</label><input class="form-input" type="text" placeholder="Opcional"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear-paciente')">Cancelar</button>
+        <button class="btn btn-primary" onclick="cerrarModal('modal-crear-paciente'); abrirModal('modal-crear')">Guardar y volver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: CREAR ESPECIALISTA (on-the-fly, con periodo) ======= -->
+  <div class="modal-overlay" id="modal-crear-especialista">
+    <div class="modal" style="width:460px;">
+      <div class="modal-header"><h3>Nuevo especialista</h3><button class="modal-close" onclick="cerrarModal('modal-crear-especialista')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text"></div>
+          <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" type="text"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">DNI *</label><input class="form-input" type="text"></div>
+          <div class="form-group">
+            <label class="form-label">Periodo (a&ntilde;o) *</label>
+            <input class="form-input" type="text" value="2026">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Grado *</label>
+            <select class="form-select"><option>PRE</option><option>POS</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Tipo *</label>
+            <select class="form-select"><option value="">Seleccionar grado primero</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear-especialista')">Cancelar</button>
+        <button class="btn btn-primary" onclick="cerrarModal('modal-crear-especialista'); abrirModal('modal-crear')">Guardar y volver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: CREAR MATERIAL (on-the-fly) ======= -->
+  <div class="modal-overlay" id="modal-crear-material">
+    <div class="modal" style="width:420px;">
+      <div class="modal-header"><h3>Nuevo material</h3><button class="modal-close" onclick="cerrarModal('modal-crear-material')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text" placeholder="Ej: Hilo de sutura seda 3-0"></div>
+        <div class="form-group"><label class="form-label">Unidad de medida *</label><input class="form-input" type="text" placeholder="Ej: Unidad, Caja, Paquete"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear-material')">Cancelar</button>
+        <button class="btn btn-primary" onclick="cerrarModal('modal-crear-material')">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: CREAR TRATAMIENTO PREDEF (on-the-fly) ======= -->
+  <div class="modal-overlay" id="modal-crear-tratpredef">
+    <div class="modal" style="width:500px;">
+      <div class="modal-header"><h3>Nuevo tipo de tratamiento</h3><button class="modal-close" onclick="cerrarModal('modal-crear-tratpredef')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" type="text" placeholder="Ej: Coronilla met&aacute;lica"></div>
+        <div class="form-group"><label class="form-label">Costo sugerido (S/)</label><input class="form-input" type="text" placeholder="0.00"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear-tratpredef')">Cancelar</button>
+        <button class="btn btn-primary" onclick="cerrarModal('modal-crear-tratpredef'); abrirModal('modal-crear')">Guardar y volver</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var moduloCreando = null;
+    var tratamientos = [];
+
+    var pacientes = [
+      { id: 1, nombre: 'Juan P\u00e9rez' },
+      { id: 2, nombre: 'Ana Torres' },
+      { id: 3, nombre: 'Luis Garc\u00eda' },
+      { id: 4, nombre: 'Carla Ruiz' },
+      { id: 5, nombre: 'Mar\u00eda L\u00f3pez' }
+    ];
+    var especialistas = [
+      { id: 1, nombre: 'Pedro Ram\u00edrez', detalle: 'PRE-4', periodo: 2026 },
+      { id: 2, nombre: 'Sof\u00eda L\u00f3pez', detalle: 'POS-R1', periodo: 2026 },
+      { id: 3, nombre: 'Diego M\u00e1rquez', detalle: 'PRE-5', periodo: 2025 },
+      { id: 4, nombre: 'Luc\u00eda Fern\u00e1ndez', detalle: 'POS-R3', periodo: 2026 }
+    ];
+    var tratamientosPredef = [
+      { id: 1, nombre: 'Exodoncia simple', costo: 30.00 },
+      { id: 2, nombre: 'Obturaci\u00f3n amalgama', costo: 25.00 },
+      { id: 3, nombre: 'Profilaxis dental', costo: 15.00 },
+      { id: 4, nombre: 'Endodoncia unirradicular', costo: 80.00 },
+      { id: 5, nombre: 'Corona met\u00e1lica', costo: 120.00 }
+    ];
+    var materiales = [
+      { id: 1, nombre: 'Guantes descartables talla M', unidad: 'Caja (50u)' },
+      { id: 2, nombre: 'Gasas est\u00e9riles 10x10', unidad: 'Paquete (25u)' },
+      { id: 3, nombre: 'Anestesia Lidoca\u00edna 2%', unidad: 'Cartucho (1.8ml)' },
+      { id: 4, nombre: 'Algod\u00f3n en rollo', unidad: 'Rollo (500g)' },
+      { id: 5, nombre: 'Cemento de ion\u00f3mero v\u00edtreo', unidad: 'Kit' },
+      { id: 6, nombre: 'Resina compuesta A1', unidad: 'Jeringa (4g)' },
+      { id: 7, nombre: 'Hilo de sutura seda 3-0', unidad: 'Unidad' },
+      { id: 8, nombre: 'Bistur\u00ed hoja #15', unidad: 'Unidad' },
+      { id: 9, nombre: 'Compresa quir\u00fargica', unidad: 'Paquete (10u)' },
+      { id: 10, nombre: 'Barbijo triple capa', unidad: 'Caja (50u)' }
+    ];
+
+    function cargarModulos() {
+      var stored = localStorage.getItem('modulos');
+      if (!stored) {
+        var defaults = [];
+        for (var i = 1; i <= 6; i++) {
+          defaults.push({ id: i, nombre: 'M\u00f3dulo ' + i, ocupado: (i % 2 === 0), tratamientoNro: (i % 2 === 0) ? Math.floor(i / 2) : null });
+        }
+        localStorage.setItem('modulos', JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(stored);
+    }
+
+    function renderizarModulos() {
+      var modulos = cargarModulos();
+      var container = document.getElementById('modulos-container');
+      container.innerHTML = '';
+
+      if (modulos.length === 0) {
+        container.innerHTML = '<div class="empty-modulos"><div class="empty-icon">🧩</div><h3>No hay m\u00f3dulos creados</h3><p>Para comenzar, cree al menos un m\u00f3dulo de atenci\u00f3n.</p><a href="modulos.html" class="btn btn-primary">Ir a Gesti\u00f3n de M\u00f3dulos</a></div>';
+        document.getElementById('status-modulos').textContent = '0 m\u00f3dulos';
+        return;
+      }
+
+      var ocupados = modulos.filter(function(m) { return m.ocupado; }).length;
+      var libres = modulos.filter(function(m) { return !m.ocupado; }).length;
+      document.getElementById('status-modulos').textContent = ocupados + ' en curso \u00b7 ' + libres + ' libres \u00b7 ' + modulos.length + ' m\u00f3dulos';
+
+      var grid = document.createElement('div');
+      grid.className = 'modulos-grid';
+      modulos.forEach(function(m) {
+        var card = document.createElement('div');
+        card.className = 'modulo-card ' + (m.ocupado ? 'ocupado' : 'libre');
+        card.innerHTML = '<span class="modulo-nro">' + m.nombre + '</span>';
+        if (m.ocupado) {
+          var trat = tratamientos[m.tratamientoNro] || { id: m.tratamientoNro, tipo: 'Tratamiento', especialista: 'Asignado', paciente: 'Asignado', monto: 0 };
+          card.innerHTML +=
+            '<div class="modulo-status"><span class="dot yellow"></span>OCUPADO</div>' +
+            '<div class="ticket-mini">' +
+            '<h4>#' + trat.id + ' \u2014 ' + trat.tipo + '</h4>' +
+            '<div class="ticket-meta">' +
+            '<div>Esp: ' + trat.especialista + '</div>' +
+            '<div>Pac: ' + trat.paciente + '</div></div>' +
+            '<div class="ticket-monto">S/ ' + trat.monto.toFixed(2) + '</div>' +
+            '<div class="mt-8"><button class="btn btn-sm btn-warning" onclick="abrirDetalle(' + m.tratamientoNro + ')">Ver datos</button></div></div>';
+        } else {
+          card.innerHTML +=
+            '<div class="modulo-status"><span class="dot green"></span>LIBRE</div>' +
+            '<div style="display:flex; align-items:center; justify-content:center; min-height:100px;">' +
+            '<button class="btn btn-primary" onclick="abrirCreacion(' + m.id + ')">+ Nuevo</button></div>';
+        }
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    function abrirCreacion(moduloId) {
+      moduloCreando = moduloId;
+      document.getElementById('crear-modulo').value = 'M\u00f3dulo ' + moduloId;
+      abrirModal('modal-crear');
+    }
+
+    function abrirDetalle(id) {
+      document.getElementById('detalle-modificado').style.display = 'none';
+      abrirModal('subventana-detalle');
+    }
+
+    function cerrarDetalle() {
+      cerrarModal('subventana-detalle');
+    }
+
+    function guardarTratamiento() {
+      cerrarModal('modal-crear');
+      var modulos = cargarModulos();
+      var nro = tratamientos.length + 1;
+      tratamientos.push({ id: nro, tipo: 'Nuevo tratamiento', especialista: 'Asignado', paciente: 'Asignado', monto: 0 });
+      for (var i = 0; i < modulos.length; i++) {
+        if (modulos[i].id === moduloCreando) {
+          modulos[i].ocupado = true;
+          modulos[i].tratamientoNro = nro;
+          break;
+        }
+      }
+      localStorage.setItem('modulos', JSON.stringify(modulos));
+      renderizarModulos();
+    }
+
+    function cerrarTratamiento() {
+      if (confirm('\u00bfCerrar este tratamiento? El m\u00f3dulo quedar\u00e1 libre.')) {
+        cerrarDetalle();
+        var modulos = cargarModulos();
+        for (var i = 0; i < modulos.length; i++) {
+          if (modulos[i].ocupado) {
+            modulos[i].ocupado = false;
+            modulos[i].tratamientoNro = null;
+            break;
+          }
+        }
+        localStorage.setItem('modulos', JSON.stringify(modulos));
+        renderizarModulos();
+      }
+    }
+
+    function anularTratamiento() {
+      cerrarModal('modal-confirmar-anulacion-tr');
+      cerrarDetalle();
+      var modulos = cargarModulos();
+      for (var i = 0; i < modulos.length; i++) {
+        if (modulos[i].ocupado) {
+          modulos[i].ocupado = false;
+          modulos[i].tratamientoNro = null;
+          break;
+        }
+      }
+      localStorage.setItem('modulos', JSON.stringify(modulos));
+      renderizarModulos();
+    }
+
+    function marcarModificado(el) {
+      document.getElementById('detalle-modificado').style.display = 'inline';
+    }
+
+    function filtrarAutocomplete(input, data, dropdownId) {
+      var val = input.value.toLowerCase();
+      var dd = document.getElementById(dropdownId);
+      if (val.length === 0) { dd.classList.remove('show'); return; }
+      var filtrados = data.filter(function(item) { return item.nombre.toLowerCase().indexOf(val) !== -1; });
+      dd.innerHTML = '';
+      if (filtrados.length === 0) {
+        dd.innerHTML = '<div class="autocomplete-empty">Sin resultados<span class="creacion-link" onclick="input.closest(\'.modal\') ? input.closest(\'.modal\').querySelector(\'.creacion-onboarding\').click() : null">+ Crear nuevo</span></div>';
+      } else {
+        filtrados.forEach(function(item) {
+          var div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.innerHTML = '<span class="item-id">' + ('00' + item.id).slice(-3) + '</span> ' + item.nombre + (item.detalle ? '<span class="item-badge badge badge-info" style="font-size:0.7rem;">' + item.detalle + '</span>' : '') + (item.unidad ? '<span class="text-muted text-xs" style="margin-left:auto;">' + item.unidad + '</span>' : '');
+          div.onclick = function() { input.value = item.nombre; dd.classList.remove('show'); if (input.dataset.onSelect) window[input.dataset.onSelect](item); };
+          dd.appendChild(div);
+        });
+      }
+      dd.classList.add('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.autocomplete-wrapper')) {
+        document.querySelectorAll('.autocomplete-dropdown').forEach(function(d) { d.classList.remove('show'); });
+      }
+    });
+
+    function abrirModal(id) {
+      document.getElementById(id).classList.add('show');
+      if (id === 'subventana-detalle') document.body.style.overflow = 'hidden';
+    }
+    function cerrarModal(id) {
+      document.getElementById(id).classList.remove('show');
+      if (id === 'subventana-detalle') document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+      m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+    });
+    document.querySelectorAll('.subventana-overlay').forEach(function(m) {
+      m.addEventListener('click', function(e) { if (e.target === this) { /* no cerrar */ } });
+    });
+
+    renderizarModulos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes — Mockup</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Formatos Odontol&oacute;gicos</h1>
+      <p>Cl&iacute;nica UNMSM</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
+      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
+      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
+      <a href="reportes.html" class="sidebar-link active"><span class="icon">📄</span> Reportes</a>
+    </nav>
+    <div class="sidebar-footer">Mockups v0.1</div>
+  </aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h2>Reportes</h2>
+        <p class="subtitle">Exportaci&oacute;n de reportes mensuales y anuales a Excel</p>
+      </div>
+    </div>
+
+    <!-- Selector de periodo -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Periodo del reporte</h3>
+      </div>
+      <div class="form-inline">
+        <div class="form-group">
+          <label class="form-label">Mes</label>
+          <select class="form-select" style="width:160px;">
+            <option>Enero</option>
+            <option>Febrero</option>
+            <option>Marzo</option>
+            <option>Abril</option>
+            <option>Mayo</option>
+            <option>Junio</option>
+            <option selected>Julio</option>
+            <option>Agosto</option>
+            <option>Septiembre</option>
+            <option>Octubre</option>
+            <option>Noviembre</option>
+            <option>Diciembre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">A&ntilde;o</label>
+          <select class="form-select" style="width:120px;">
+            <option>2024</option>
+            <option selected>2025</option>
+            <option>2026</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reportes mensuales -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Reportes mensuales — Julio 2025</h3>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
+          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Materiales Generales</h4>
+          <p class="text-muted text-sm mb-16">Consolidado de todos los materiales consumidos en el mes</p>
+          <button class="btn btn-primary">📥 Generar Excel</button>
+        </div>
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
+          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Ingresos Financieros</h4>
+          <p class="text-muted text-sm mb-16">Montos facturados agrupados por grado y tipo de especialista</p>
+          <button class="btn btn-primary">📥 Generar Excel</button>
+        </div>
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
+          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consumo Docente</h4>
+          <p class="text-muted text-sm mb-16">Materiales entregados por docente (consolidado + detalle diario)</p>
+          <div class="flex gap-8">
+            <button class="btn btn-primary">📥 Generar Excel</button>
+          </div>
+        </div>
+        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
+          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consumo Especialista</h4>
+          <p class="text-muted text-sm mb-16">Materiales consumidos por especialista en tratamientos cerrados</p>
+          <button class="btn btn-primary">📥 Generar Excel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reporte anual -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Reporte anual</h3>
+      </div>
+      <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px; max-width:500px;">
+        <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consolidado Anual</h4>
+        <p class="text-muted text-sm mb-16">Los 4 reportes anteriores desglosados mes por mes para el a&ntilde;o seleccionado</p>
+        <div class="flex gap-8">
+          <button class="btn btn-success btn-lg">📥 Generar Reporte Anual 2025</button>
+        </div>
+        <p class="text-xs text-muted mt-8">⚠️ Puede tomar unos segundos. Se mostrar&aacute; un indicador de progreso.</p>
+      </div>
+    </div>
+
+    <!-- Reportes generados recientemente -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Reportes generados recientemente</h3>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Archivo</th><th style="width:120px">Periodo</th><th style="width:140px">Generado</th><th style="width:80px"></th></tr></thead>
+          <tbody>
+            <tr><td>Materiales_Julio_2025.xlsx</td><td>Julio 2025</td><td>30/07/2025 10:23</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
+            <tr><td>Anual_2025.xlsx</td><td>Anual 2025</td><td>30/07/2025 10:15</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
+            <tr><td>Ingresos_Junio_2025.xlsx</td><td>Junio 2025</td><td>25/06/2025 08:45</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

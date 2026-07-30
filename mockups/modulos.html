@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gesti&oacute;n de M&oacute;dulos — Mockup</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Formatos Odontol&oacute;gicos</h1>
+      <p>Cl&iacute;nica UNMSM</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
+      <a href="modulos.html" class="sidebar-link active"><span class="icon">🧩</span> M&oacute;dulos</a>
+      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
+      <a href="reportes.html" class="sidebar-link"><span class="icon">📄</span> Reportes</a>
+    </nav>
+    <div class="sidebar-footer">Mockups v0.1</div>
+  </aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h2>Gesti&oacute;n de M&oacute;dulos</h2>
+        <p class="subtitle">Administre los m&oacute;dulos de atenci&oacute;n de la cl&iacute;nica</p>
+      </div>
+      <button class="btn btn-primary" onclick="abrirModal('modal-crear-modulo')">+ Nuevo M&oacute;dulo</button>
+    </div>
+
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:80px">#</th>
+              <th>Nombre</th>
+              <th style="width:120px">Estado</th>
+              <th style="width:120px" class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="modulos-tbody">
+          </tbody>
+        </table>
+      </div>
+      <div class="flex flex-between mt-16">
+        <span class="text-muted text-sm" id="modulos-count">0 m&oacute;dulos</span>
+        <a href="tratamiento.html" class="text-sm" style="color:#3b82f6;">&larr; Volver a Tratamientos</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Crear Módulo -->
+  <div class="modal-overlay" id="modal-crear-modulo">
+    <div class="modal" style="width:400px;">
+      <div class="modal-header">
+        <h3>Nuevo M&oacute;dulo</h3>
+        <button class="modal-close" onclick="cerrarModal('modal-crear-modulo')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-banner alert-info">
+          <span>ℹ️</span>
+          <span>Se crear&aacute; autom&aacute;ticamente como "M&oacute;dulo N" donde N es el siguiente n&uacute;mero disponible.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-crear-modulo')">Cancelar</button>
+        <button class="btn btn-primary" onclick="crearModulo()">Crear M&oacute;dulo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var modulos = [];
+
+    function cargarModulos() {
+      var stored = localStorage.getItem('modulos');
+      modulos = stored ? JSON.parse(stored) : [
+        { id: 1, nombre: 'M\u00f3dulo 1', ocupado: false, tratamientoNro: null },
+        { id: 2, nombre: 'M\u00f3dulo 2', ocupado: true, tratamientoNro: 1 },
+        { id: 3, nombre: 'M\u00f3dulo 3', ocupado: false, tratamientoNro: null },
+        { id: 4, nombre: 'M\u00f3dulo 4', ocupado: true, tratamientoNro: 2 },
+        { id: 5, nombre: 'M\u00f3dulo 5', ocupado: false, tratamientoNro: null },
+        { id: 6, nombre: 'M\u00f3dulo 6', ocupado: true, tratamientoNro: 3 }
+      ];
+      if (!stored) { guardarModulos(); }
+      renderizar();
+    }
+
+    function guardarModulos() {
+      localStorage.setItem('modulos', JSON.stringify(modulos));
+    }
+
+    function renderizar() {
+      var tbody = document.getElementById('modulos-tbody');
+      tbody.innerHTML = '';
+      modulos.forEach(function(m) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + m.id + '</td>' +
+          '<td>' + m.nombre + '</td>' +
+          '<td>' + (m.ocupado
+            ? '<span class="badge badge-warning">Ocupado #' + m.tratamientoNro + '</span>'
+            : '<span class="badge badge-success">Libre</span>') +
+          '</td>' +
+          '<td class="text-center">' +
+          (m.ocupado
+            ? '<span class="btn btn-sm btn-secondary modulo-tooltip" data-tooltip="No se puede eliminar: m\u00f3dulo ocupado" style="opacity:0.5; cursor:not-allowed;">Eliminar</span>'
+            : '<button class="btn btn-sm btn-danger" onclick="eliminarModulo(' + m.id + ')">Eliminar</button>') +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+      document.getElementById('modulos-count').textContent = modulos.length + ' m\u00f3dulo' + (modulos.length !== 1 ? 's' : '');
+    }
+
+    function crearModulo() {
+      var maxId = modulos.reduce(function(max, m) { return Math.max(max, m.id); }, 0);
+      var nextId = maxId + 1;
+      modulos.push({ id: nextId, nombre: 'M\u00f3dulo ' + nextId, ocupado: false, tratamientoNro: null });
+      guardarModulos();
+      renderizar();
+      cerrarModal('modal-crear-modulo');
+    }
+
+    function eliminarModulo(id) {
+      var idx = modulos.findIndex(function(m) { return m.id === id; });
+      if (idx === -1) return;
+      if (modulos[idx].ocupado) return;
+      modulos.splice(idx, 1);
+      guardarModulos();
+      renderizar();
+    }
+
+    function abrirModal(id) { document.getElementById(id).classList.add('show'); }
+    function cerrarModal(id) { document.getElementById(id).classList.remove('show'); }
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+      m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+    });
+
+    cargarModulos();
+  </script>
+</body>
+</html>
