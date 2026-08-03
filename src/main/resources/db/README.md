@@ -1,18 +1,12 @@
-Aqui ira la definicion de la base de datos local.
+Definicion de la base de datos local.
 
-Diseno previsto a alto nivel:
+Migraciones Flyway (classpath:db/migration):
 
-- `operador`: catalogo de operadores o doctores
-- `paciente`: catalogo de pacientes
-- `material`: catalogo de materiales e insumos
-- `tratamiento`: registro principal de la atencion
-- `tratamiento_material`: detalle de materiales usados por tratamiento
+- `V1__schema_inicial.sql`: crea las 13 tablas (Operadores, Materiales, Docentes,
+  Pacientes, Unidad, Tratamiento_PRED, Materiales_List_PRED, Tratamiento,
+  Materiales_List, Asistencia, Materiales_Asistencia, Unidad_Conversion,
+  RegistroAnulacion) con FKs, CHECK y UNIQUE.
 
-Relaciones previstas:
+Diagrama ER: Docs/FormatosDB.mmd
 
-- un `paciente` puede tener muchos `tratamientos`
-- un `operador` puede tener muchos `tratamientos`
-- un `tratamiento` puede usar muchos `materiales`
-- un `material` puede aparecer en muchos `tratamientos`
-
-Cuando se implemente de verdad, aqui ira el `schema.sql` o las migraciones necesarias.
+La migracion se aplica automaticamente al arrancar (ConnectionManager).
