@@ -1,26 +1,28 @@
 package com.odontologia.formatos.model;
 
-public class Paciente {
+public class Docente {
 
-    private int pacienteID;
+    private int docenteID;
     private String nombres;
     private String apellidos;
+    private int estado;
 
-    public Paciente() {
+    public Docente() {
     }
 
-    public Paciente(int pacienteID, String nombres, String apellidos) {
-        this.pacienteID = pacienteID;
+    public Docente(int docenteID, String nombres, String apellidos, int estado) {
+        this.docenteID = docenteID;
         this.nombres = nombres;
         this.apellidos = apellidos;
+        this.estado = estado;
     }
 
-    public int getPacienteID() {
-        return pacienteID;
+    public int getDocenteID() {
+        return docenteID;
     }
 
-    public void setPacienteID(int pacienteID) {
-        this.pacienteID = pacienteID;
+    public void setDocenteID(int docenteID) {
+        this.docenteID = docenteID;
     }
 
     public String getNombres() {
@@ -37,6 +39,14 @@ public class Paciente {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public int getEstado() {
+        return estado;
+    }
+
+    public void setEstado(int estado) {
+        this.estado = estado;
     }
 
     @Override
