@@ -94,8 +94,25 @@
           </div>
           <div class="form-group">
             <label class="form-label">Monto total (S/)</label>
-            <input class="form-input" type="text" placeholder="0.00">
+            <input class="form-input" type="text" placeholder="0.00" id="crear-monto">
           </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="crear-tipo" onchange="ajustarMontoContinuo()">
+              <option value="NORMAL" selected>Normal</option>
+              <option value="CONTINUO">Continuo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estado de pago</label>
+            <input class="form-input" type="text" value="PENDIENTE" readonly>
+          </div>
+        </div>
+        <div class="alert-banner alert-info" id="crear-continuo-aviso" style="display:none; margin-bottom:0;">
+          <svg aria-hidden="true"><use href="icons.svg#info"></use></svg>
+          <span>Tratamiento continuo: el costo queda absorbido por un tratamiento inicial. Monto en S/ 0.00 (no editable) y estado de pago PAGADO.</span>
         </div>
       </div>
       <div class="modal-footer">
@@ -124,6 +141,14 @@
         <div class="sv-fila">
           <div><div class="sv-label">Monto total</div><div class="sv-valor" id="detalle-monto">S/ 30.00</div></div>
           <div><div class="sv-label">Estado</div><div class="sv-valor"><span class="badge badge-warning" id="detalle-estado"><span class="led"></span>ABIERTO</span></div></div>
+        </div>
+        <div class="sv-fila">
+          <div><div class="sv-label">Tipo</div><div class="sv-valor"><span class="badge badge-info" id="detalle-tipo">Normal</span></div></div>
+          <div><div class="sv-label">Pago</div><div class="sv-valor"><span class="badge badge-danger" id="detalle-pago">PENDIENTE</span> <span class="text-xs text-muted" id="detalle-pago-monto"></span></div></div>
+        </div>
+        <div class="alert-banner alert-warning" id="detalle-aviso-pago" style="display:none;">
+          <svg aria-hidden="true"><use href="icons.svg#warning"></use></svg>
+          <span>Atenci&oacute;n: este tratamiento no ha sido pagado. Verifique el cobro antes de continuar.</span>
         </div>
         <hr style="border:none; border-top:1px solid var(--line); margin:16px 0;">
         <h4 style="font-size:0.85rem; font-weight:600; margin-bottom:12px;">Materiales del tratamiento</h4>
@@ -190,8 +215,33 @@
         <div><span class="text-muted text-sm flex flex-center" id="detalle-modificado" style="display:none; color:var(--warn-ink);"><svg aria-hidden="true" style="width:13px; height:13px; margin-right:6px;"><use href="icons.svg#pencil"></use></svg>Se hicieron cambios</span></div>
         <div class="flex gap-8">
           <button class="btn btn-ghost" onclick="abrirModal('modal-confirmar-anulacion-tr')">Anular</button>
+          <button class="btn btn-secondary" onclick="abrirModal('modal-registrar-pago')"><svg aria-hidden="true"><use href="icons.svg#check"></use></svg>Registrar pago</button>
           <button class="btn btn-success" onclick="cerrarTratamiento()"><svg aria-hidden="true"><use href="icons.svg#check"></use></svg>Cerrar tratamiento</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= MODAL: REGISTRAR PAGO ======= -->
+  <div class="modal-overlay" id="modal-registrar-pago">
+    <div class="modal" style="width:420px;">
+      <div class="modal-header">
+        <h3>Registrar pago</h3>
+        <button class="modal-close" onclick="cerrarModal('modal-registrar-pago')" aria-label="Cerrar"><svg aria-hidden="true"><use href="icons.svg#close"></use></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="sv-fila" style="margin-bottom:16px;">
+          <div><div class="sv-label">Monto total</div><div class="sv-valor">S/ 30.00</div></div>
+          <div><div class="sv-label">Pagado hasta ahora</div><div class="sv-valor">S/ 0.00</div></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monto del abono (S/) *</label>
+          <input class="form-input" type="text" placeholder="0.00">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal('modal-registrar-pago')">Cancelar</button>
+        <button class="btn btn-success" onclick="cerrarModal('modal-registrar-pago')">Registrar abono</button>
       </div>
     </div>
   </div>
@@ -462,6 +512,21 @@
 
     function marcarModificado(el) {
       document.getElementById('detalle-modificado').style.display = 'inline-flex';
+    }
+
+    function ajustarMontoContinuo() {
+      var tipo = document.getElementById('crear-tipo').value;
+      var monto = document.getElementById('crear-monto');
+      var aviso = document.getElementById('crear-continuo-aviso');
+      if (tipo === 'CONTINUO') {
+        monto.value = '0.00';
+        monto.disabled = true;
+        aviso.style.display = 'flex';
+      } else {
+        monto.disabled = false;
+        monto.value = '';
+        aviso.style.display = 'none';
+      }
     }
 
     function filtrarAutocomplete(input, data, dropdownId) {
