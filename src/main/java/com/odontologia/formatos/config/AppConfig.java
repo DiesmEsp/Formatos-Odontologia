@@ -28,6 +28,10 @@ public final class AppConfig {
         return resolver(override != null ? override : PROPS.getProperty("db.path", "clinica.db"));
     }
 
+    public static String carpetaDatos() {
+        return appDataDir();
+    }
+
     public static String carpetaInicialReportes() {
         String override = System.getProperty("reportes.carpetaInicial");
         return resolver(override != null ? override : PROPS.getProperty("reportes.carpetaInicial", "Reportes"));

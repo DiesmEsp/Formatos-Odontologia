@@ -57,20 +57,22 @@ class MaterialRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void findAllYBuscarPorTexto() throws SQLException {
-        insertar("Guante", "guante");
-        insertar("Gasa", "paquete");
+        int base = repository.findAll().size();
+
+        insertar("Guante nitrilo", "caja");
+        insertar("Gasa estéril 5x5", "paquete");
         insertar("Alginato", "cucharada");
 
         List<Materiales> todos = repository.findAll();
-        assertEquals(3, todos.size());
+        assertEquals(base + 3, todos.size());
 
-        List<Materiales> gaseosa = repository.buscarPorTexto("gas");
-        assertEquals(1, gaseosa.size());
+        List<Materiales> gasa = repository.buscarPorTexto("Gasa estéril 5x5");
+        assertEquals(1, gasa.size());
     }
 
     @Test
     void deleteEliminaRegistro() throws SQLException {
-        int id = insertar("Algodón", "paquete");
+        int id = insertar("Alginato", "cucharada");
 
         repository.delete(id);
 
