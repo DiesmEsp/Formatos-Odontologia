@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.odontologia'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+javafx {
+    version = '21.0.12'
+    modules = ['javafx.controls']
+}
+
+application {
+    mainClass = 'com.odontologia.formatos.MainApp'
+}
+
+dependencies {
+    implementation 'org.xerial:sqlite-jdbc:3.53.2.1'
+    implementation 'org.flywaydb:flyway-core:13.1.0'
+    implementation 'org.flywaydb:flyway-database-nc-sqlite:13.1.0'
+    implementation 'org.apache.poi:poi-ooxml:5.5.1'
+    implementation 'org.controlsfx:controlsfx:11.2.4'
+
+    testImplementation platform('org.junit:junit-bom:5.14.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.testfx:testfx-core:4.0.18'
+    testImplementation 'org.testfx:testfx-junit5:4.0.18'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+    }
+}
