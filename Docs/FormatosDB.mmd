@@ -1,113 +1,113 @@
-erDiagram
-    OPERADORES ||--o{ TRATAMIENTO : "realiza"
-    PACIENTES ||--o{ TRATAMIENTO : "recibe"
-    UNIDAD ||--o{ TRATAMIENTO : "se atiende en"
-    TRATAMIENTO ||--o{ MATERIALES_LIST : "consume"
-    MATERIALES ||--o{ MATERIALES_LIST : ""
-    TRATAMIENTO_PRED ||--o{ MATERIALES_LIST_PRED : "define"
-    MATERIALES ||--o{ MATERIALES_LIST_PRED : ""
-    DOCENTES ||--o{ ASISTENCIA : "asiste"
-    ASISTENCIA ||--o{ MATERIALES_ASISTENCIA : "recibe"
-    MATERIALES ||--o{ MATERIALES_ASISTENCIA : ""
-    MATERIALES ||--o| UNIDAD_CONVERSION : "se convierte"
+    erDiagram
+        OPERADORES ||--o{ TRATAMIENTO : "realiza"
+        PACIENTES ||--o{ TRATAMIENTO : "recibe"
+        UNIDAD ||--o{ TRATAMIENTO : "se atiende en"
+        TRATAMIENTO ||--o{ MATERIALES_LIST : "consume"
+        MATERIALES ||--o{ MATERIALES_LIST : ""
+        TRATAMIENTO_PRED ||--o{ MATERIALES_LIST_PRED : "define"
+        MATERIALES ||--o{ MATERIALES_LIST_PRED : ""
+        DOCENTES ||--o{ ASISTENCIA : "asiste"
+        ASISTENCIA ||--o{ MATERIALES_ASISTENCIA : "recibe"
+        MATERIALES ||--o{ MATERIALES_ASISTENCIA : ""
+        MATERIALES ||--o| UNIDAD_CONVERSION : "se convierte"
 
-    OPERADORES {
-        int OperadorID PK
-        text Nombres
-        text Apellidos
-        text Grado "PRE|POS"
-        text Tipo "4|5|6 | R1|R2|R3"
-        int Periodo "año académico"
-        int Estado "1=activo"
-    }
+        OPERADORES {
+            int OperadorID PK
+            text Nombres
+            text Apellidos
+            text Grado "PRE|POS"
+            text Tipo "4|5|6 | R1|R2|R3"
+            int Periodo "año académico"
+            int Estado "1=activo"
+        }
 
-    PACIENTES {
-        int PacienteID PK
-        text Nombres
-        text Apellidos
-    }
+        PACIENTES {
+            int PacienteID PK
+            text Nombres
+            text Apellidos
+        }
 
-    DOCENTES {
-        int DocenteID PK
-        text Nombres
-        text Apellidos
-        int Estado "1=activo"
-    }
+        DOCENTES {
+            int DocenteID PK
+            text Nombres
+            text Apellidos
+            int Estado "1=activo"
+        }
 
-    MATERIALES {
-        int MaterialID PK
-        text Nombre
-        text Unidad "unidad de medida libre"
-        int Estado "1=activo"
-    }
+        MATERIALES {
+            int MaterialID PK
+            text Nombre
+            text Unidad "unidad de medida libre"
+            int Estado "1=activo"
+        }
 
-    UNIDAD {
-        int UnidadID PK
-        int UnidadNro "1, 2, 3..."
-    }
+        UNIDAD {
+            int UnidadID PK
+            int UnidadNro "1, 2, 3..."
+        }
 
-    TRATAMIENTO_PRED {
-        int TratPredID PK
-        text NombreTratamiento
-        real MontoSugerido
-    }
+        TRATAMIENTO_PRED {
+            int TratPredID PK
+            text NombreTratamiento
+            real MontoSugerido
+        }
 
-    MATERIALES_LIST_PRED {
-        int MaterialListPredID PK
-        int TratPredID FK
-        int MaterialID FK
-        real Cantidad "cantidad sugerida"
-    }
+        MATERIALES_LIST_PRED {
+            int MaterialListPredID PK
+            int TratPredID FK
+            int MaterialID FK
+            real Cantidad "cantidad sugerida"
+        }
 
-    TRATAMIENTO {
-        int TratamientoID PK
-        int OperadorID FK
-        int PacienteID FK
-        int UnidadID FK "NULL si se elimina la unidad"
-        text Fecha
-        text NombreTratamiento "copia de la plantilla"
-        real Monto "copia de la plantilla, editable"
-        text Tipo "NORMAL|CONTINUO"
-        text EstadoPago "PENDIENTE|PARCIAL|PAGADO (persistido)"
-        real MontoPagado "0 por defecto"
-        text Estado "ABIERTO|CERRADO|ANULADO"
-        text CerradoEn "timestamp de cierre"
-    }
+        TRATAMIENTO {
+            int TratamientoID PK
+            int OperadorID FK
+            int PacienteID FK
+            int UnidadID FK "NULL si se elimina la unidad"
+            text Fecha
+            text NombreTratamiento "copia de la plantilla"
+            real Monto "copia de la plantilla, editable"
+            text Tipo "NORMAL|CONTINUO"
+            text EstadoPago "PENDIENTE|PARCIAL|PAGADO (persistido)"
+            real MontoPagado "0 por defecto"
+            text Estado "ABIERTO|CERRADO|ANULADO"
+            text CerradoEn "timestamp de cierre"
+        }
 
-    MATERIALES_LIST {
-        int MaterialesListID PK
-        int TratamientoID FK
-        int MaterialID FK
-        real Cantidad "consumo real (2 decimales)"
-    }
+        MATERIALES_LIST {
+            int MaterialesListID PK
+            int TratamientoID FK
+            int MaterialID FK
+            real Cantidad "consumo real (2 decimales)"
+        }
 
-    ASISTENCIA {
-        int AsistenciaID PK
-        int DocenteID FK
-        text Fecha
-        text Estado "ACTIVO|ANULADO"
-    }
+        ASISTENCIA {
+            int AsistenciaID PK
+            int DocenteID FK
+            text Fecha
+            text Estado "ACTIVO|ANULADO"
+        }
 
-    MATERIALES_ASISTENCIA {
-        int MatAsistenciaID PK
-        int AsistenciaID FK
-        int MaterialesID FK
-        real Cantidad
-    }
+        MATERIALES_ASISTENCIA {
+            int MatAsistenciaID PK
+            int AsistenciaID FK
+            int MaterialesID FK
+            real Cantidad
+        }
 
-    UNIDAD_CONVERSION {
-        int ConversionID PK
-        int MaterialID FK
-        text UnidadBase "guante, gramo, cucharada"
-        text UnidadEmpaque "caja, paquete"
-        real Factor "unidades base por empaque"
-    }
+        UNIDAD_CONVERSION {
+            int ConversionID PK
+            int MaterialID FK
+            text UnidadBase "guante, gramo, cucharada"
+            text UnidadEmpaque "caja, paquete"
+            real Factor "unidades base por empaque"
+        }
 
-    REGISTRO_ANULACION {
-        int AnulacionID PK
-        text TablaAfectada "tratamiento|asistencia"
-        int IdRegistroAnulado
-        text Motivo
-        text Usuario
-        text Timestamp
-    }
+        REGISTRO_ANULACION {
+            int AnulacionID PK
+            text TablaAfectada "tratamiento|asistencia"
+            int IdRegistroAnulado
+            text Motivo
+            text Usuario
+            text Timestamp
+        }
