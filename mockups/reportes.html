@@ -8,19 +8,24 @@
 </head>
 <body>
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1>Formatos Odontol&oacute;gicos</h1>
-      <p>Cl&iacute;nica UNMSM</p>
+    <div class="sidebar-brand">
+      <span class="brand-mark"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg></span>
+      <div class="brand-text">
+        <h1>Formatos Odontol&oacute;gicos</h1>
+        <p>Cl&iacute;nica UNMSM</p>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
-      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
-      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
-      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
-      <a href="reportes.html" class="sidebar-link active"><span class="icon">📄</span> Reportes</a>
+      <div class="nav-eyebrow">Atenci&oacute;n</div>
+      <a href="tratamiento.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg><span>Tratamientos</span></a>
+      <a href="asistencia-docente.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#asistencia"></use></svg><span>Asistencia Docente</span></a>
+      <div class="nav-eyebrow">Gesti&oacute;n</div>
+      <a href="dashboard.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#dashboard"></use></svg><span>Dashboard</span></a>
+      <a href="catalogos.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#catalogo"></use></svg><span>Cat&aacute;logos</span></a>
+      <a href="unidades.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#modulos"></use></svg><span>Unidades</span></a>
+      <a href="reportes.html" class="sidebar-link active"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg><span>Reportes</span></a>
     </nav>
-    <div class="sidebar-footer">Mockups v0.1</div>
+    <div class="sidebar-footer">Mockups v0.2</div>
   </aside>
 
   <div class="main-content">
@@ -68,30 +73,32 @@
     <!-- Reportes mensuales -->
     <div class="card">
       <div class="card-header">
-        <h3>Reportes mensuales — Julio 2025</h3>
+        <h3>Reportes mensuales &mdash; Julio 2025</h3>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
-          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Materiales Generales</h4>
-          <p class="text-muted text-sm mb-16">Consolidado de todos los materiales consumidos en el mes</p>
-          <button class="btn btn-primary">📥 Generar Excel</button>
+      <div class="report-grid">
+        <div class="report-card">
+          <div class="report-icon"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg></div>
+          <h4>Materiales Generales</h4>
+          <p class="report-desc">Consolidado de todos los materiales consumidos en el mes</p>
+          <div class="report-action"><button class="btn btn-primary"><svg aria-hidden="true"><use href="icons.svg#download"></use></svg>Generar Excel</button></div>
         </div>
-        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
-          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Ingresos Financieros</h4>
-          <p class="text-muted text-sm mb-16">Montos facturados agrupados por grado y tipo de especialista</p>
-          <button class="btn btn-primary">📥 Generar Excel</button>
+        <div class="report-card">
+          <div class="report-icon"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg></div>
+          <h4>Ingresos Financieros</h4>
+          <p class="report-desc">Montos facturados agrupados por grado y tipo de especialista</p>
+          <div class="report-action"><button class="btn btn-primary"><svg aria-hidden="true"><use href="icons.svg#download"></use></svg>Generar Excel</button></div>
         </div>
-        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
-          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consumo Docente</h4>
-          <p class="text-muted text-sm mb-16">Materiales entregados por docente (consolidado + detalle diario)</p>
-          <div class="flex gap-8">
-            <button class="btn btn-primary">📥 Generar Excel</button>
-          </div>
+        <div class="report-card">
+          <div class="report-icon"><svg aria-hidden="true"><use href="icons.svg#docente"></use></svg></div>
+          <h4>Consumo Docente</h4>
+          <p class="report-desc">Materiales entregados por docente (consolidado + detalle diario)</p>
+          <div class="report-action"><button class="btn btn-primary"><svg aria-hidden="true"><use href="icons.svg#download"></use></svg>Generar Excel</button></div>
         </div>
-        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px;">
-          <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consumo Especialista</h4>
-          <p class="text-muted text-sm mb-16">Materiales consumidos por especialista en tratamientos cerrados</p>
-          <button class="btn btn-primary">📥 Generar Excel</button>
+        <div class="report-card">
+          <div class="report-icon"><svg aria-hidden="true"><use href="icons.svg#docente"></use></svg></div>
+          <h4>Consumo Especialista</h4>
+          <p class="report-desc">Materiales consumidos por especialista en tratamientos cerrados</p>
+          <div class="report-action"><button class="btn btn-primary"><svg aria-hidden="true"><use href="icons.svg#download"></use></svg>Generar Excel</button></div>
         </div>
       </div>
     </div>
@@ -101,13 +108,12 @@
       <div class="card-header">
         <h3>Reporte anual</h3>
       </div>
-      <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px; max-width:500px;">
-        <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:4px;">Consolidado Anual</h4>
-        <p class="text-muted text-sm mb-16">Los 4 reportes anteriores desglosados mes por mes para el a&ntilde;o seleccionado</p>
-        <div class="flex gap-8">
-          <button class="btn btn-success btn-lg">📥 Generar Reporte Anual 2025</button>
-        </div>
-        <p class="text-xs text-muted mt-8">⚠️ Puede tomar unos segundos. Se mostrar&aacute; un indicador de progreso.</p>
+      <div class="report-card" style="max-width:520px;">
+        <div class="report-icon"><svg aria-hidden="true"><use href="icons.svg#clock"></use></svg></div>
+        <h4>Consolidado Anual</h4>
+        <p class="report-desc">Los 4 reportes anteriores desglosados mes por mes para el a&ntilde;o seleccionado</p>
+        <div class="report-action"><button class="btn btn-success btn-lg"><svg aria-hidden="true"><use href="icons.svg#download"></use></svg>Generar Reporte Anual 2025</button></div>
+        <p class="text-xs text-muted mt-8 flex flex-center gap-8" style="gap:7px;"><svg aria-hidden="true" style="width:14px; height:14px; color:var(--warn);"><use href="icons.svg#clock"></use></svg>Puede tomar unos segundos. Se mostrar&aacute; un indicador de progreso.</p>
       </div>
     </div>
 
@@ -118,11 +124,11 @@
       </div>
       <div class="table-container">
         <table>
-          <thead><tr><th>Archivo</th><th style="width:120px">Periodo</th><th style="width:140px">Generado</th><th style="width:80px"></th></tr></thead>
+          <thead><tr><th>Archivo</th><th style="width:120px">Periodo</th><th style="width:150px">Generado</th><th style="width:80px"></th></tr></thead>
           <tbody>
-            <tr><td>Materiales_Julio_2025.xlsx</td><td>Julio 2025</td><td>30/07/2025 10:23</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
-            <tr><td>Anual_2025.xlsx</td><td>Anual 2025</td><td>30/07/2025 10:15</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
-            <tr><td>Ingresos_Junio_2025.xlsx</td><td>Junio 2025</td><td>25/06/2025 08:45</td><td><button class="btn btn-sm btn-secondary">📂 Abrir</button></td></tr>
+            <tr><td class="num">Materiales_Julio_2025.xlsx</td><td>Julio 2025</td><td class="num">30/07/2025 10:23</td><td><button class="btn btn-sm btn-secondary"><svg aria-hidden="true"><use href="icons.svg#folder"></use></svg>Abrir</button></td></tr>
+            <tr><td class="num">Anual_2025.xlsx</td><td>Anual 2025</td><td class="num">30/07/2025 10:15</td><td><button class="btn btn-sm btn-secondary"><svg aria-hidden="true"><use href="icons.svg#folder"></use></svg>Abrir</button></td></tr>
+            <tr><td class="num">Ingresos_Junio_2025.xlsx</td><td>Junio 2025</td><td class="num">25/06/2025 08:45</td><td><button class="btn btn-sm btn-secondary"><svg aria-hidden="true"><use href="icons.svg#folder"></use></svg>Abrir</button></td></tr>
           </tbody>
         </table>
       </div>

@@ -8,19 +8,24 @@
 </head>
 <body>
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1>Formatos Odontológicos</h1>
-      <p>Clínica UNMSM</p>
+    <div class="sidebar-brand">
+      <span class="brand-mark"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg></span>
+      <div class="brand-text">
+        <h1>Formatos Odontol&oacute;gicos</h1>
+        <p>Cl&iacute;nica UNMSM</p>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
-      <a href="dashboard.html" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
-      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
-      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
-      <a href="registro-docente.html" class="sidebar-link"><span class="icon">📝</span> Registro Docente</a>
-      <a href="reportes.html" class="sidebar-link"><span class="icon">📄</span> Reportes</a>
+      <div class="nav-eyebrow">Atenci&oacute;n</div>
+      <a href="tratamiento.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg><span>Tratamientos</span></a>
+      <a href="asistencia-docente.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#asistencia"></use></svg><span>Asistencia Docente</span></a>
+      <div class="nav-eyebrow">Gesti&oacute;n</div>
+      <a href="dashboard.html" class="sidebar-link active"><svg aria-hidden="true"><use href="icons.svg#dashboard"></use></svg><span>Dashboard</span></a>
+      <a href="catalogos.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#catalogo"></use></svg><span>Cat&aacute;logos</span></a>
+      <a href="unidades.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#modulos"></use></svg><span>Unidades</span></a>
+      <a href="reportes.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg><span>Reportes</span></a>
     </nav>
-    <div class="sidebar-footer">Mockups v0.1</div>
+    <div class="sidebar-footer">Mockups v0.2</div>
   </aside>
 
   <div class="main-content">
@@ -32,55 +37,184 @@
     </div>
 
     <div class="alert-banner alert-info">
-      <span>ℹ️</span>
-      <span>Los reportes del mes de Julio 2026 están desactualizados. Se modificaron registros posteriormente.</span>
+      <svg aria-hidden="true"><use href="icons.svg#info"></use></svg>
+      <span>Los reportes del mes de Julio 2026 est&aacute;n desactualizados. Se modificaron registros posteriormente.</span>
     </div>
 
-    <div class="stats-bar">
-      <div class="stat-item">
-        <div class="stat-value">238</div>
-        <div class="stat-label">Materiales registrados</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Ingresos del mes</span>
+          <span class="kpi-ico"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg></span>
+        </div>
+        <div class="kpi-value">S/ 4,820.00</div>
+        <div class="kpi-sub"><span class="trend-up">+12%</span> vs. mes anterior</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value">14</div>
-        <div class="stat-label">Docentes activos</div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Ingresos de la semana</span>
+          <span class="kpi-ico"><svg aria-hidden="true"><use href="icons.svg#clock"></use></svg></span>
+        </div>
+        <div class="kpi-value">S/ 1,235.00</div>
+        <div class="kpi-sub">Jul 24 &ndash; 30 &middot; 23 tratamientos</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value">42</div>
-        <div class="stat-label">Especialistas activos</div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Tratamientos en curso</span>
+          <span class="kpi-ico warn"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg></span>
+        </div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-sub"><span class="led-dot warn"></span>3 unidades en uso</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value">18</div>
-        <div class="stat-label">Tratamientos en curso</div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Docentes presentes hoy</span>
+          <span class="kpi-ico ok"><svg aria-hidden="true"><use href="icons.svg#asistencia"></use></svg></span>
+        </div>
+        <div class="kpi-value">12</div>
+        <div class="kpi-sub"><span class="led-dot"></span>2 salidas registradas</div>
       </div>
     </div>
 
-    <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:12px; color:#0f172a;">Módulos</h3>
+    <div class="chart-grid">
+      <div class="chart-card span-2">
+        <div class="chart-head">
+          <span class="chart-title">Ingresos mensuales 2026</span>
+          <span class="chart-meta">S/ facturado por mes</span>
+        </div>
+        <div class="chart-body">
+          <svg viewBox="0 0 640 220" role="img" aria-label="Ingresos mensuales 2026">
+            <defs>
+              <linearGradient id="g-area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0f7b72" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#0f7b72" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <line x1="44" y1="186" x2="640" y2="186" stroke="#dce4e4" stroke-width="1"/>
+            <line x1="44" y1="128.7" x2="640" y2="128.7" stroke="#dce4e4" stroke-width="1" stroke-dasharray="3 5"/>
+            <line x1="44" y1="71.3" x2="640" y2="71.3" stroke="#dce4e4" stroke-width="1" stroke-dasharray="3 5"/>
+            <line x1="44" y1="14" x2="640" y2="14" stroke="#dce4e4" stroke-width="1" stroke-dasharray="3 5"/>
+            <text x="38" y="190" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#93a6a9">S/ 2k</text>
+            <text x="38" y="132.7" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#93a6a9">S/ 3k</text>
+            <text x="38" y="75.3" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#93a6a9">S/ 4k</text>
+            <text x="38" y="18" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#93a6a9">S/ 5k</text>
+            <path d="M44 151.6 L140.7 125.8 L237.3 141.3 L334 98.9 L430.7 72.5 L527.3 53.6 L624 24.3 L624 186 L44 186 Z" fill="url(#g-area)"/>
+            <polyline points="44,151.6 140.7,125.8 237.3,141.3 334,98.9 430.7,72.5 527.3,53.6 624,24.3" fill="none" stroke="#0f7b72" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="44" cy="151.6" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="140.7" cy="125.8" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="237.3" cy="141.3" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="334" cy="98.9" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="430.7" cy="72.5" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="527.3" cy="53.6" r="3" fill="#fff" stroke="#0f7b72" stroke-width="2"/>
+            <circle cx="624" cy="24.3" r="4.5" fill="#0f7b72" stroke="#fff" stroke-width="2"/>
+            <text x="624" y="10" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#0b5650">S/ 4,820</text>
+            <text x="44" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Ene</text>
+            <text x="140.7" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Feb</text>
+            <text x="237.3" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Mar</text>
+            <text x="334" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Abr</text>
+            <text x="430.7" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">May</text>
+            <text x="527.3" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Jun</text>
+            <text x="624" y="208" text-anchor="middle" font-size="11" fill="#93a6a9">Jul</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <span class="chart-title">Tratamientos por estado</span>
+          <span class="chart-meta">Julio 2026</span>
+        </div>
+        <div class="chart-body">
+          <svg viewBox="0 0 120 120" role="img" aria-label="Tratamientos por estado">
+            <g transform="rotate(-90 60 60)">
+              <circle cx="60" cy="60" r="40" fill="none" stroke="#0f7b72" stroke-width="15" stroke-dasharray="214.9 251.3"/>
+              <circle cx="60" cy="60" r="40" fill="none" stroke="#b5791f" stroke-width="15" stroke-dasharray="31.2 251.3" stroke-dashoffset="-214.9"/>
+              <circle cx="60" cy="60" r="40" fill="none" stroke="#c2403a" stroke-width="15" stroke-dasharray="5.2 251.3" stroke-dashoffset="-246.1"/>
+            </g>
+            <text x="60" y="56" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="20" font-weight="600" fill="#142a33">145</text>
+            <text x="60" y="70" text-anchor="middle" font-size="9" fill="#93a6a9">del mes</text>
+          </svg>
+          <div class="legend">
+            <span class="legend-item"><span class="legend-swatch" style="background:#0f7b72;"></span>Cerrados 124</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#b5791f;"></span>En curso 18</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#c2403a;"></span>Anulados 3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <span class="chart-title">Materiales m&aacute;s utilizados</span>
+          <span class="chart-meta">Julio 2026 &middot; top 5</span>
+        </div>
+        <div class="chart-body">
+          <div class="hbar"><span class="hbar-label">Guantes desc. talla M</span><div class="hbar-track"><div class="hbar-fill" style="width:100%"></div></div><span class="hbar-val">214</span></div>
+          <div class="hbar"><span class="hbar-label">Gasas est&eacute;riles 10x10</span><div class="hbar-track"><div class="hbar-fill" style="width:83%"></div></div><span class="hbar-val">178</span></div>
+          <div class="hbar"><span class="hbar-label">Anestesia Lidoca&iacute;na 2%</span><div class="hbar-track"><div class="hbar-fill" style="width:66%"></div></div><span class="hbar-val">142</span></div>
+          <div class="hbar"><span class="hbar-label">Barbijo triple capa</span><div class="hbar-track"><div class="hbar-fill" style="width:61%"></div></div><span class="hbar-val">131</span></div>
+          <div class="hbar"><span class="hbar-label">Algod&oacute;n en rollo</span><div class="hbar-track"><div class="hbar-fill" style="width:45%"></div></div><span class="hbar-val">96</span></div>
+        </div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="chart-head">
+          <span class="chart-title">Asistencia docente hoy</span>
+          <span class="chart-meta">30/07/2026</span>
+        </div>
+        <div class="chart-body">
+          <div class="att-list">
+            <div class="att-row">
+              <span class="att-avatar">MG</span>
+              <div class="att-name">Mar&iacute;a Gonz&aacute;lez Rivas<small>Ingreso 08:12</small></div>
+              <span class="att-flag"><span class="led-dot"></span>En consulta</span>
+            </div>
+            <div class="att-row">
+              <span class="att-avatar">CM</span>
+              <div class="att-name">Carlos Mendoza Paredes<small>Ingreso 08:20</small></div>
+              <span class="att-flag"><span class="led-dot"></span>En consulta</span>
+            </div>
+            <div class="att-row">
+              <span class="att-avatar">AH</span>
+              <div class="att-name">Ana Huam&aacute;n Torres<small>Ingreso 09:05</small></div>
+              <span class="att-flag"><span class="led-dot warn"></span>Salida 12:40</span>
+            </div>
+            <div class="att-row">
+              <span class="att-avatar">LQ</span>
+              <div class="att-name">Luis Quispe Condori<small>Ingreso 09:31</small></div>
+              <span class="att-flag"><span class="led-dot warn"></span>Salida 12:15</span>
+            </div>
+          </div>
+          <div class="kpi-sub" style="border-top:1px solid var(--line); margin-top:4px; padding-top:10px;"><span class="led-dot"></span>12 presentes &middot; <span class="led-dot warn"></span>2 salidas registradas</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:0.95rem; font-weight:600; margin-bottom:12px; color:var(--ink);">Unidades</h3>
     <div class="grid-cards">
       <a href="catalogos.html" class="dash-card">
-        <div class="icon-big">📋</div>
-        <h4>Catálogos</h4>
+        <div class="icon-big"><svg aria-hidden="true"><use href="icons.svg#catalogo"></use></svg></div>
+        <h4>Cat&aacute;logos</h4>
         <p>Materiales, docentes, especialistas y tratamientos predefinidos</p>
       </a>
-      <a href="registro-docente.html" class="dash-card">
-        <div class="icon-big">📝</div>
-        <h4>Registro Docente</h4>
+      <a href="asistencia-docente.html" class="dash-card">
+        <div class="icon-big"><svg aria-hidden="true"><use href="icons.svg#asistencia"></use></svg></div>
+        <h4>Asistencia Docente</h4>
         <p>Control diario de entrega de materiales a docentes</p>
       </a>
       <a href="tratamiento.html" class="dash-card">
-        <div class="icon-big">🦷</div>
+        <div class="icon-big"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg></div>
         <h4>Tratamiento</h4>
-        <p>Registro de atención con materiales predefinidos y adicionales</p>
+        <p>Registro de atenci&oacute;n con materiales predefinidos y adicionales</p>
       </a>
       <a href="reportes.html" class="dash-card">
-        <div class="icon-big">📄</div>
+        <div class="icon-big"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg></div>
         <h4>Reportes</h4>
-        <p>Exportación Excel de materiales, ingresos, docentes y especialistas</p>
+        <p>Exportaci&oacute;n Excel de materiales, ingresos, docentes y especialistas</p>
       </a>
-      <a href="modulos.html" class="dash-card">
-        <div class="icon-big">🧩</div>
-        <h4>M&oacute;dulos</h4>
-        <p>Gesti&oacute;n de m&oacute;dulos de atenci&oacute;n de la cl&iacute;nica</p>
+      <a href="unidades.html" class="dash-card">
+        <div class="icon-big"><svg aria-hidden="true"><use href="icons.svg#modulos"></use></svg></div>
+        <h4>Unidades</h4>
+        <p>Gesti&oacute;n de unidades de atenci&oacute;n de la cl&iacute;nica</p>
       </a>
     </div>
   </div>

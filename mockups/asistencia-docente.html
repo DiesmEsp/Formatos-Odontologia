@@ -3,30 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro Docente — Mockup</title>
+  <title>Asistencia Docente — Mockup</title>
   <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1>Formatos Odontológicos</h1>
-      <p>Clínica UNMSM</p>
+    <div class="sidebar-brand">
+      <span class="brand-mark"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg></span>
+      <div class="brand-text">
+        <h1>Formatos Odontol&oacute;gicos</h1>
+        <p>Cl&iacute;nica UNMSM</p>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <a href="tratamiento.html" class="sidebar-link"><span class="icon">🦷</span> Tratamientos</a>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
-      <a href="catalogos.html" class="sidebar-link"><span class="icon">📋</span> Cat&aacute;logos</a>
-      <a href="modulos.html" class="sidebar-link"><span class="icon">🧩</span> M&oacute;dulos</a>
-      <a href="registro-docente.html" class="sidebar-link active"><span class="icon">📝</span> Registro Docente</a>
-      <a href="reportes.html" class="sidebar-link"><span class="icon">📄</span> Reportes</a>
+      <div class="nav-eyebrow">Atenci&oacute;n</div>
+      <a href="tratamiento.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#tooth"></use></svg><span>Tratamientos</span></a>
+      <a href="asistencia-docente.html" class="sidebar-link active"><svg aria-hidden="true"><use href="icons.svg#asistencia"></use></svg><span>Asistencia Docente</span></a>
+      <div class="nav-eyebrow">Gesti&oacute;n</div>
+      <a href="dashboard.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#dashboard"></use></svg><span>Dashboard</span></a>
+      <a href="catalogos.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#catalogo"></use></svg><span>Cat&aacute;logos</span></a>
+      <a href="unidades.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#modulos"></use></svg><span>Unidades</span></a>
+      <a href="reportes.html" class="sidebar-link"><svg aria-hidden="true"><use href="icons.svg#reportes"></use></svg><span>Reportes</span></a>
     </nav>
-    <div class="sidebar-footer">Mockups v0.1</div>
+    <div class="sidebar-footer">Mockups v0.2</div>
   </aside>
 
   <div class="main-content">
     <div class="page-header">
       <div>
-        <h2>Registro Docente Diario</h2>
+        <h2>Asistencia Docente</h2>
         <p class="subtitle">Entrega y control de materiales a docentes</p>
       </div>
     </div>
@@ -40,13 +45,13 @@
         <div class="form-group" style="flex:1; max-width:400px;">
           <label class="form-label">Docente</label>
           <div class="search-box">
-            <span class="search-icon">🔎</span>
+            <svg aria-hidden="true"><use href="icons.svg#user"></use></svg>
             <input type="text" placeholder="Buscar docente por nombre…" value="González">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Fecha</label>
-          <input class="form-input" type="text" value="30/07/2026" readonly style="width:140px; background:#f8fafc;">
+          <input class="form-input" type="text" value="30/07/2026" readonly style="width:140px;">
         </div>
         <button class="btn btn-primary" style="margin-bottom:0;">Buscar</button>
       </div>
@@ -55,13 +60,13 @@
           <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th style="width:120px"></th></tr></thead>
           <tbody>
             <tr>
-              <td>1</td>
-              <td>María</td>
-              <td>González Rivas</td>
+              <td class="num">1</td>
+              <td>Mar&iacute;a</td>
+              <td>Gonz&aacute;lez Rivas</td>
               <td><button class="btn btn-sm btn-primary" onclick="document.getElementById('seleccion-docente').style.display='block'; this.disabled=true;">Seleccionar</button></td>
             </tr>
             <tr>
-              <td>2</td>
+              <td class="num">2</td>
               <td>Carlos</td>
               <td>Mendoza Paredes</td>
               <td><button class="btn btn-sm btn-primary">Seleccionar</button></td>
@@ -74,19 +79,19 @@
     <!-- Step 2: Registro activo (se muestra después de seleccionar docente) -->
     <div class="card" id="seleccion-docente" style="display:none;">
       <div class="card-header">
-        <h3>2. Registro del día <span class="text-muted" style="font-weight:400;">— María González — 30/07/2026</span></h3>
+        <h3>2. Registro del d&iacute;a <span class="text-muted" style="font-weight:400;">&mdash; Mar&iacute;a Gonz&aacute;lez &mdash; 30/07/2026</span></h3>
         <div>
-          <span class="badge badge-success" style="font-size:0.85rem; padding:4px 14px;">🟢 Registro activo</span>
+          <span class="badge badge-success" style="font-size:0.85rem; padding:4px 14px;"><span class="led"></span>Registro activo</span>
         </div>
       </div>
 
       <div class="alert-banner alert-info">
-        <span>ℹ️</span>
-        <span>Este registro acumula todos los materiales del día. No es necesario crear uno nuevo si el docente vuelve a pedir.</span>
+        <svg aria-hidden="true"><use href="icons.svg#info"></use></svg>
+        <span>Este registro acumula todos los materiales del d&iacute;a. No es necesario crear uno nuevo si el docente vuelve a pedir.</span>
       </div>
 
       <!-- Materiales ya entregados -->
-      <h4 style="font-size:0.85rem; font-weight:600; color:#475569; margin-bottom:8px;">Materiales entregados hoy</h4>
+      <h4 style="font-size:0.85rem; font-weight:600; color:var(--muted); margin-bottom:8px;">Materiales entregados hoy</h4>
       <div class="table-container">
         <table>
           <thead><tr><th>Material</th><th style="width:100px">Cantidad</th><th style="width:140px">Unidad</th><th style="width:70px"></th></tr></thead>
@@ -95,49 +100,49 @@
               <td>Guantes descartables talla M</td>
               <td><input class="form-input" type="number" value="2" style="width:70px;"></td>
               <td>Caja (50u)</td>
-              <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;">✕</button></td>
+              <td><button class="btn btn-sm btn-ghost" style="color:var(--danger);" aria-label="Quitar material"><svg aria-hidden="true"><use href="icons.svg#trash"></use></svg></button></td>
             </tr>
             <tr>
-              <td>Gasas estériles 10x10</td>
+              <td>Gasas est&eacute;riles 10x10</td>
               <td><input class="form-input" type="number" value="3" style="width:70px;"></td>
               <td>Paquete (25u)</td>
-              <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;">✕</button></td>
+              <td><button class="btn btn-sm btn-ghost" style="color:var(--danger);" aria-label="Quitar material"><svg aria-hidden="true"><use href="icons.svg#trash"></use></svg></button></td>
             </tr>
             <tr>
               <td>Barbijo triple capa</td>
               <td><input class="form-input" type="number" value="1" style="width:70px;"></td>
               <td>Caja (50u)</td>
-              <td><button class="btn btn-sm btn-ghost" style="color:#ef4444;">✕</button></td>
+              <td><button class="btn btn-sm btn-ghost" style="color:var(--danger);" aria-label="Quitar material"><svg aria-hidden="true"><use href="icons.svg#trash"></use></svg></button></td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Agregar material -->
-      <div class="mt-16" style="border-top:1px solid #e2e8f0; padding-top:16px;">
-        <h4 style="font-size:0.85rem; font-weight:600; color:#475569; margin-bottom:8px;">Agregar material</h4>
+      <div class="mt-16" style="border-top:1px solid var(--line); padding-top:16px;">
+        <h4 style="font-size:0.85rem; font-weight:600; color:var(--muted); margin-bottom:8px;">Agregar material</h4>
         <div class="form-inline">
           <div class="form-group" style="flex:1; max-width:400px;">
             <div class="search-box">
-              <span class="search-icon">🔎</span>
+              <svg aria-hidden="true"><use href="icons.svg#search"></use></svg>
               <input type="text" placeholder="Buscar material por nombre…">
             </div>
           </div>
           <div class="form-group">
             <input class="form-input" type="number" placeholder="Cantidad" style="width:100px;" value="1">
           </div>
-          <button class="btn btn-success" style="margin-bottom:0;">+ Agregar</button>
+          <button class="btn btn-success" style="margin-bottom:0;"><svg aria-hidden="true"><use href="icons.svg#plus"></use></svg>Agregar</button>
         </div>
       </div>
 
       <!-- Acciones -->
-      <div class="flex flex-between mt-16" style="border-top:1px solid #e2e8f0; padding-top:16px;">
+      <div class="flex flex-between mt-16" style="border-top:1px solid var(--line); padding-top:16px;">
         <div>
           <span class="text-muted text-sm">3 materiales registrados hoy</span>
         </div>
         <div class="flex gap-8">
-          <button class="btn btn-secondary" onclick="abrirModal('modal-confirmar-anulacion')">Anular registro</button>
-          <button class="btn btn-success">✔ Guardar cambios</button>
+          <button class="btn btn-secondary" onclick="abrirModal('modal-confirmar-anulacion')">Anular asistencia</button>
+          <button class="btn btn-success"><svg aria-hidden="true"><use href="icons.svg#check"></use></svg>Guardar cambios</button>
         </div>
       </div>
     </div>
@@ -147,26 +152,26 @@
   <div class="modal-overlay" id="modal-confirmar-anulacion">
     <div class="modal" style="width:420px;">
       <div class="modal-header">
-        <h3>Anular registro docente</h3>
-        <button class="modal-close" onclick="cerrarModal('modal-confirmar-anulacion')">&times;</button>
+        <h3>Anular asistencia docente</h3>
+        <button class="modal-close" onclick="cerrarModal('modal-confirmar-anulacion')" aria-label="Cerrar"><svg aria-hidden="true"><use href="icons.svg#close"></use></svg></button>
       </div>
       <div class="modal-body">
         <div class="alert-banner alert-danger" style="margin-bottom:16px;">
-          <span>⚠️</span>
-          <span>Esta acción no se puede deshacer. El registro quedará excluido de todos los reportes.</span>
+          <svg aria-hidden="true"><use href="icons.svg#warning"></use></svg>
+          <span>Esta acci&oacute;n no se puede deshacer. El registro quedar&aacute; excluido de todos los reportes.</span>
         </div>
         <div class="form-group">
           <label class="form-label">Tu nombre *</label>
           <input class="form-input" type="text" placeholder="Nombre del asistente">
         </div>
         <div class="form-group">
-          <label class="form-label">Motivo de la anulación</label>
+          <label class="form-label">Motivo de la anulaci&oacute;n</label>
           <textarea class="form-textarea" placeholder="Describe el motivo (opcional)"></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="cerrarModal('modal-confirmar-anulacion')">Cancelar</button>
-        <button class="btn btn-danger">Sí, anular registro</button>
+        <button class="btn btn-danger">S&iacute;, anular asistencia</button>
       </div>
     </div>
   </div>
