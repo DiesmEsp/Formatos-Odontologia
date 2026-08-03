@@ -1,0 +1,856 @@
+{
+  "version": "31.1.5",
+  "data": "<mxfile host=\"app.diagrams.net\"><diagram name=\"Página-1\" id=\"E8d_6aHQFICb3FtQikd_\"><mxGraphModel dx=\"1414\" dy=\"729\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"827\" pageHeight=\"1169\" math=\"0\" shadow=\"0\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-6\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;miterlimit=4;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Operadores\" vertex=\"1\"><mxGeometry height=\"240\" width=\"180\" x=\"74\" y=\"20\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-7\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-8\" parent=\"bVsYpYMz5GkdcFj9vAmd-7\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-9\" parent=\"bVsYpYMz5GkdcFj9vAmd-7\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"OperadorID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-10\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-11\" parent=\"bVsYpYMz5GkdcFj9vAmd-10\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-12\" parent=\"bVsYpYMz5GkdcFj9vAmd-10\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Nombres\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-13\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-14\" parent=\"bVsYpYMz5GkdcFj9vAmd-13\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-15\" parent=\"bVsYpYMz5GkdcFj9vAmd-13\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Apellidos\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-16\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-17\" parent=\"bVsYpYMz5GkdcFj9vAmd-16\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-18\" parent=\"bVsYpYMz5GkdcFj9vAmd-16\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Grado\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-149\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"150\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-150\" parent=\"bVsYpYMz5GkdcFj9vAmd-149\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-151\" parent=\"bVsYpYMz5GkdcFj9vAmd-149\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Tipo\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-152\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"180\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-153\" parent=\"bVsYpYMz5GkdcFj9vAmd-152\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-154\" parent=\"bVsYpYMz5GkdcFj9vAmd-152\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Periodo\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-155\" parent=\"bVsYpYMz5GkdcFj9vAmd-6\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"210\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-156\" parent=\"bVsYpYMz5GkdcFj9vAmd-155\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-157\" parent=\"bVsYpYMz5GkdcFj9vAmd-155\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Estado\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-19\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Tratamiento\" vertex=\"1\"><mxGeometry height=\"300\" width=\"180\" x=\"322\" y=\"135\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-20\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-21\" parent=\"bVsYpYMz5GkdcFj9vAmd-20\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-22\" parent=\"bVsYpYMz5GkdcFj9vAmd-20\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"TratamientoID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-23\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-24\" parent=\"bVsYpYMz5GkdcFj9vAmd-23\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-25\" parent=\"bVsYpYMz5GkdcFj9vAmd-23\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"OperadorID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-26\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-27\" parent=\"bVsYpYMz5GkdcFj9vAmd-26\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-28\" parent=\"bVsYpYMz5GkdcFj9vAmd-26\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PacienteID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-29\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-30\" parent=\"bVsYpYMz5GkdcFj9vAmd-29\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-31\" parent=\"bVsYpYMz5GkdcFj9vAmd-29\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"UnidadID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-158\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"150\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-159\" parent=\"bVsYpYMz5GkdcFj9vAmd-158\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-160\" parent=\"bVsYpYMz5GkdcFj9vAmd-158\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Fecha\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-161\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"180\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-162\" parent=\"bVsYpYMz5GkdcFj9vAmd-161\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-163\" parent=\"bVsYpYMz5GkdcFj9vAmd-161\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"NombreTratamiento\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-164\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"210\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-165\" parent=\"bVsYpYMz5GkdcFj9vAmd-164\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-166\" parent=\"bVsYpYMz5GkdcFj9vAmd-164\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Monto\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-167\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"240\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-168\" parent=\"bVsYpYMz5GkdcFj9vAmd-167\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-169\" parent=\"bVsYpYMz5GkdcFj9vAmd-167\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Tipo\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-170\" parent=\"bVsYpYMz5GkdcFj9vAmd-19\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"270\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-171\" parent=\"bVsYpYMz5GkdcFj9vAmd-170\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-172\" parent=\"bVsYpYMz5GkdcFj9vAmd-170\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"EstadoPago&amp;nbsp;\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-32\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Materiales&lt;div&gt;&lt;br&gt;&lt;/div&gt;\" vertex=\"1\"><mxGeometry height=\"150\" width=\"180\" x=\"580\" y=\"278\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-33\" parent=\"bVsYpYMz5GkdcFj9vAmd-32\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-34\" parent=\"bVsYpYMz5GkdcFj9vAmd-33\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-35\" parent=\"bVsYpYMz5GkdcFj9vAmd-33\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-36\" parent=\"bVsYpYMz5GkdcFj9vAmd-32\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-37\" parent=\"bVsYpYMz5GkdcFj9vAmd-36\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-38\" parent=\"bVsYpYMz5GkdcFj9vAmd-36\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Nombre\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-39\" parent=\"bVsYpYMz5GkdcFj9vAmd-32\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-40\" parent=\"bVsYpYMz5GkdcFj9vAmd-39\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-41\" parent=\"bVsYpYMz5GkdcFj9vAmd-39\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Unidad\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-42\" parent=\"bVsYpYMz5GkdcFj9vAmd-32\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-43\" parent=\"bVsYpYMz5GkdcFj9vAmd-42\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-44\" parent=\"bVsYpYMz5GkdcFj9vAmd-42\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Estado\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-45\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Pacientes\" vertex=\"1\"><mxGeometry height=\"120\" width=\"180\" x=\"74\" y=\"300\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-46\" parent=\"bVsYpYMz5GkdcFj9vAmd-45\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-47\" parent=\"bVsYpYMz5GkdcFj9vAmd-46\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-48\" parent=\"bVsYpYMz5GkdcFj9vAmd-46\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PacienteID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-49\" parent=\"bVsYpYMz5GkdcFj9vAmd-45\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-50\" parent=\"bVsYpYMz5GkdcFj9vAmd-49\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-51\" parent=\"bVsYpYMz5GkdcFj9vAmd-49\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Nombres\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-52\" parent=\"bVsYpYMz5GkdcFj9vAmd-45\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-53\" parent=\"bVsYpYMz5GkdcFj9vAmd-52\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-54\" parent=\"bVsYpYMz5GkdcFj9vAmd-52\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Apellidos\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-58\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Docentes\" vertex=\"1\"><mxGeometry height=\"150\" width=\"180\" x=\"74\" y=\"470\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-59\" parent=\"bVsYpYMz5GkdcFj9vAmd-58\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-60\" parent=\"bVsYpYMz5GkdcFj9vAmd-59\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-61\" parent=\"bVsYpYMz5GkdcFj9vAmd-59\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"DocenteID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-62\" parent=\"bVsYpYMz5GkdcFj9vAmd-58\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-63\" parent=\"bVsYpYMz5GkdcFj9vAmd-62\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-64\" parent=\"bVsYpYMz5GkdcFj9vAmd-62\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Nombres\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-65\" parent=\"bVsYpYMz5GkdcFj9vAmd-58\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-66\" parent=\"bVsYpYMz5GkdcFj9vAmd-65\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-67\" parent=\"bVsYpYMz5GkdcFj9vAmd-65\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Apellidos\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-68\" parent=\"bVsYpYMz5GkdcFj9vAmd-58\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-69\" parent=\"bVsYpYMz5GkdcFj9vAmd-68\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-70\" parent=\"bVsYpYMz5GkdcFj9vAmd-68\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Estado\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-71\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Materiales_List\" vertex=\"1\"><mxGeometry height=\"150\" width=\"180\" x=\"570\" y=\"80\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-72\" parent=\"bVsYpYMz5GkdcFj9vAmd-71\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-73\" parent=\"bVsYpYMz5GkdcFj9vAmd-72\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-74\" parent=\"bVsYpYMz5GkdcFj9vAmd-72\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialesListID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-75\" parent=\"bVsYpYMz5GkdcFj9vAmd-71\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-76\" parent=\"bVsYpYMz5GkdcFj9vAmd-75\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-77\" parent=\"bVsYpYMz5GkdcFj9vAmd-75\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"TratamientoID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-78\" parent=\"bVsYpYMz5GkdcFj9vAmd-71\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-79\" parent=\"bVsYpYMz5GkdcFj9vAmd-78\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-80\" parent=\"bVsYpYMz5GkdcFj9vAmd-78\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-81\" parent=\"bVsYpYMz5GkdcFj9vAmd-71\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-82\" parent=\"bVsYpYMz5GkdcFj9vAmd-81\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-83\" parent=\"bVsYpYMz5GkdcFj9vAmd-81\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Cantidad\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-84\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Materiales_List_PRED\" vertex=\"1\"><mxGeometry height=\"150\" width=\"180\" x=\"580\" y=\"476\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-85\" parent=\"bVsYpYMz5GkdcFj9vAmd-84\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-86\" parent=\"bVsYpYMz5GkdcFj9vAmd-85\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-87\" parent=\"bVsYpYMz5GkdcFj9vAmd-85\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialListPredID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-88\" parent=\"bVsYpYMz5GkdcFj9vAmd-84\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-89\" parent=\"bVsYpYMz5GkdcFj9vAmd-88\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-90\" parent=\"bVsYpYMz5GkdcFj9vAmd-88\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"TratPredID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-91\" parent=\"bVsYpYMz5GkdcFj9vAmd-84\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-92\" parent=\"bVsYpYMz5GkdcFj9vAmd-91\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-93\" parent=\"bVsYpYMz5GkdcFj9vAmd-91\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-94\" parent=\"bVsYpYMz5GkdcFj9vAmd-84\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-95\" parent=\"bVsYpYMz5GkdcFj9vAmd-94\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-96\" parent=\"bVsYpYMz5GkdcFj9vAmd-94\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Cantidad\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-97\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Tratamiento_PRED\" vertex=\"1\"><mxGeometry height=\"120\" width=\"180\" x=\"320\" y=\"473\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-98\" parent=\"bVsYpYMz5GkdcFj9vAmd-97\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-99\" parent=\"bVsYpYMz5GkdcFj9vAmd-98\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-100\" parent=\"bVsYpYMz5GkdcFj9vAmd-98\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"TratPredID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-101\" parent=\"bVsYpYMz5GkdcFj9vAmd-97\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-102\" parent=\"bVsYpYMz5GkdcFj9vAmd-101\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-103\" parent=\"bVsYpYMz5GkdcFj9vAmd-101\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"NombreTratamiento\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-104\" parent=\"bVsYpYMz5GkdcFj9vAmd-97\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-105\" parent=\"bVsYpYMz5GkdcFj9vAmd-104\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-106\" parent=\"bVsYpYMz5GkdcFj9vAmd-104\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MontoSugerido\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-110\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Asistencia\" vertex=\"1\"><mxGeometry height=\"120\" width=\"180\" x=\"74\" y=\"660\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-111\" parent=\"bVsYpYMz5GkdcFj9vAmd-110\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-112\" parent=\"bVsYpYMz5GkdcFj9vAmd-111\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-113\" parent=\"bVsYpYMz5GkdcFj9vAmd-111\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"AsistenciaID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-114\" parent=\"bVsYpYMz5GkdcFj9vAmd-110\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-115\" parent=\"bVsYpYMz5GkdcFj9vAmd-114\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-116\" parent=\"bVsYpYMz5GkdcFj9vAmd-114\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"DocenteID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-117\" parent=\"bVsYpYMz5GkdcFj9vAmd-110\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-118\" parent=\"bVsYpYMz5GkdcFj9vAmd-117\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-119\" parent=\"bVsYpYMz5GkdcFj9vAmd-117\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Fecha\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-123\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Materiales_Asistencia\" vertex=\"1\"><mxGeometry height=\"150\" width=\"180\" x=\"320\" y=\"660\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-124\" parent=\"bVsYpYMz5GkdcFj9vAmd-123\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-125\" parent=\"bVsYpYMz5GkdcFj9vAmd-124\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-126\" parent=\"bVsYpYMz5GkdcFj9vAmd-124\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MatAsistenciaID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-127\" parent=\"bVsYpYMz5GkdcFj9vAmd-123\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-128\" parent=\"bVsYpYMz5GkdcFj9vAmd-127\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-129\" parent=\"bVsYpYMz5GkdcFj9vAmd-127\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"AsistenciaID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-130\" parent=\"bVsYpYMz5GkdcFj9vAmd-123\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"90\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-131\" parent=\"bVsYpYMz5GkdcFj9vAmd-130\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"FK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-132\" parent=\"bVsYpYMz5GkdcFj9vAmd-130\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"MaterialesID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-133\" parent=\"bVsYpYMz5GkdcFj9vAmd-123\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-134\" parent=\"bVsYpYMz5GkdcFj9vAmd-133\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-135\" parent=\"bVsYpYMz5GkdcFj9vAmd-133\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"Cantidad\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-136\" parent=\"1\" style=\"shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;\" value=\"Unidad\" vertex=\"1\"><mxGeometry height=\"90\" width=\"180\" x=\"322\" y=\"21\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-137\" parent=\"bVsYpYMz5GkdcFj9vAmd-136\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"30\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-138\" parent=\"bVsYpYMz5GkdcFj9vAmd-137\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;fontStyle=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"PK\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-139\" parent=\"bVsYpYMz5GkdcFj9vAmd-137\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"UnidadID\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-140\" parent=\"bVsYpYMz5GkdcFj9vAmd-136\" style=\"shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"180\" y=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-141\" parent=\"bVsYpYMz5GkdcFj9vAmd-140\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;editable=1;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"\" vertex=\"1\"><mxGeometry height=\"30\" width=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"30\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"bVsYpYMz5GkdcFj9vAmd-142\" parent=\"bVsYpYMz5GkdcFj9vAmd-140\" style=\"shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;\" value=\"UnidadNro\" vertex=\"1\"><mxGeometry height=\"30\" width=\"150\" x=\"30\" as=\"geometry\"><mxRectangle height=\"30\" width=\"150\" as=\"alternateBounds\"/></mxGeometry></mxCell></root></mxGraphModel></diagram></mxfile>",
+  "pages": [
+    {
+      "id": "E8d_6aHQFICb3FtQikd_",
+      "name": "Página-1",
+      "cells": [
+        {
+          "id": "1",
+          "type": "layer"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-6",
+          "type": "node",
+          "parent": "1",
+          "label": "Operadores"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-7",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-8",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-7",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-9",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-7",
+          "label": "OperadorID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-10",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-11",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-10"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-12",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-10",
+          "label": "Nombres"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-13",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-14",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-13"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-15",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-13",
+          "label": "Apellidos"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-16",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-17",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-16"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-18",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-16",
+          "label": "Grado"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-149",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-150",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-149"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-151",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-149",
+          "label": "Tipo"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-152",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-153",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-152"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-154",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-152",
+          "label": "Periodo"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-155",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-6"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-156",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-155"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-157",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-155",
+          "label": "Estado"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-19",
+          "type": "node",
+          "parent": "1",
+          "label": "Tratamiento"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-20",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-21",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-20",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-22",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-20",
+          "label": "TratamientoID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-23",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-24",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-23",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-25",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-23",
+          "label": "OperadorID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-26",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-27",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-26",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-28",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-26",
+          "label": "PacienteID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-29",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-30",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-29",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-31",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-29",
+          "label": "UnidadID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-158",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-159",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-158"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-160",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-158",
+          "label": "Fecha"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-161",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-162",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-161"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-163",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-161",
+          "label": "NombreTratamiento"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-164",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-165",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-164"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-166",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-164",
+          "label": "Monto"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-167",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-168",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-167"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-169",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-167",
+          "label": "Tipo"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-170",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-19"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-171",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-170"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-172",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-170",
+          "label": "EstadoPago&nbsp;"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-32",
+          "type": "node",
+          "parent": "1",
+          "label": "Materiales",
+          "html": "Materiales<div><br></div>"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-33",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-32"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-34",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-33",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-35",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-33",
+          "label": "MaterialID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-36",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-32"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-37",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-36"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-38",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-36",
+          "label": "Nombre"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-39",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-32"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-40",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-39"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-41",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-39",
+          "label": "Unidad"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-42",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-32"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-43",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-42"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-44",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-42",
+          "label": "Estado"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-45",
+          "type": "node",
+          "parent": "1",
+          "label": "Pacientes"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-46",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-45"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-47",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-46",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-48",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-46",
+          "label": "PacienteID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-49",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-45"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-50",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-49"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-51",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-49",
+          "label": "Nombres"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-52",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-45"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-53",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-52"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-54",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-52",
+          "label": "Apellidos"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-58",
+          "type": "node",
+          "parent": "1",
+          "label": "Docentes"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-59",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-58"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-60",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-59",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-61",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-59",
+          "label": "DocenteID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-62",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-58"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-63",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-62"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-64",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-62",
+          "label": "Nombres"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-65",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-58"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-66",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-65"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-67",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-65",
+          "label": "Apellidos"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-68",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-58"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-69",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-68"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-70",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-68",
+          "label": "Estado"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-71",
+          "type": "node",
+          "parent": "1",
+          "label": "Materiales_List"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-72",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-71"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-73",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-72",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-74",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-72",
+          "label": "MaterialesListID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-75",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-71"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-76",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-75",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-77",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-75",
+          "label": "TratamientoID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-78",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-71"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-79",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-78",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-80",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-78",
+          "label": "MaterialID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-81",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-71"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-82",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-81"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-83",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-81",
+          "label": "Cantidad"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-84",
+          "type": "node",
+          "parent": "1",
+          "label": "Materiales_List_PRED"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-85",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-84"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-86",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-85",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-87",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-85",
+          "label": "MaterialListPredID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-88",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-84"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-89",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-88",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-90",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-88",
+          "label": "TratPredID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-91",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-84"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-92",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-91",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-93",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-91",
+          "label": "MaterialID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-94",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-84"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-95",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-94"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-96",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-94",
+          "label": "Cantidad"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-97",
+          "type": "node",
+          "parent": "1",
+          "label": "Tratamiento_PRED"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-98",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-97"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-99",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-98",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-100",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-98",
+          "label": "TratPredID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-101",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-97"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-102",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-101"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-103",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-101",
+          "label": "NombreTratamiento"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-104",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-97"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-105",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-104"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-106",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-104",
+          "label": "MontoSugerido"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-110",
+          "type": "node",
+          "parent": "1",
+          "label": "Asistencia"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-111",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-110"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-112",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-111",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-113",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-111",
+          "label": "AsistenciaID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-114",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-110"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-115",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-114",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-116",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-114",
+          "label": "DocenteID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-117",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-110"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-118",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-117"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-119",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-117",
+          "label": "Fecha"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-123",
+          "type": "node",
+          "parent": "1",
+          "label": "Materiales_Asistencia"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-124",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-123"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-125",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-124",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-126",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-124",
+          "label": "MatAsistenciaID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-127",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-123"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-128",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-127",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-129",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-127",
+          "label": "AsistenciaID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-130",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-123"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-131",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-130",
+          "label": "FK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-132",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-130",
+          "label": "MaterialesID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-133",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-123"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-134",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-133"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-135",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-133",
+          "label": "Cantidad"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-136",
+          "type": "node",
+          "parent": "1",
+          "label": "Unidad"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-137",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-136"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-138",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-137",
+          "label": "PK"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-139",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-137",
+          "label": "UnidadID"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-140",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-136"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-141",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-140"
+        },
+        {
+          "id": "bVsYpYMz5GkdcFj9vAmd-142",
+          "type": "node",
+          "parent": "bVsYpYMz5GkdcFj9vAmd-140",
+          "label": "UnidadNro"
+        }
+      ]
+    }
+  ]
+}
