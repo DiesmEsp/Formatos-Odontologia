@@ -1,8 +1,24 @@
 # Formatos-Odontologia
 
-Estado actual: estructura base del proyecto, sin implementacion funcional.
+Estado actual: Fase 0 y Fase 1 (catálogos) implementadas. Compila y tests pasan.
 
-La idea es usar este repositorio como esqueleto para una aplicacion de escritorio en Java con interfaz grafica, base de datos local por PC y exportacion a Excel.
+Aplicación de escritorio en Java (JavaFX) con base de datos local SQLite y exportación a Excel.
+
+## Estado de implementación
+
+- **Fase 0 (completada)**: build Gradle 8.14.2 (wrapper), Java 21, JavaFX 21, migraciones Flyway, `ConnectionManager`, configuración por `application.properties`.
+- **Modelos (completados)**: 13 clases POJO alineadas con el esquema V1.
+- **Fase 1 (completada)**: repositorios y servicios de catálogos (Materiales, Docentes, Operadores, Pacientes, Unidad, Tratamiento_PRED + Materiales_List_PRED) con validaciones (unicidad RF-1.1.3, grado/tipo RD-3.1.1, numeración secuencial de unidades, bloqueo por ocupación).
+- **Tests**: JUnit 5 contra SQLite en archivo temporal (mismo motor que producción). 15 tests pasan.
+- **Pendiente**: UI, Asistencia Docente, Tratamientos, Reportes.
+
+## Comandos
+
+```text
+.\gradlew.bat compileJava   # compilar
+.\gradlew.bat test          # ejecutar tests
+.\gradlew.bat run           # lanzar la app
+```
 
 ## Referencia funcional actual
 
