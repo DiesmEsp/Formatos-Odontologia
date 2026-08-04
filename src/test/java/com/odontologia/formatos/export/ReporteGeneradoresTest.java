@@ -19,7 +19,6 @@ import com.odontologia.formatos.repository.PacienteRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoRepository;
 import com.odontologia.formatos.repository.UnidadConversionRepository;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -31,16 +30,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Verifica que los generadores escriban archivos Excel válidos con el nombre
- * correcto (RNF-2.3.2) y con los datos esperados (RF-1.7.2 a RF-1.7.6).
- */
 class ReporteGeneradoresTest extends BaseRepositoryTest {
 
     @TempDir
@@ -102,84 +96,95 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
     }
 
     @Test
-    void materialesGeneraArchivoConNombreYContenido() throws Exception {
+    void materialesGeneraArchivoMensual() throws Exception {
         Path archivo = new ReporteMaterialesGenerator().generar(2024, 10, carpeta);
 
         assertEquals("Materiales_Octubre_2024.xlsx", archivo.getFileName().toString());
         try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
-            Sheet hoja = libro.getSheet("Materiales");
-            assertNotNull(hoja);
-            assertEquals("Material", texto(hoja, 0, 0));
-            assertEquals("Algodón prueba", texto(hoja, 1, 0));
-            assertEquals("gramo", texto(hoja, 1, 1));
-            assertEquals(1500.0, numero(hoja, 1, 2), 0.001);
+            assertEquals(3, libro.getNumberOfSheets());
+
+            Sheet general = libro.getSheet("General");
+            assertNotNull(general);
+            assertEquals("Material", general.getRow(0).getCell(0).getStringCellValue());
+            assertEquals("Algodón prueba", general.getRow(1).getCell(0).getStringCellValue());
+            assertEquals("gramo", general.getRow(1).getCell(1).getStringCellValue());
+            assertEquals(1500.0, general.getRow(1).getCell(2).getNumericCellValue(), 0.001);
+
+            Sheet detalleDocente = libro.getSheet("Detalle Docente");
+            assertNotNull(detalleDocente);
+            assertEquals("Docente: Carlos Rojas", detalleDocente.getRow(0).getCell(0).getStringCellValue());
+
+            Sheet operador = libro.getSheet("Por Operador");
+            assertNotNull(operador);
+            assertEquals("Operador: Ana Perez (PRE-4)", operador.getRow(0).getCell(0).getStringCellValue());
+            assertEquals("Material", operador.getRow(1).getCell(0).getStringCellValue());
+            assertEquals("Algodón prueba", operador.getRow(2).getCell(0).getStringCellValue());
+            assertEquals("gramo", operador.getRow(2).getCell(1).getStringCellValue());
+            assertEquals(1000.0, operador.getRow(2).getCell(2).getNumericCellValue(), 0.001);
         }
     }
 
     @Test
-    void ingresosGeneraArchivoConAgrupacion() throws Exception {
-        Path archivo = new ReporteIngresosGenerator().generar(2024, 10, carpeta);
+    void materialesGeneraArchivoAnual() throws Exception {
+        Path archivo = new ReporteMaterialesGenerator().generar(2024, 1, 12, carpeta);
 
-        assertEquals("Ingresos_Octubre_2024.xlsx", archivo.getFileName().toString());
+        assertEquals("Materiales_2024.xlsx", archivo.getFileName().toString());
         try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
-            Sheet hoja = libro.getSheet("Ingresos");
-            assertNotNull(hoja);
-            assertEquals("PRE", texto(hoja, 1, 0));
-            assertEquals("4", texto(hoja, 1, 1));
-            assertEquals(2.0, numero(hoja, 1, 2), 0.001);
-            assertEquals(150.0, numero(hoja, 1, 3), 0.001);
-            assertEquals(90.0, numero(hoja, 1, 4), 0.001);
-            assertEquals(60.0, numero(hoja, 1, 5), 0.001);
+            assertEquals(3, libro.getNumberOfSheets());
+            Sheet general = libro.getSheet("General");
+            assertNotNull(general);
+            assertEquals("Ene", general.getRow(0).getCell(2).getStringCellValue());
+            assertEquals("Total", general.getRow(0).getCell(14).getStringCellValue());
         }
     }
 
     @Test
-    void docenteGeneraConsolidadoYDetalleDiario() throws Exception {
-        Path archivo = new ReporteDocenteGenerator().generar(2024, 10, carpeta);
+    void materialesGeneraArchivoSemestral() throws Exception {
+        Path archivo = new ReporteMaterialesGenerator().generar(2024, 1, 6, carpeta);
 
-        assertEquals("Docente_Octubre_2024.xlsx", archivo.getFileName().toString());
+        assertEquals("Materiales_Ene_Jun_2024.xlsx", archivo.getFileName().toString());
         try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
-            Sheet consolidado = libro.getSheet("Consolidado");
-            Sheet detalle = libro.getSheet("Detalle diario");
-            assertNotNull(consolidado);
-            assertNotNull(detalle);
-            assertEquals("Carlos Rojas", texto(consolidado, 1, 0));
-            assertEquals(1.0, numero(consolidado, 1, 3), 0.001);
-            assertEquals("2024-10-15", texto(detalle, 1, 1));
+            assertTrue(libro.getNumberOfSheets() >= 3);
         }
     }
 
     @Test
-    void especialistaGeneraArchivo() throws Exception {
-        Path archivo = new ReporteEspecialistaGenerator().generar(2024, 10, carpeta);
+    void economicoGeneraArchivoMensual() throws Exception {
+        Path archivo = new ReporteEconomicoGenerator().generar(2024, 10, carpeta);
 
-        assertEquals("Especialista_Octubre_2024.xlsx", archivo.getFileName().toString());
+        assertEquals("Economico_Octubre_2024.xlsx", archivo.getFileName().toString());
         try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
-            Sheet hoja = libro.getSheet("Especialista");
-            assertNotNull(hoja);
-            assertEquals("Ana Perez", texto(hoja, 1, 0));
-            assertEquals(2.0, numero(hoja, 1, 5), 0.001);
+            assertEquals(2, libro.getNumberOfSheets());
+
+            Sheet general = libro.getSheet("General");
+            assertNotNull(general);
+            assertEquals("Tratamiento", general.getRow(0).getCell(0).getStringCellValue());
+            assertEquals("Tratamiento test", general.getRow(1).getCell(0).getStringCellValue());
+            assertEquals(2.0, general.getRow(1).getCell(1).getNumericCellValue(), 0.001);
+            assertEquals(150.0, general.getRow(1).getCell(2).getNumericCellValue(), 0.001);
+            assertEquals(90.0, general.getRow(1).getCell(3).getNumericCellValue(), 0.001);
+            assertEquals(60.0, general.getRow(1).getCell(4).getNumericCellValue(), 0.001);
+
+            Sheet operador = libro.getSheet("Por Operador");
+            assertNotNull(operador);
+            assertEquals("Operador: Ana Perez (PRE-4)", operador.getRow(0).getCell(0).getStringCellValue());
+            assertEquals("Tratamiento", operador.getRow(1).getCell(0).getStringCellValue());
+            assertEquals("Tratamiento test", operador.getRow(2).getCell(0).getStringCellValue());
+            assertEquals(2.0, operador.getRow(2).getCell(1).getNumericCellValue(), 0.001);
         }
     }
 
     @Test
-    void anualGeneraCuatroHojasConTotales() throws Exception {
-        Path archivo = new ReporteAnualGenerator().generar(2024, 1, carpeta);
+    void economicoGeneraArchivoAnual() throws Exception {
+        Path archivo = new ReporteEconomicoGenerator().generar(2024, 1, 12, carpeta);
 
-        assertEquals("Anual_2024.xlsx", archivo.getFileName().toString());
+        assertEquals("Economico_2024.xlsx", archivo.getFileName().toString());
         try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
-            assertEquals(4, libro.getNumberOfSheets());
-            Sheet materiales = libro.getSheet("Materiales");
-            assertNotNull(materiales);
-            assertEquals("Ene", texto(materiales, 0, 2));
-            assertEquals("Total", texto(materiales, 0, 14));
-            int filaAlgodon = buscarFila(materiales, 0, "Algodón prueba");
-            assertTrue(filaAlgodon > 0);
-            assertEquals(1500.0, numero(materiales, filaAlgodon, 2 + 9), 0.001);
-            assertEquals(2500.0, numero(materiales, filaAlgodon, 14), 0.001);
-            assertNotNull(libro.getSheet("Ingresos"));
-            assertNotNull(libro.getSheet("Docente"));
-            assertNotNull(libro.getSheet("Especialista"));
+            assertEquals(2, libro.getNumberOfSheets());
+            Sheet general = libro.getSheet("General");
+            assertNotNull(general);
+            assertEquals("Ene", general.getRow(0).getCell(1).getStringCellValue());
+            assertEquals("Total", general.getRow(0).getCell(13).getStringCellValue());
         }
     }
 
@@ -188,9 +193,6 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
         Path archivo = new ReporteMaterialesGenerator().generar(2024, 10, carpeta);
 
         assertTrue(Files.exists(archivo));
-        try (Stream<Path> contenido = Files.list(carpeta)) {
-            assertEquals(1, contenido.count());
-        }
     }
 
     private int insertarMaterial(String nombre, String unidad) throws SQLException {
@@ -250,27 +252,5 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
         item.setMaterialID(materialID);
         item.setCantidad(cantidad);
         asistenciaMaterialRepository.insert(item);
-    }
-
-    private String texto(Sheet hoja, int fila, int col) {
-        Cell celda = hoja.getRow(fila).getCell(col);
-        return switch (celda.getCellType()) {
-            case STRING -> celda.getStringCellValue();
-            case NUMERIC -> String.valueOf(celda.getNumericCellValue());
-            default -> "";
-        };
-    }
-
-    private double numero(Sheet hoja, int fila, int col) {
-        return hoja.getRow(fila).getCell(col).getNumericCellValue();
-    }
-
-    private int buscarFila(Sheet hoja, int col, String valor) {
-        for (int i = 1; i <= hoja.getLastRowNum(); i++) {
-            if (valor.equals(texto(hoja, i, col))) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

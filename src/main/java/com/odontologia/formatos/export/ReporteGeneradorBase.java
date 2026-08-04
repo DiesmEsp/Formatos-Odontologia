@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,9 +39,31 @@ public abstract class ReporteGeneradorBase {
         return destino;
     }
 
+    public Path generar(int anio, int mesInicio, int mesFin, Path carpetaDestino) throws SQLException, ReporteException {
+        Path destino = carpetaDestino.resolve(nombreArchivoRango(anio, mesInicio, mesFin));
+        Workbook libro = ExcelExporter.nuevoLibro();
+        try {
+            construirRango(libro, anio, mesInicio, mesFin);
+            ExcelExporter.guardar(libro, destino);
+        } catch (IOException e) {
+            throw new ReporteException(ExportErrorUtil.mensaje(e, destino.toString()));
+        } finally {
+            cerrarQuietamente(libro);
+        }
+        return destino;
+    }
+
     protected abstract String nombreArchivo(int anio, int mes);
 
+    protected String nombreArchivoRango(int anio, int mesInicio, int mesFin) {
+        return nombreArchivo(anio, mesInicio);
+    }
+
     protected abstract void construir(Workbook libro, int anio, int mes) throws SQLException;
+
+    protected void construirRango(Workbook libro, int anio, int mesInicio, int mesFin) throws SQLException {
+        construir(libro, anio, mesInicio);
+    }
 
     protected Sheet crearHoja(Workbook libro, String nombre) {
         return ExcelExporter.crearHoja(libro, nombre);
@@ -50,8 +73,24 @@ public abstract class ReporteGeneradorBase {
         ExcelExporter.escribirEncabezado(hoja, 0, encabezados);
     }
 
+    protected void encabezado(Sheet hoja, int filaIndex, List<String> encabezados) {
+        ExcelExporter.escribirEncabezado(hoja, filaIndex, encabezados);
+    }
+
+    protected void titulo(Sheet hoja, String texto, int colspan) {
+        ExcelExporter.escribirTitulo(hoja, 0, texto, colspan);
+    }
+
+    protected void seccion(Sheet hoja, int filaIndex, String texto, int colspan) {
+        ExcelExporter.escribirEncabezadoSeccion(hoja, filaIndex, texto, colspan);
+    }
+
     protected void fila(Sheet hoja, int filaIndex, List<?> valores) {
         ExcelExporter.escribirFila(hoja, filaIndex, valores);
+    }
+
+    protected void filaTotal(Sheet hoja, int filaIndex, List<Object> valores, int colInicio) {
+        ExcelExporter.escribirTotal(hoja, filaIndex, valores, colInicio);
     }
 
     protected void autoAjustar(Sheet hoja, int numColumnas) {
@@ -62,6 +101,27 @@ public abstract class ReporteGeneradorBase {
         return Arrays.asList(
                 "Ene", "Feb", "Mar", "Abr", "May", "Jun",
                 "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
+    }
+
+    protected List<Integer> mesesEnRango(int mesInicio, int mesFin) {
+        List<Integer> meses = new ArrayList<>();
+        for (int m = mesInicio; m <= mesFin; m++) {
+            meses.add(m);
+        }
+        return meses;
+    }
+
+    protected List<String> nombresMesesEnRango(int mesInicio, int mesFin) {
+        List<String> nombres = mesesAnio();
+        List<String> resultado = new ArrayList<>();
+        for (int m = mesInicio; m <= mesFin; m++) {
+            resultado.add(nombres.get(m - 1));
+        }
+        return resultado;
+    }
+
+    protected int diasDelMes(int anio, int mes) {
+        return ExcelExporter.diasDelMes(anio, mes);
     }
 
     protected double redondear2(double valor) {

@@ -2,16 +2,15 @@ package com.odontologia.formatos.export;
 
 /**
  * Nomenclatura dinámica de archivos de reportes (RNF-2.3.2).
- * Formato: {Materiales,Ingresos,Docente,Especialista,Anual}_{Mes}_{Año}.xlsx
- * Ejemplo: Materiales_Octubre_2024.xlsx, Anual_2024.xlsx
+ * <p>
+ * Formato mensual:   {Tipo}_{Mes}_{Anio}.xlsx    → Materiales_Octubre_2024.xlsx
+ * Formato semestral: {Tipo}_{Inicio}_{Fin}_{Anio}.xlsx → Materiales_Ene_Jun_2024.xlsx
+ * Formato anual:     {Tipo}_{Anio}.xlsx           → Materiales_2024.xlsx
  */
 public final class ReporteNomenclatura {
 
     public static final String TIPO_MATERIALES = "Materiales";
-    public static final String TIPO_INGRESOS = "Ingresos";
-    public static final String TIPO_DOCENTE = "Docente";
-    public static final String TIPO_ESPECIALISTA = "Especialista";
-    public static final String TIPO_ANUAL = "Anual";
+    public static final String TIPO_ECONOMICO = "Economico";
 
     private static final String[] MESES = {
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -26,12 +25,40 @@ public final class ReporteNomenclatura {
     private ReporteNomenclatura() {
     }
 
-    public static String nombre(String tipo, int anio, int mes) {
-        return tipo + "_" + mes(mes) + "_" + anio + ".xlsx";
+    public static String nombreMateriales(int anio, int mes) {
+        return nombreMensual(TIPO_MATERIALES, anio, mes);
     }
 
-    public static String nombreAnual(int anio) {
-        return TIPO_ANUAL + "_" + anio + ".xlsx";
+    public static String nombreMateriales(int anio, int mesInicio, int mesFin) {
+        return nombreRango(TIPO_MATERIALES, anio, mesInicio, mesFin);
+    }
+
+    public static String nombreEconomico(int anio, int mes) {
+        return nombreMensual(TIPO_ECONOMICO, anio, mes);
+    }
+
+    public static String nombreEconomico(int anio, int mesInicio, int mesFin) {
+        return nombreRango(TIPO_ECONOMICO, anio, mesInicio, mesFin);
+    }
+
+    private static String nombreMensual(String tipo, int anio, int mes) {
+        if (mes < 1 || mes > 12) {
+            throw new IllegalArgumentException("El mes debe estar entre 1 y 12.");
+        }
+        return tipo + "_" + MESES[mes - 1] + "_" + anio + ".xlsx";
+    }
+
+    private static String nombreRango(String tipo, int anio, int mesInicio, int mesFin) {
+        if (mesInicio < 1 || mesInicio > 12 || mesFin < 1 || mesFin > 12) {
+            throw new IllegalArgumentException("Los meses deben estar entre 1 y 12.");
+        }
+        if (mesInicio > mesFin) {
+            throw new IllegalArgumentException("mesInicio debe ser <= mesFin.");
+        }
+        if (mesInicio == 1 && mesFin == 12) {
+            return tipo + "_" + anio + ".xlsx";
+        }
+        return tipo + "_" + MESES_CORTOS[mesInicio - 1] + "_" + MESES_CORTOS[mesFin - 1] + "_" + anio + ".xlsx";
     }
 
     public static String mes(int mes) {

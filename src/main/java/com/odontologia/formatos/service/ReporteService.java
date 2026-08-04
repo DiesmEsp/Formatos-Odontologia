@@ -38,6 +38,16 @@ public class ReporteService {
         return repository.especialista(anio, mes);
     }
 
+    public List<ReporteRepository.FilaIngresoTratamiento> ingresosPorTratamiento(int anio, int mes) throws SQLException {
+        validarMes(mes);
+        return repository.ingresosPorTratamiento(anio, mes);
+    }
+
+    public List<ReporteRepository.FilaIngresoOperador> ingresosPorOperador(int anio, int mes) throws SQLException {
+        validarMes(mes);
+        return repository.ingresosPorOperador(anio, mes);
+    }
+
     private void validarMes(int mes) {
         if (mes < 1 || mes > 12) {
             throw new NegocioException("El mes debe estar entre 1 y 12.");

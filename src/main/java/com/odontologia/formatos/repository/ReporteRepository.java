@@ -102,18 +102,21 @@ public class ReporteRepository {
     private List<FilaDocente> docente(int anio, int mes, boolean porDia) throws SQLException {
         String selectDia = porDia ? "a.Fecha AS Dia, " : "NULL AS Dia, ";
         String groupBy = porDia
-                ? "GROUP BY d.DocenteID, d.Nombres, d.Apellidos, a.Fecha, m.MaterialID, m.Nombre, m.Unidad "
-                : "GROUP BY d.DocenteID, d.Nombres, d.Apellidos, m.MaterialID, m.Nombre, m.Unidad ";
+                ? "GROUP BY d.DocenteID, d.Nombres, d.Apellidos, a.Fecha, m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
+                : "GROUP BY d.DocenteID, d.Nombres, d.Apellidos, m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) ";
         String orderBy = porDia
                 ? "ORDER BY a.Fecha, d.Apellidos, d.Nombres, m.Nombre"
                 : "ORDER BY d.Apellidos, d.Nombres, m.Nombre";
         String sql = "SELECT d.DocenteID, d.Nombres || ' ' || d.Apellidos AS Docente, "
                 + selectDia
-                + "m.MaterialID, m.Nombre AS Material, m.Unidad, SUM(ma.Cantidad) AS Cantidad "
+                + "m.MaterialID, m.Nombre AS Material, COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
+                + "SUM(ma.Cantidad * COALESCE(uc.Factor, 1)) AS Cantidad "
                 + "FROM Materiales_Asistencia ma "
                 + "JOIN Asistencia a ON a.AsistenciaID = ma.AsistenciaID "
                 + "JOIN Docentes d ON d.DocenteID = a.DocenteID "
                 + "JOIN Materiales m ON m.MaterialID = ma.MaterialesID "
+                + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
+                + "  AND uc.UnidadEmpaque = m.Unidad "
                 + "WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? "
                 + groupBy + orderBy;
         List<FilaDocente> lista = new ArrayList<>();
@@ -139,15 +142,18 @@ public class ReporteRepository {
 
     public List<FilaEspecialista> especialista(int anio, int mes) throws SQLException {
         String sql = "SELECT o.OperadorID, o.Nombres || ' ' || o.Apellidos AS Especialista, "
-                + "o.Grado, o.Tipo, m.MaterialID, m.Nombre AS Material, m.Unidad, "
-                + "SUM(ml.Cantidad) AS Cantidad "
+                + "o.Grado, o.Tipo, m.MaterialID, m.Nombre AS Material, "
+                + "COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
+                + "SUM(ml.Cantidad * COALESCE(uc.Factor, 1)) AS Cantidad "
                 + "FROM Materiales_List ml "
                 + "JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
                 + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
+                + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
+                + "  AND uc.UnidadEmpaque = m.Unidad "
                 + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
                 + "GROUP BY o.OperadorID, o.Nombres, o.Apellidos, o.Grado, o.Tipo, "
-                + "m.MaterialID, m.Nombre, m.Unidad "
+                + "m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
                 + "ORDER BY o.Apellidos, o.Nombres, m.Nombre";
         List<FilaEspecialista> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
@@ -164,6 +170,68 @@ public class ReporteRepository {
                             rs.getString("Material"),
                             rs.getString("Unidad"),
                             rs.getDouble("Cantidad")));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<FilaIngresoTratamiento> ingresosPorTratamiento(int anio, int mes) throws SQLException {
+        String sql = "SELECT t.NombreTratamiento, "
+                + "COUNT(*) AS CantidadTratamientos, "
+                + "COALESCE(SUM(t.Monto), 0) AS IngresoTotal, "
+                + "COALESCE(SUM(t.MontoPagado), 0) AS MontoPagado, "
+                + "COALESCE(SUM(t.Monto - t.MontoPagado), 0) AS MontoPendiente "
+                + "FROM Tratamiento t "
+                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? "
+                + "GROUP BY t.NombreTratamiento "
+                + "ORDER BY IngresoTotal DESC";
+        List<FilaIngresoTratamiento> lista = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, patronMes(anio, mes));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new FilaIngresoTratamiento(
+                            rs.getString("NombreTratamiento"),
+                            rs.getInt("CantidadTratamientos"),
+                            rs.getDouble("IngresoTotal"),
+                            rs.getDouble("MontoPagado"),
+                            rs.getDouble("MontoPendiente")));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<FilaIngresoOperador> ingresosPorOperador(int anio, int mes) throws SQLException {
+        String sql = "SELECT o.OperadorID, o.Nombres || ' ' || o.Apellidos AS Nombre, "
+                + "o.Grado, o.Tipo, t.NombreTratamiento, "
+                + "COUNT(*) AS Cantidad, "
+                + "COALESCE(SUM(t.Monto), 0) AS IngresoTotal, "
+                + "COALESCE(SUM(t.MontoPagado), 0) AS MontoPagado, "
+                + "COALESCE(SUM(t.Monto - t.MontoPagado), 0) AS MontoPendiente "
+                + "FROM Tratamiento t "
+                + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
+                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? "
+                + "GROUP BY o.OperadorID, t.NombreTratamiento "
+                + "ORDER BY o.Grado, o.Tipo, IngresoTotal DESC";
+        List<FilaIngresoOperador> lista = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, patronMes(anio, mes));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new FilaIngresoOperador(
+                            rs.getInt("OperadorID"),
+                            rs.getString("Nombre"),
+                            rs.getString("Grado"),
+                            rs.getString("Tipo"),
+                            rs.getString("NombreTratamiento"),
+                            rs.getInt("Cantidad"),
+                            rs.getDouble("IngresoTotal"),
+                            rs.getDouble("MontoPagado"),
+                            rs.getDouble("MontoPendiente")));
                 }
             }
         }
@@ -348,6 +416,105 @@ public class ReporteRepository {
 
         public double getCantidad() {
             return cantidad;
+        }
+    }
+
+    public static class FilaIngresoTratamiento {
+        private final String tratamiento;
+        private final int cantidadTratamientos;
+        private final double ingresoTotal;
+        private final double montoPagado;
+        private final double montoPendiente;
+
+        public FilaIngresoTratamiento(String tratamiento, int cantidadTratamientos,
+                                      double ingresoTotal, double montoPagado, double montoPendiente) {
+            this.tratamiento = tratamiento;
+            this.cantidadTratamientos = cantidadTratamientos;
+            this.ingresoTotal = ingresoTotal;
+            this.montoPagado = montoPagado;
+            this.montoPendiente = montoPendiente;
+        }
+
+        public String getTratamiento() {
+            return tratamiento;
+        }
+
+        public int getCantidadTratamientos() {
+            return cantidadTratamientos;
+        }
+
+        public double getIngresoTotal() {
+            return ingresoTotal;
+        }
+
+        public double getMontoPagado() {
+            return montoPagado;
+        }
+
+        public double getMontoPendiente() {
+            return montoPendiente;
+        }
+    }
+
+    public static class FilaIngresoOperador {
+        private final int operadorID;
+        private final String nombre;
+        private final String grado;
+        private final String tipo;
+        private final String tratamiento;
+        private final int cantidad;
+        private final double ingresoTotal;
+        private final double montoPagado;
+        private final double montoPendiente;
+
+        public FilaIngresoOperador(int operadorID, String nombre, String grado, String tipo,
+                                   String tratamiento, int cantidad, double ingresoTotal,
+                                   double montoPagado, double montoPendiente) {
+            this.operadorID = operadorID;
+            this.nombre = nombre;
+            this.grado = grado;
+            this.tipo = tipo;
+            this.tratamiento = tratamiento;
+            this.cantidad = cantidad;
+            this.ingresoTotal = ingresoTotal;
+            this.montoPagado = montoPagado;
+            this.montoPendiente = montoPendiente;
+        }
+
+        public int getOperadorID() {
+            return operadorID;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public String getGrado() {
+            return grado;
+        }
+
+        public String getTipo() {
+            return tipo;
+        }
+
+        public String getTratamiento() {
+            return tratamiento;
+        }
+
+        public int getCantidad() {
+            return cantidad;
+        }
+
+        public double getIngresoTotal() {
+            return ingresoTotal;
+        }
+
+        public double getMontoPagado() {
+            return montoPagado;
+        }
+
+        public double getMontoPendiente() {
+            return montoPendiente;
         }
     }
 }

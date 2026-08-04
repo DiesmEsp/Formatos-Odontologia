@@ -143,7 +143,8 @@ class ReporteServiceTest extends BaseRepositoryTest {
         assertEquals(2, filas.size());
         ReporteRepository.FilaDocente alg = filaDocente(filas, algodon);
         assertEquals("Carlos Rojas", alg.getDocente());
-        assertEquals(1.0, alg.getCantidad(), 0.001);
+        assertEquals("gramo", alg.getUnidad());
+        assertEquals(500.0, alg.getCantidad(), 0.001);
         assertTrue(filaDocente(filas, anestesia).getCantidad() > 0);
     }
 
@@ -163,7 +164,37 @@ class ReporteServiceTest extends BaseRepositoryTest {
         ReporteRepository.FilaEspecialista alg = filaEspecialista(filas, algodon);
         assertEquals("Ana Perez", alg.getEspecialista());
         assertEquals("PRE", alg.getGrado());
-        assertEquals(2.0, alg.getCantidad(), 0.001);
+        assertEquals("gramo", alg.getUnidad());
+        assertEquals(1000.0, alg.getCantidad(), 0.001);
+    }
+
+    @Test
+    void ingresosPorTratamiento() throws SQLException {
+        List<ReporteRepository.FilaIngresoTratamiento> filas = service.ingresosPorTratamiento(2024, 10);
+
+        assertEquals(1, filas.size());
+        ReporteRepository.FilaIngresoTratamiento f = filas.get(0);
+        assertEquals("Tratamiento test", f.getTratamiento());
+        assertEquals(2, f.getCantidadTratamientos());
+        assertEquals(150.0, f.getIngresoTotal(), 0.001);
+        assertEquals(90.0, f.getMontoPagado(), 0.001);
+        assertEquals(60.0, f.getMontoPendiente(), 0.001);
+    }
+
+    @Test
+    void ingresosPorOperador() throws SQLException {
+        List<ReporteRepository.FilaIngresoOperador> filas = service.ingresosPorOperador(2024, 10);
+
+        assertEquals(1, filas.size());
+        ReporteRepository.FilaIngresoOperador f = filas.get(0);
+        assertEquals("Ana Perez", f.getNombre());
+        assertEquals("PRE", f.getGrado());
+        assertEquals("4", f.getTipo());
+        assertEquals("Tratamiento test", f.getTratamiento());
+        assertEquals(2, f.getCantidad());
+        assertEquals(150.0, f.getIngresoTotal(), 0.001);
+        assertEquals(90.0, f.getMontoPagado(), 0.001);
+        assertEquals(60.0, f.getMontoPendiente(), 0.001);
     }
 
     @Test

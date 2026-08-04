@@ -5,15 +5,20 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 /**
@@ -60,6 +65,46 @@ public final class ExcelExporter {
         }
     }
 
+    public static void escribirTitulo(Sheet hoja, int filaIndex, String texto, int colspan) {
+        Row fila = hoja.createRow(filaIndex);
+        Cell celda = fila.createCell(0);
+        celda.setCellValue(texto);
+        celda.setCellStyle(estiloTitulo(hoja.getWorkbook()));
+        if (colspan > 1) {
+            hoja.addMergedRegion(new CellRangeAddress(filaIndex, filaIndex, 0, colspan - 1));
+        }
+        fila.setHeight((short) 500);
+    }
+
+    public static void escribirEncabezadoSeccion(Sheet hoja, int filaIndex, String texto, int colspan) {
+        Row fila = hoja.createRow(filaIndex);
+        Cell celda = fila.createCell(0);
+        celda.setCellValue(texto);
+        celda.setCellStyle(estiloSeccion(hoja.getWorkbook()));
+        if (colspan > 1) {
+            hoja.addMergedRegion(new CellRangeAddress(filaIndex, filaIndex, 0, colspan - 1));
+        }
+    }
+
+    public static void escribirTotal(Sheet hoja, int filaIndex, List<Object> valores, int colInicio) {
+        Row fila = hoja.createRow(filaIndex);
+        CellStyle estilo = estiloDatoConBordeSuperior(hoja.getWorkbook());
+        for (int i = 0; i < valores.size(); i++) {
+            Cell celda = fila.createCell(colInicio + i);
+            Object valor = valores.get(i);
+            if (valor instanceof Number numero) {
+                celda.setCellValue(numero.doubleValue());
+            } else if (valor != null) {
+                celda.setCellValue(valor.toString());
+            }
+            celda.setCellStyle(estilo);
+        }
+    }
+
+    public static int diasDelMes(int anio, int mes) {
+        return YearMonth.of(anio, mes).lengthOfMonth();
+    }
+
     public static void autoAjustar(Sheet hoja, int numColumnas) {
         for (int col = 0; col < numColumnas; col++) {
             int ancho = 10;
@@ -101,6 +146,47 @@ public final class ExcelExporter {
         Font fuente = libro.createFont();
         fuente.setBold(true);
         fuente.setColor(IndexedColors.WHITE.getIndex());
+        estilo.setFont(fuente);
+        return estilo;
+    }
+
+    private static CellStyle estiloTitulo(Workbook libro) {
+        CellStyle estilo = libro.createCellStyle();
+        estilo.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
+        estilo.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        estilo.setAlignment(HorizontalAlignment.LEFT);
+        estilo.setVerticalAlignment(VerticalAlignment.CENTER);
+        Font fuente = libro.createFont();
+        fuente.setBold(true);
+        fuente.setFontHeightInPoints((short) 14);
+        fuente.setColor(IndexedColors.WHITE.getIndex());
+        estilo.setFont(fuente);
+        return estilo;
+    }
+
+    private static CellStyle estiloSeccion(Workbook libro) {
+        CellStyle estilo = libro.createCellStyle();
+        estilo.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+        estilo.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        estilo.setBorderBottom(BorderStyle.THIN);
+        estilo.setBorderTop(BorderStyle.THIN);
+        estilo.setBorderLeft(BorderStyle.THIN);
+        estilo.setBorderRight(BorderStyle.THIN);
+        Font fuente = libro.createFont();
+        fuente.setBold(true);
+        fuente.setFontHeightInPoints((short) 11);
+        estilo.setFont(fuente);
+        return estilo;
+    }
+
+    private static CellStyle estiloDatoConBordeSuperior(Workbook libro) {
+        CellStyle estilo = libro.createCellStyle();
+        estilo.setBorderTop(BorderStyle.MEDIUM);
+        estilo.setBorderBottom(BorderStyle.THIN);
+        estilo.setBorderLeft(BorderStyle.THIN);
+        estilo.setBorderRight(BorderStyle.THIN);
+        Font fuente = libro.createFont();
+        fuente.setBold(true);
         estilo.setFont(fuente);
         return estilo;
     }
