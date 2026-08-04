@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegistroAnulacionRepository {
 
@@ -37,5 +39,26 @@ public class RegistroAnulacionRepository {
             }
         }
         throw new SQLException("No se pudo obtener el id generado para RegistroAnulacion");
+    }
+
+    public List<RegistroAnulacion> findAll() throws SQLException {
+        String sql = "SELECT AnulacionID, TablaAfectada, IdRegistroAnulado, Motivo, Usuario, Timestamp "
+                + "FROM RegistroAnulacion ORDER BY Timestamp DESC";
+        List<RegistroAnulacion> lista = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                RegistroAnulacion r = new RegistroAnulacion();
+                r.setAnulacionID(rs.getInt("AnulacionID"));
+                r.setTablaAfectada(rs.getString("TablaAfectada"));
+                r.setIdRegistroAnulado(rs.getInt("IdRegistroAnulado"));
+                r.setMotivo(rs.getString("Motivo"));
+                r.setUsuario(rs.getString("Usuario"));
+                r.setTimestamp(rs.getString("Timestamp"));
+                lista.add(r);
+            }
+        }
+        return lista;
     }
 }

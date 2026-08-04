@@ -1,11 +1,11 @@
 package com.odontologia.formatos;
 
 import com.odontologia.formatos.db.ConnectionManager;
+import com.odontologia.formatos.ui.view.*;
 import com.odontologia.formatos.util.LogConfig;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.util.logging.Level;
@@ -20,8 +20,24 @@ public class MainApp extends Application {
         configurarErroresGlobales();
         LogConfig.configurar();
         ConnectionManager.getInstance();
-        stage.setTitle("Formatos Odontología");
-        stage.setScene(new Scene(new Label("Aplicación en construcción"), 1280, 720));
+
+        MainView mainView = new MainView();
+
+        mainView.registerView("dashboard", new DashboardView());
+        mainView.registerView("catalogos", new CatalogosView(() -> {}));
+        mainView.registerView("unidades", new UnidadesView());
+        mainView.registerView("asistencia", new AsistenciaView(() -> mainView.showToastSuccess("Asistencia registrada")));
+        mainView.registerView("tratamientos", new TratamientosView());
+        mainView.registerView("reportes", new ReportesView());
+        mainView.registerView("auditoria", new AuditoriaView());
+
+        mainView.selectNav("dashboard");
+
+        Scene scene = new Scene(mainView, 1280, 720);
+        scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
+
+        stage.setTitle("Formatos Odontologia");
+        stage.setScene(scene);
         stage.setMinWidth(1280);
         stage.setMinHeight(720);
         stage.show();
@@ -33,7 +49,7 @@ public class MainApp extends Application {
             javafx.application.Platform.runLater(() -> {
                 Alert alerta = new Alert(Alert.AlertType.ERROR);
                 alerta.setTitle("Error inesperado");
-                alerta.setHeaderText("Ocurrió un error inesperado");
+                alerta.setHeaderText("Ocurrio un error inesperado");
                 alerta.setContentText(e.getMessage() == null ? e.toString() : e.getMessage());
                 alerta.showAndWait();
             });
