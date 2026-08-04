@@ -1,6 +1,7 @@
 package com.odontologia.formatos;
 
 import com.odontologia.formatos.db.ConnectionManager;
+import com.odontologia.formatos.db.DemoDataLoader;
 import com.odontologia.formatos.ui.components.FontLoader;
 import com.odontologia.formatos.ui.view.*;
 import com.odontologia.formatos.util.LogConfig;
@@ -21,6 +22,7 @@ public class MainApp extends Application {
         configurarErroresGlobales();
         LogConfig.configurar();
         ConnectionManager.getInstance();
+        DemoDataLoader.loadIfNeeded();
         FontLoader.load();
 
         MainView mainView = new MainView();
