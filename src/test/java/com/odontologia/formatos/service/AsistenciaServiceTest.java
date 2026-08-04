@@ -109,4 +109,31 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
         assertThrows(NegocioException.class,
                 () -> service.registrarMateriales(docenteID, "2026-08-03", Map.of(9999, 1.0)));
     }
+
+    @Test
+    void anularCambiaEstado() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+        service.registrarMateriales(docenteID, "2026-08-03", Map.of(1, 2.0));
+
+        service.anular(a.getAsistenciaID(), "Motivo de prueba");
+
+        Asistencia anulada = asistenciaRepository.findById(a.getAsistenciaID());
+        assertEquals("ANULADO", anulada.getEstado());
+    }
+
+    @Test
+    void anularYaAnuladoArrojaError() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+        service.anular(a.getAsistenciaID(), "Motivo");
+
+        assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), "Otra vez"));
+    }
+
+    @Test
+    void anularSinMotivoArrojaError() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+
+        assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), null));
+        assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), "  "));
+    }
 }

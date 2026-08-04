@@ -129,6 +129,19 @@ public class TratamientoRepository {
         return lista;
     }
 
+    public boolean existeOtroAbiertoEnUnidad(int unidadID, int tratamientoExcluido) throws SQLException {
+        String sql = "SELECT COUNT(*) AS cnt FROM Tratamiento "
+                + "WHERE UnidadID = ? AND Estado = 'ABIERTO' AND TratamientoID != ?";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, unidadID);
+            ps.setInt(2, tratamientoExcluido);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt("cnt") > 0;
+            }
+        }
+    }
+
     public Tratamiento findAbiertoPorUnidad(int unidadID) throws SQLException {
         String sql = "SELECT * FROM Tratamiento WHERE UnidadID = ? AND Estado = 'ABIERTO' "
                 + "ORDER BY TratamientoID DESC LIMIT 1";

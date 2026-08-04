@@ -1,5 +1,6 @@
 package com.odontologia.formatos.service;
 
+import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.model.Tratamiento;
 import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.model.TratamientoPredefinido;
@@ -7,6 +8,7 @@ import com.odontologia.formatos.model.TratamientoPredefinidoMaterial;
 import com.odontologia.formatos.repository.MaterialRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
+import com.odontologia.formatos.repository.RegistroAnulacionRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoRepository;
@@ -17,6 +19,7 @@ import com.odontologia.formatos.util.TransaccionBD;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Flujo de tratamientos (RF-1.4.x).
@@ -36,6 +39,7 @@ public class TratamientoService {
     private final PacienteRepository pacienteRepository = new PacienteRepository();
     private final UnidadRepository unidadRepository = new UnidadRepository();
     private final MaterialRepository materialRepositoryCatalogo = new MaterialRepository();
+    private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo) throws SQLException {
@@ -166,6 +170,31 @@ public class TratamientoService {
         });
     }
 
+    public void anular(int tratamientoID, String motivo) throws SQLException {
+        if (motivo == null || motivo.isBlank()) {
+            throw new NegocioException("Debe indicar el motivo de la anulación.");
+        }
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        if ("ANULADO".equals(t.getEstado())) {
+            throw new NegocioException("El tratamiento ya está anulado.");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            t.setEstado("ANULADO");
+            repository.update(con, t);
+
+            RegistroAnulacion r = new RegistroAnulacion();
+            r.setTablaAfectada("Tratamiento");
+            r.setIdRegistroAnulado(tratamientoID);
+            r.setMotivo(motivo);
+            r.setUsuario("SYSTEM");
+            anulacionRepository.insert(con, r);
+        });
+    }
+
     public void reabrir(int tratamientoID) throws SQLException {
         Tratamiento t = repository.findById(tratamientoID);
         if (t == null) {
@@ -174,9 +203,88 @@ public class TratamientoService {
         if (!"CERRADO".equals(t.getEstado())) {
             throw new NegocioException("Solo se puede reabrir un tratamiento cerrado.");
         }
+        if (t.getUnidadID() != null && repository.existeOtroAbiertoEnUnidad(t.getUnidadID(), tratamientoID)) {
+            throw new NegocioException("La unidad de tratamiento ya está ocupada por otro tratamiento activo.");
+        }
         t.setEstado("ABIERTO");
         t.setCerradoEn(null);
         repository.update(t);
+    }
+
+    public void editarRetroactivo(int tratamientoID, EditarRetroactivoDto dto) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        if (!"CERRADO".equals(t.getEstado())) {
+            throw new NegocioException("Solo se pueden editar tratamientos cerrados de forma retroactiva.");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            if (dto.monto != null) {
+                if (dto.monto < 0) {
+                    throw new NegocioException("El monto del tratamiento no puede ser negativo.");
+                }
+                t.setMonto(dto.monto);
+            }
+            if (dto.montoPagado != null) {
+                if (dto.montoPagado > t.getMonto()) {
+                    throw new NegocioException("El monto pagado no puede superar el monto total.");
+                }
+                t.setMontoPagado(dto.montoPagado);
+                t.setEstadoPago(derivarEstadoPago(dto.montoPagado, t.getMonto()));
+            }
+            if (dto.estadoPago != null) {
+                t.setEstadoPago(dto.estadoPago);
+            }
+            if (dto.fecha != null) {
+                validarFecha(dto.fecha);
+                t.setFecha(dto.fecha);
+            }
+            if (dto.nombreTratamiento != null) {
+                t.setNombreTratamiento(dto.nombreTratamiento);
+            }
+            if (dto.operadorID != null) {
+                validarEspecialista(dto.operadorID);
+                t.setOperadorID(dto.operadorID);
+            }
+            if (dto.pacienteID != null) {
+                validarPaciente(dto.pacienteID);
+                t.setPacienteID(dto.pacienteID);
+            }
+
+            repository.update(con, t);
+
+            if (dto.cantidadesMateriales != null) {
+                List<TratamientoMaterial> actuales = materialRepository.findByTratamientoID(tratamientoID);
+                for (Map.Entry<Integer, Double> entry : dto.cantidadesMateriales.entrySet()) {
+                    int materialID = entry.getKey();
+                    double nuevaCantidad = entry.getValue();
+                    if (nuevaCantidad <= 0) {
+                        TratamientoMaterial aEliminar = actuales.stream()
+                                .filter(m -> m.getMaterialID() == materialID)
+                                .findFirst().orElse(null);
+                        if (aEliminar != null) {
+                            materialRepository.delete(con, aEliminar.getMaterialesListID());
+                        }
+                    } else {
+                        TratamientoMaterial existente = actuales.stream()
+                                .filter(m -> m.getMaterialID() == materialID)
+                                .findFirst().orElse(null);
+                        if (existente != null) {
+                            existente.setCantidad(nuevaCantidad);
+                            materialRepository.update(con, existente);
+                        } else {
+                            TratamientoMaterial nuevo = new TratamientoMaterial();
+                            nuevo.setTratamientoID(tratamientoID);
+                            nuevo.setMaterialID(materialID);
+                            nuevo.setCantidad(nuevaCantidad);
+                            materialRepository.insert(con, nuevo);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public void registrarPago(int tratamientoID, double abono) throws SQLException {
@@ -280,5 +388,16 @@ public class TratamientoService {
 
     private String timestampLocal() {
         return java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public static class EditarRetroactivoDto {
+        public Double monto;
+        public Double montoPagado;
+        public String estadoPago;
+        public String fecha;
+        public String nombreTratamiento;
+        public Integer operadorID;
+        public Integer pacienteID;
+        public Map<Integer, Double> cantidadesMateriales;
     }
 }

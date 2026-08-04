@@ -1,11 +1,13 @@
 package com.odontologia.formatos.service;
 
+import com.odontologia.formatos.model.Materiales;
 import com.odontologia.formatos.model.Operador;
 import com.odontologia.formatos.model.Paciente;
 import com.odontologia.formatos.model.Tratamiento;
 import com.odontologia.formatos.model.TratamientoPredefinido;
 import com.odontologia.formatos.model.TratamientoPredefinidoMaterial;
 import com.odontologia.formatos.repository.BaseRepositoryTest;
+import com.odontologia.formatos.repository.MaterialRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
@@ -16,7 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,6 +38,7 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     private final TratamientoPredefinidoRepository predRepository = new TratamientoPredefinidoRepository();
     private final TratamientoPredefinidoMaterialRepository predMaterialRepository =
             new TratamientoPredefinidoMaterialRepository();
+    private final MaterialRepository materialCatalogo = new MaterialRepository();
     private int operadorID;
     private int pacienteID;
 
@@ -217,6 +222,122 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, null, "CONTINUO");
 
         assertThrows(NegocioException.class, () -> service.registrarPago(id, 10.0));
+    }
+
+    @Test
+    void anularCambiaEstado() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        service.anular(id, "Motivo de prueba");
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("ANULADO", t.getEstado());
+    }
+
+    @Test
+    void anularCerradoCambiaEstado() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        service.anular(id, "Motivo de prueba");
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("ANULADO", t.getEstado());
+    }
+
+    @Test
+    void anularYaAnuladoArrojaError() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.anular(id, "Motivo");
+
+        assertThrows(NegocioException.class, () -> service.anular(id, "Otra vez"));
+    }
+
+    @Test
+    void anularSinMotivoArrojaError() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        assertThrows(NegocioException.class, () -> service.anular(id, null));
+        assertThrows(NegocioException.class, () -> service.anular(id, "  "));
+    }
+
+    @Test
+    void reabrirConUnidadOcupadaArrojaError() throws SQLException {
+        int id1 = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id1);
+
+        int id2 = service.crear(operadorID, pacienteID, 1, "2026-08-05", null, 50.0, "NORMAL");
+
+        assertThrows(NegocioException.class, () -> service.reabrir(id1));
+    }
+
+    @Test
+    void editarRetroactivoMontoYGasto() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.monto = 200.0;
+        dto.montoPagado = 150.0;
+        service.editarRetroactivo(id, dto);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(200.0, t.getMonto(), 0.001);
+        assertEquals(150.0, t.getMontoPagado(), 0.001);
+        assertEquals("PARCIAL", t.getEstadoPago());
+    }
+
+    @Test
+    void editarRetroactivoMateriales() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.agregarMaterial(id, 1, 2.0);
+        service.agregarMaterial(id, 2, 1.0);
+        service.cerrar(id);
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(1, 5.0);
+        materiales.put(2, -1.0);
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.cantidadesMateriales = materiales;
+        service.editarRetroactivo(id, dto);
+
+        List<TratamientoMaterialRepository.MaterialConCantidad> lista = service.materialesConNombre(id);
+        assertEquals(1, lista.size());
+        assertEquals(1, lista.get(0).getMaterialID());
+        assertEquals(5.0, lista.get(0).getCantidad(), 0.001);
+    }
+
+    @Test
+    void editarRetroactivoAgregarMaterial() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.agregarMaterial(id, 1, 2.0);
+        service.cerrar(id);
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(2, 3.0);
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.cantidadesMateriales = materiales;
+        service.editarRetroactivo(id, dto);
+
+        List<TratamientoMaterialRepository.MaterialConCantidad> lista = service.materialesConNombre(id);
+        assertEquals(2, lista.size());
+    }
+
+    @Test
+    void editarRetroactivoSoloCerrado() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.monto = 200.0;
+        assertThrows(NegocioException.class, () -> service.editarRetroactivo(id, dto));
+    }
+
+    private int crearMaterial(String nombre, String unidad) throws SQLException {
+        Materiales m = new Materiales();
+        m.setNombre(nombre);
+        m.setUnidad(unidad);
+        m.setEstado(1);
+        return materialCatalogo.insert(m);
     }
 
     private int crearPlantillaConMateriales() throws SQLException {

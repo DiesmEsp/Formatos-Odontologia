@@ -2,10 +2,12 @@ package com.odontologia.formatos.service;
 
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.AsistenciaMaterial;
+import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
 import com.odontologia.formatos.repository.AsistenciaRepository;
 import com.odontologia.formatos.repository.DocenteRepository;
 import com.odontologia.formatos.repository.MaterialRepository;
+import com.odontologia.formatos.repository.RegistroAnulacionRepository;
 import com.odontologia.formatos.util.TransaccionBD;
 
 import java.sql.Connection;
@@ -23,6 +25,7 @@ public class AsistenciaService {
     private final AsistenciaMaterialRepository materialRepository = new AsistenciaMaterialRepository();
     private final DocenteRepository docenteRepository = new DocenteRepository();
     private final MaterialRepository materialRepositoryCatalogo = new MaterialRepository();
+    private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
 
     public Asistencia abrirDia(int docenteID, String fecha) throws SQLException {
         validarDocente(docenteID);
@@ -65,6 +68,30 @@ public class AsistenciaService {
             for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
                 acumular(con, asistencia.getAsistenciaID(), entrada.getKey(), entrada.getValue());
             }
+        });
+    }
+
+    public void anular(int asistenciaID, String motivo) throws SQLException {
+        if (motivo == null || motivo.isBlank()) {
+            throw new NegocioException("Debe indicar el motivo de la anulación.");
+        }
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        if ("ANULADO".equals(a.getEstado())) {
+            throw new NegocioException("La asistencia ya está anulada.");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            asistenciaRepository.anular(con, asistenciaID);
+
+            RegistroAnulacion r = new RegistroAnulacion();
+            r.setTablaAfectada("Asistencia");
+            r.setIdRegistroAnulado(asistenciaID);
+            r.setMotivo(motivo);
+            r.setUsuario("SYSTEM");
+            anulacionRepository.insert(con, r);
         });
     }
 
