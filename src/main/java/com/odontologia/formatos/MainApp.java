@@ -1,6 +1,7 @@
 package com.odontologia.formatos;
 
 import com.odontologia.formatos.db.ConnectionManager;
+import com.odontologia.formatos.ui.components.FontLoader;
 import com.odontologia.formatos.ui.view.*;
 import com.odontologia.formatos.util.LogConfig;
 import javafx.application.Application;
@@ -20,26 +21,26 @@ public class MainApp extends Application {
         configurarErroresGlobales();
         LogConfig.configurar();
         ConnectionManager.getInstance();
+        FontLoader.load();
 
         MainView mainView = new MainView();
 
-        mainView.registerView("dashboard", new DashboardView());
+        mainView.registerView("tratamientos", new TratamientosView());
+        mainView.registerView("asistencia", new AsistenciaView(() -> mainView.showToastSuccess("Asistencia registrada")));
+        mainView.registerView("dashboard", new DashboardView(mainView::selectNav));
         mainView.registerView("catalogos", new CatalogosView(() -> {}));
         mainView.registerView("unidades", new UnidadesView());
-        mainView.registerView("asistencia", new AsistenciaView(() -> mainView.showToastSuccess("Asistencia registrada")));
-        mainView.registerView("tratamientos", new TratamientosView());
         mainView.registerView("reportes", new ReportesView());
-        mainView.registerView("auditoria", new AuditoriaView());
 
-        mainView.selectNav("dashboard");
+        mainView.selectNav("tratamientos");
 
         Scene scene = new Scene(mainView, 1280, 720);
         scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
 
-        stage.setTitle("Formatos Odontologia");
+        stage.setTitle("Formatos Odontologicos");
         stage.setScene(scene);
-        stage.setMinWidth(1280);
-        stage.setMinHeight(720);
+        stage.setMinWidth(1100);
+        stage.setMinHeight(680);
         stage.show();
     }
 
