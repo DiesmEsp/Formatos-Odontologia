@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 group = 'com.odontologia'
-version = '1.0.0'
+version = '2.0.0'
 
 repositories {
     mavenCentral()
@@ -17,13 +17,8 @@ java {
     }
 }
 
-javafx {
-    version = '21.0.12'
-    modules = ['javafx.controls']
-}
-
 application {
-    mainClass = 'com.odontologia.formatos.MainApp'
+    mainClass = 'com.odontologia.formatos.controller.Main'
 }
 
 dependencies {
@@ -31,18 +26,60 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:13.1.0'
     implementation 'org.flywaydb:flyway-database-nc-sqlite:13.1.0'
     implementation 'org.apache.poi:poi-ooxml:5.5.1'
-    implementation 'org.controlsfx:controlsfx:11.2.4'
+    implementation 'org.slf4j:slf4j-simple:2.0.16'
+    implementation 'io.javalin:javalin:6.5.0'
 
     testImplementation platform('org.junit:junit-bom:5.14.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.testfx:testfx-core:4.0.18'
-    testImplementation 'org.testfx:testfx-junit5:4.0.18'
+}
+
+shadowJar {
+    archiveClassifier.set('all')
+    mergeServiceFiles()
 }
 
 tasks.named('test') {
     useJUnitPlatform()
     testLogging {
         events 'passed', 'failed', 'skipped'
+    }
+}
+
+task buildJre(type: Exec) {
+    description = 'Crea una JRE minima con jlink para distribuir con Electron'
+    group = 'distribution'
+
+    def jdkHome = System.getProperty('java.home')
+    def jlinkBin = "${jdkHome}/bin/jlink"
+    def outputDir = "${layout.buildDirectory.get()}/jre-minimal"
+
+    doFirst {
+        file(outputDir).mkdirs()
+    }
+
+    commandLine jlinkBin,
+        '--output', outputDir,
+        '--add-modules', 'java.base,java.sql,java.naming,java.logging,java.management,jdk.unsupported,java.xml',
+        '--strip-debug',
+        '--compress=zip-6',
+        '--no-header-files',
+        '--no-man-pages'
+}
+
+task prepareElectronResources(type: Copy) {
+    description = 'Copia JAR y JRE al directorio de recursos de Electron'
+    group = 'distribution'
+
+    dependsOn shadowJar, buildJre
+
+    from shadowJar.archiveFile
+    into "${layout.projectDirectory}/frontend/build-resources"
+
+    doLast {
+        copy {
+            from "${layout.buildDirectory.get()}/jre-minimal"
+            into "${layout.projectDirectory}/frontend/build-resources/jre"
+        }
     }
 }

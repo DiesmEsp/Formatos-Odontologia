@@ -9,7 +9,7 @@ public class DocenteService {
 
     private final DocenteRepository repository = new DocenteRepository();
 
-    public int crear(String nombres, String apellidos) throws SQLException {
+    public int crear(String nombres, String apellidos, String telefono) throws SQLException {
         validarObligatorios(nombres, apellidos);
         for (Docente d : repository.findAll()) {
             if (mismoNombre(d, nombres, apellidos)) {
@@ -20,6 +20,7 @@ public class DocenteService {
         Docente docente = new Docente();
         docente.setNombres(nombres.trim());
         docente.setApellidos(apellidos.trim());
+        docente.setTelefono(telefono == null ? null : telefono.trim());
         docente.setEstado(1);
         return repository.insert(docente);
     }

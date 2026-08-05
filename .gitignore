@@ -11,6 +11,15 @@ out/
 clinica.db
 Reportes/
 
-# Documento de planificación local (trazabilidad fuera de git)
-planning/
+# Electron + React
+frontend/node_modules/
+frontend/dist/
+frontend/dist-electron/
+frontend/release/
+frontend/coverage/
+frontend/test-results/
+frontend/build-resources/
+
+# Node package lock
+frontend/package-lock.json
 

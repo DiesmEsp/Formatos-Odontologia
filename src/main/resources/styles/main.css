@@ -835,3 +835,42 @@
 .combo-box .list-cell {
     -fx-padding: 0 0 0 0;
 }
+
+/* ===== KPI ICON VARIANTS ===== */
+.kpi-icon-warn {
+    -fx-background-color: #f7efdd;
+}
+.kpi-icon-warn .svg-icon-group {
+    -fx-fill: #8a5e11;
+}
+.kpi-icon-ok {
+    -fx-background-color: #e4f3eb;
+}
+.kpi-icon-ok .svg-icon-group {
+    -fx-fill: #116b45;
+}
+
+/* ===== CHART GRID ===== */
+.chart-grid {
+    -fx-hgap: 14;
+    -fx-vgap: 14;
+}
+
+/* ===== TREND UP ===== */
+.trend-up {
+    -fx-text-fill: #116b45;
+    -fx-font-weight: 700;
+}
+
+/* ===== LEGEND ===== */
+.legend-item {
+    -fx-spacing: 7;
+    -fx-alignment: CENTER-LEFT;
+}
+.legend-swatch {
+    -fx-min-width: 9;
+    -fx-min-height: 9;
+    -fx-max-width: 9;
+    -fx-max-height: 9;
+    -fx-background-radius: 2;
+}

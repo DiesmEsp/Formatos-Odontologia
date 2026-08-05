@@ -37,6 +37,16 @@ public final class AppConfig {
         return resolver(override != null ? override : PROPS.getProperty("reportes.carpetaInicial", "Reportes"));
     }
 
+    public static int getInt(String key, int defaultValue) {
+        String val = PROPS.getProperty(key);
+        if (val == null || val.isBlank()) return defaultValue;
+        try {
+            return Integer.parseInt(val.trim());
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     private static String resolver(String valor) {
         return valor.replace("${APPDATA}", appDataDir());
     }

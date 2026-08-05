@@ -1,7 +1,6 @@
 package com.odontologia.formatos.model;
 
 public class Paciente {
-
     private int pacienteID;
     private String nombres;
     private String apellidos;
@@ -15,29 +14,14 @@ public class Paciente {
         this.apellidos = apellidos;
     }
 
-    public int getPacienteID() {
-        return pacienteID;
-    }
+    public int getPacienteID() { return pacienteID; }
+    public void setPacienteID(int pacienteID) { this.pacienteID = pacienteID; }
 
-    public void setPacienteID(int pacienteID) {
-        this.pacienteID = pacienteID;
-    }
+    public String getNombres() { return nombres; }
+    public void setNombres(String nombres) { this.nombres = nombres; }
 
-    public String getNombres() {
-        return nombres;
-    }
-
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
-    }
-
-    public String getApellidos() {
-        return apellidos;
-    }
-
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
+    public String getApellidos() { return apellidos; }
+    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
 
     @Override
     public String toString() {

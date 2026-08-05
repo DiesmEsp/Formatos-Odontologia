@@ -14,15 +14,16 @@ import java.util.List;
 public class OperadorRepository {
 
     public int insert(Operador operador) throws SQLException {
-        String sql = "INSERT INTO Operadores (Nombres, Apellidos, Grado, Tipo, Periodo, Estado) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Operadores (Nombres, Apellidos, DNI, Grado, Tipo, Periodo, Estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, operador.getNombres());
             ps.setString(2, operador.getApellidos());
-            ps.setString(3, operador.getGrado());
-            ps.setString(4, operador.getTipo());
-            ps.setInt(5, operador.getPeriodo());
-            ps.setInt(6, operador.getEstado());
+            ps.setString(3, operador.getDni());
+            ps.setString(4, operador.getGrado());
+            ps.setString(5, operador.getTipo());
+            ps.setInt(6, operador.getPeriodo());
+            ps.setInt(7, operador.getEstado());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -34,16 +35,17 @@ public class OperadorRepository {
     }
 
     public void update(Operador operador) throws SQLException {
-        String sql = "UPDATE Operadores SET Nombres = ?, Apellidos = ?, Grado = ?, Tipo = ?, Periodo = ?, Estado = ? WHERE OperadorID = ?";
+        String sql = "UPDATE Operadores SET Nombres = ?, Apellidos = ?, DNI = ?, Grado = ?, Tipo = ?, Periodo = ?, Estado = ? WHERE OperadorID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, operador.getNombres());
             ps.setString(2, operador.getApellidos());
-            ps.setString(3, operador.getGrado());
-            ps.setString(4, operador.getTipo());
-            ps.setInt(5, operador.getPeriodo());
-            ps.setInt(6, operador.getEstado());
-            ps.setInt(7, operador.getOperadorID());
+            ps.setString(3, operador.getDni());
+            ps.setString(4, operador.getGrado());
+            ps.setString(5, operador.getTipo());
+            ps.setInt(6, operador.getPeriodo());
+            ps.setInt(7, operador.getEstado());
+            ps.setInt(8, operador.getOperadorID());
             ps.executeUpdate();
         }
     }
@@ -118,6 +120,7 @@ public class OperadorRepository {
                 rs.getInt("OperadorID"),
                 rs.getString("Nombres"),
                 rs.getString("Apellidos"),
+                rs.getString("DNI"),
                 rs.getString("Grado"),
                 rs.getString("Tipo"),
                 rs.getInt("Periodo"),

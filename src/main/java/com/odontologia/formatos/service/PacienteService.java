@@ -10,11 +10,11 @@ public class PacienteService {
     private final PacienteRepository repository = new PacienteRepository();
 
     public int crear(String nombres, String apellidos) throws SQLException {
-        validarObligatorios(nombres, apellidos);
+        if (nombres == null || nombres.isBlank()) throw new NegocioException("Los nombres son obligatorios.");
+        if (apellidos == null || apellidos.isBlank()) throw new NegocioException("Los apellidos son obligatorios.");
         for (Paciente p : repository.findAll()) {
-            if (mismoNombre(p, nombres, apellidos)) {
-                throw new EntidadDuplicadaException(
-                        "Ya existe un paciente con el nombre '" + nombres.trim() + " " + apellidos.trim() + "'.");
+            if (p.getNombres().equalsIgnoreCase(nombres.trim()) && p.getApellidos().equalsIgnoreCase(apellidos.trim())) {
+                throw new EntidadDuplicadaException("Ya existe un paciente con ese nombre.");
             }
         }
         Paciente paciente = new Paciente();
@@ -24,25 +24,12 @@ public class PacienteService {
     }
 
     public void actualizar(Paciente paciente) throws SQLException {
-        validarObligatorios(paciente.getNombres(), paciente.getApellidos());
+        if (paciente.getNombres() == null || paciente.getNombres().isBlank()) throw new NegocioException("Los nombres son obligatorios.");
+        if (paciente.getApellidos() == null || paciente.getApellidos().isBlank()) throw new NegocioException("Los apellidos son obligatorios.");
         repository.update(paciente);
     }
 
-    public void eliminar(int pacienteID) throws SQLException {
-        repository.delete(pacienteID);
-    }
-
-    private boolean mismoNombre(Paciente existente, String nombres, String apellidos) {
-        return existente.getNombres().equalsIgnoreCase(nombres.trim())
-                && existente.getApellidos().equalsIgnoreCase(apellidos.trim());
-    }
-
-    private void validarObligatorios(String nombres, String apellidos) {
-        if (nombres == null || nombres.isBlank()) {
-            throw new NegocioException("Los nombres del paciente son obligatorios.");
-        }
-        if (apellidos == null || apellidos.isBlank()) {
-            throw new NegocioException("Los apellidos del paciente son obligatorios.");
-        }
+    public void eliminar(int id) throws SQLException {
+        repository.delete(id);
     }
 }

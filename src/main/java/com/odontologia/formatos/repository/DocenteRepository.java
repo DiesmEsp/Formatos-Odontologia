@@ -14,12 +14,13 @@ import java.util.List;
 public class DocenteRepository {
 
     public int insert(Docente docente) throws SQLException {
-        String sql = "INSERT INTO Docentes (Nombres, Apellidos, Estado) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Docentes (Nombres, Apellidos, Telefono, Estado) VALUES (?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, docente.getNombres());
             ps.setString(2, docente.getApellidos());
-            ps.setInt(3, docente.getEstado());
+            ps.setString(3, docente.getTelefono());
+            ps.setInt(4, docente.getEstado());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -31,13 +32,14 @@ public class DocenteRepository {
     }
 
     public void update(Docente docente) throws SQLException {
-        String sql = "UPDATE Docentes SET Nombres = ?, Apellidos = ?, Estado = ? WHERE DocenteID = ?";
+        String sql = "UPDATE Docentes SET Nombres = ?, Apellidos = ?, Telefono = ?, Estado = ? WHERE DocenteID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, docente.getNombres());
             ps.setString(2, docente.getApellidos());
-            ps.setInt(3, docente.getEstado());
-            ps.setInt(4, docente.getDocenteID());
+            ps.setString(3, docente.getTelefono());
+            ps.setInt(4, docente.getEstado());
+            ps.setInt(5, docente.getDocenteID());
             ps.executeUpdate();
         }
     }
@@ -97,6 +99,7 @@ public class DocenteRepository {
                 rs.getInt("DocenteID"),
                 rs.getString("Nombres"),
                 rs.getString("Apellidos"),
+                rs.getString("Telefono"),
                 rs.getInt("Estado"));
     }
 }

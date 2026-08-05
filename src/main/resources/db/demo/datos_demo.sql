@@ -10,23 +10,23 @@ INSERT OR IGNORE INTO Unidad (UnidadID, UnidadNro) VALUES (4, 4);
 INSERT OR IGNORE INTO Unidad (UnidadID, UnidadNro) VALUES (5, 5);
 INSERT OR IGNORE INTO Unidad (UnidadID, UnidadNro) VALUES (6, 6);
 
-INSERT OR IGNORE INTO Docentes (DocenteID, Nombres, Apellidos, Estado) VALUES
-    (1,'Maria','Gonzalez Rivas',1),
-    (2,'Carlos','Mendoza Paredes',1),
-    (3,'Ana','Huaman Torres',1),
-    (4,'Luis','Quispe Condori',1),
-    (5,'Patricia','Vargas Leon',1),
-    (6,'Roberto','Castro Diaz',1);
+INSERT OR IGNORE INTO Docentes (DocenteID, Nombres, Apellidos, Telefono, Estado) VALUES
+    (1,'Maria','Gonzalez Rivas','999111222',1),
+    (2,'Carlos','Mendoza Paredes','999333444',1),
+    (3,'Ana','Huaman Torres',NULL,1),
+    (4,'Luis','Quispe Condori','999555666',1),
+    (5,'Patricia','Vargas Leon','999777888',1),
+    (6,'Roberto','Castro Diaz',NULL,1);
 
-INSERT OR IGNORE INTO Operadores (OperadorID, Nombres, Apellidos, Grado, Tipo, Periodo, Estado) VALUES
-    (1,'Pedro','Ramirez Lopez','PRE','4',2026,1),
-    (2,'Sofia','Lopez Garcia','POS','R1',2026,1),
-    (3,'Diego','Marquez Rojas','PRE','5',2025,1),
-    (4,'Lucia','Fernandez Paz','POS','R3',2026,1),
-    (5,'Jorge','Alvarez Mori','PRE','6',2026,1),
-    (6,'Carmen','Torres Silva','POS','R2',2025,1),
-    (7,'Miguel','Rios Ortega','PRE','4',2025,1),
-    (8,'Valeria','Paredes Cueva','POS','R1',2026,1);
+INSERT OR IGNORE INTO Operadores (OperadorID, Nombres, Apellidos, DNI, Grado, Tipo, Periodo, Estado) VALUES
+    (1,'Pedro','Ramirez Lopez','72456123','PRE','4',2026,1),
+    (2,'Sofia','Lopez Garcia','73542189','POS','R1',2026,1),
+    (3,'Diego','Marquez Rojas','70123567','PRE','5',2025,1),
+    (4,'Lucia','Fernandez Paz','74523190','POS','R3',2026,1),
+    (5,'Jorge','Alvarez Mori','75412098','PRE','6',2026,1),
+    (6,'Carmen','Torres Silva','76843901','POS','R2',2025,1),
+    (7,'Miguel','Rios Ortega','71234987','PRE','4',2025,1),
+    (8,'Valeria','Paredes Cueva','78901234','POS','R1',2026,1);
 
 INSERT OR IGNORE INTO Pacientes (PacienteID, Nombres, Apellidos) VALUES
     (1,'Juan','Perez Mendez'),

@@ -5,6 +5,7 @@ public class Operador {
     private int operadorID;
     private String nombres;
     private String apellidos;
+    private String dni;
     private String grado;
     private String tipo;
     private int periodo;
@@ -13,10 +14,11 @@ public class Operador {
     public Operador() {
     }
 
-    public Operador(int operadorID, String nombres, String apellidos, String grado, String tipo, int periodo, int estado) {
+    public Operador(int operadorID, String nombres, String apellidos, String dni, String grado, String tipo, int periodo, int estado) {
         this.operadorID = operadorID;
         this.nombres = nombres;
         this.apellidos = apellidos;
+        this.dni = dni;
         this.grado = grado;
         this.tipo = tipo;
         this.periodo = periodo;
@@ -45,6 +47,14 @@ public class Operador {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
     }
 
     public String getGrado() {
