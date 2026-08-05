@@ -20,6 +20,5 @@ frontend/coverage/
 frontend/test-results/
 frontend/build-resources/
 
-# Node package lock
-frontend/package-lock.json
+
 

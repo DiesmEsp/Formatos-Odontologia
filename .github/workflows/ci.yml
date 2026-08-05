@@ -26,6 +26,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Fix Gradle permissions
+        run: chmod +x ./gradlew
+
       - name: Run backend tests
         run: ./gradlew test --no-daemon
 
@@ -50,6 +53,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Fix Gradle permissions
+        run: chmod +x ./gradlew
 
       - name: Compile Java
         run: ./gradlew compileJava --no-daemon
@@ -122,6 +128,10 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Fix Gradle permissions
+        working-directory: .
+        run: chmod +x ./gradlew
+
       - name: Build backend JAR
         working-directory: .
         run: ./gradlew shadowJar --no-daemon
@@ -162,6 +172,9 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Fix Gradle permissions
+        run: chmod +x ./gradlew
 
       - name: Build fat JAR
         run: ./gradlew shadowJar --no-daemon
