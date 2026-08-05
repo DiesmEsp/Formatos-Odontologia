@@ -1,0 +1,138 @@
+package com.odontologia.formatos.controller;
+
+import com.odontologia.formatos.export.ReporteEconomicoGenerator;
+import com.odontologia.formatos.export.ReporteGeneradorBase;
+import com.odontologia.formatos.export.ReporteMaterialesGenerator;
+import com.odontologia.formatos.export.ReporteNomenclatura;
+import com.odontologia.formatos.export.ReporteException;
+import com.odontologia.formatos.service.NegocioException;
+import io.javalin.Javalin;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ReporteController {
+
+    private final ReporteMaterialesGenerator materialesGen = new ReporteMaterialesGenerator();
+    private final ReporteEconomicoGenerator economicoGen = new ReporteEconomicoGenerator();
+
+    public void register(Javalin app) {
+        app.post("/api/reportes/materiales/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/economico/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = economicoGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/docente/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/especialista/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/anual/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            try {
+                Path pathMat = materialesGen.generar(anio, 1, 12, carpetaReportes());
+                Path pathEco = economicoGen.generar(anio, 1, 12, carpetaReportes());
+                ctx.json(Map.of(
+                        "reporteMateriales", pathMat.toAbsolutePath().toString(),
+                        "reporteEconomico", pathEco.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.get("/api/reportes/recientes", ctx -> {
+            ctx.json(archivosRecientes());
+        });
+    }
+
+    private Path carpetaReportes() {
+        String appData = System.getenv("APPDATA");
+        if (appData == null || appData.isBlank()) {
+            appData = System.getProperty("user.home");
+        }
+        Path dir = Paths.get(appData, "FormatosOdontologia", "Reportes");
+        try {
+            Files.createDirectories(dir);
+        } catch (Exception e) {
+            dir = Paths.get(System.getProperty("java.io.tmpdir"), "FormatosOdontologia", "Reportes");
+            try {
+                Files.createDirectories(dir);
+            } catch (Exception ignored) { }
+        }
+        return dir;
+    }
+
+    private List<Map<String, String>> archivosRecientes() {
+        List<Map<String, String>> lista = new ArrayList<>();
+        Path dir = carpetaReportes();
+        File[] archivos = dir.toFile().listFiles((d, name) -> name.endsWith(".xlsx"));
+        if (archivos == null) return lista;
+
+        for (File f : archivos) {
+            Map<String, String> entry = new LinkedHashMap<>();
+            entry.put("nombre", f.getName());
+            entry.put("path", f.getAbsolutePath());
+            entry.put("tamano", String.valueOf(f.length()));
+            lista.add(entry);
+        }
+
+        lista.sort((a, b) -> b.get("nombre").compareTo(a.get("nombre")));
+        return lista;
+    }
+}

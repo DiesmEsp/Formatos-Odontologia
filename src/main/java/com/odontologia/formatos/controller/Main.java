@@ -3,8 +3,11 @@ package com.odontologia.formatos.controller;
 import com.odontologia.formatos.config.AppConfig;
 import com.odontologia.formatos.db.ConnectionManager;
 import com.odontologia.formatos.db.DemoDataLoader;
+import com.odontologia.formatos.service.EntidadDuplicadaException;
+import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.LogConfig;
 import io.javalin.Javalin;
+import io.javalin.http.ContentType;
 
 import java.util.Map;
 
@@ -17,7 +20,29 @@ public class Main {
         ConnectionManager.getInstance();
         DemoDataLoader.loadIfNeeded();
 
-        Javalin app = Javalin.create();
+        Javalin app = Javalin.create(config -> {
+            config.http.defaultContentType = ContentType.JSON;
+            config.bundledPlugins.enableCors(cors -> {
+                cors.addRule(it -> {
+                    it.anyHost();
+                    it.allowCredentials = false;
+                });
+            });
+        });
+
+        app.exception(NegocioException.class, (e, ctx) -> {
+            ctx.status(400).json(Map.of("error", e.getMessage()));
+        });
+
+        app.exception(EntidadDuplicadaException.class, (e, ctx) -> {
+            ctx.status(409).json(Map.of("error", e.getMessage()));
+        });
+
+        app.exception(Exception.class, (e, ctx) -> {
+            System.err.println("Error no manejado: " + e.getMessage());
+            e.printStackTrace();
+            ctx.status(500).json(Map.of("error", "Error interno del servidor"));
+        });
 
         app.get("/health", ctx -> ctx.json(Map.of("status", "OK")));
 
@@ -25,6 +50,13 @@ public class Main {
             ctx.json(Map.of("status", "shutting_down"));
             app.stop();
         });
+
+        new TratamientoController().register(app);
+        new AsistenciaController().register(app);
+        new CatalogoController().register(app);
+        new ReporteController().register(app);
+        new DashboardController().register(app);
+        new UnidadController().register(app);
 
         app.events(event -> {
             event.serverStarted(() ->
