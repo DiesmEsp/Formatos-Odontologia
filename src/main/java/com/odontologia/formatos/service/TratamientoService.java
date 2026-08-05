@@ -211,6 +211,33 @@ public class TratamientoService {
         repository.update(t);
     }
 
+    public void cambiarTipo(int tratamientoID, String tipo) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        if (!"ABIERTO".equals(t.getEstado())) {
+            throw new NegocioException("Solo se puede cambiar el tipo en tratamientos abiertos.");
+        }
+        String tipoNormalizado = normalizarTipo(tipo);
+        if (tipoNormalizado.equals(t.getTipo())) {
+            throw new NegocioException("El tratamiento ya es de tipo " + tipoNormalizado + ".");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            t.setTipo(tipoNormalizado);
+            if ("CONTINUO".equals(tipoNormalizado)) {
+                t.setMonto(0);
+                t.setEstadoPago("PAGADO");
+                t.setMontoPagado(0);
+            } else {
+                t.setEstadoPago("PENDIENTE");
+                t.setMontoPagado(0);
+            }
+            repository.update(con, t);
+        });
+    }
+
     public void editarRetroactivo(int tratamientoID, EditarRetroactivoDto dto) throws SQLException {
         Tratamiento t = repository.findById(tratamientoID);
         if (t == null) {
@@ -221,6 +248,15 @@ public class TratamientoService {
         }
 
         TransaccionBD.ejecutar(con -> {
+            if (dto.tipo != null) {
+                String tipoNormalizado = normalizarTipo(dto.tipo);
+                t.setTipo(tipoNormalizado);
+                if ("CONTINUO".equals(tipoNormalizado)) {
+                    t.setMonto(0);
+                    t.setEstadoPago("PAGADO");
+                    t.setMontoPagado(0);
+                }
+            }
             if (dto.monto != null) {
                 if (dto.monto < 0) {
                     throw new NegocioException("El monto del tratamiento no puede ser negativo.");
@@ -391,6 +427,7 @@ public class TratamientoService {
     }
 
     public static class EditarRetroactivoDto {
+        public String tipo;
         public Double monto;
         public Double montoPagado;
         public String estadoPago;

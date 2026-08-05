@@ -56,6 +56,10 @@ const electronAPI = {
       method: 'PUT',
       body: JSON.stringify(dto),
     }),
+    cambiarTipo: (id: number, tipo: string) => apiFetch<void>(`/api/tratamientos/${id}/cambiar-tipo`, {
+      method: 'POST',
+      body: JSON.stringify({ tipo }),
+    }),
   },
 
   asistencia: {

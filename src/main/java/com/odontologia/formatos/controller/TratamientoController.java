@@ -102,11 +102,24 @@ public class TratamientoController {
             }
         });
 
+        app.post("/api/tratamientos/{id}/cambiar-tipo", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var body = ctx.bodyAsClass(Map.class);
+            String tipo = (String) body.get("tipo");
+            try {
+                service.cambiarTipo(id, tipo);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.put("/api/tratamientos/{id}/editar", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
             var body = ctx.bodyAsClass(Map.class);
 
             TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+            dto.tipo = (String) body.get("tipo");
             dto.monto = body.get("monto") != null
                     ? ((Number) body.get("monto")).doubleValue() : null;
             dto.montoPagado = body.get("montoPagado") != null
