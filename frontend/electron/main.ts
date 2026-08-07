@@ -126,7 +126,13 @@ function stopJavaBackend(): void {
 
 app.on('ready', async () => {
   ipcMain.handle('shell:openPath', async (_event, filePath: string) => {
-    return shell.showItemInFolder(filePath);
+    const normalized = path.normalize(filePath);
+    try {
+      await shell.openPath(path.dirname(normalized));
+      return { success: true };
+    } catch {
+      return { success: false, error: 'No se pudo abrir la ubicacion' };
+    }
   });
 
   startJavaBackend();

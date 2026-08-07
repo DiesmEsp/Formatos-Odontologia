@@ -11,7 +11,7 @@ declare global {
       dashboard: Record<string, any>;
       unidades: Record<string, any>;
       reportes: Record<string, any>;
-      shell?: { openPath: (filePath: string) => Promise<string> };
+      shell?: { openPath: (filePath: string) => Promise<{ success: boolean; error?: string }> };
     };
   }
 }

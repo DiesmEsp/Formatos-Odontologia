@@ -65,10 +65,15 @@ export function MaterialTable({
             />
           )}
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             className="text-field material-row-input"
-            value={row.cantidad}
-            onChange={(e) => onCantidadChange(row.key, Number(e.target.value))}
+            value={row.cantidad === 0 ? '' : row.cantidad}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9.]/g, '');
+              const num = val === '' || val === '.' ? 0 : Number(val);
+              onCantidadChange(row.key, num);
+            }}
             min={0}
             step={0.01}
             readOnly={readOnly}

@@ -9,6 +9,8 @@ interface Field {
   placeholder?: string;
 }
 
+import type { ReactNode } from 'react';
+
 interface CatalogoModalProps {
   open: boolean;
   title: string;
@@ -17,6 +19,8 @@ interface CatalogoModalProps {
   onSave: (values: Record<string, any>) => void;
   onCancel: () => void;
   saving?: boolean;
+  children?: ReactNode;
+  width?: number;
 }
 
 export function CatalogoModal({
@@ -27,6 +31,8 @@ export function CatalogoModal({
   onSave,
   onCancel,
   saving = false,
+  children,
+  width,
 }: CatalogoModalProps) {
   const [values, setValues] = useState<Record<string, any>>(initialValues);
 
@@ -48,7 +54,7 @@ export function CatalogoModal({
 
   return (
     <div className="dialog-overlay" onClick={handleCancel}>
-      <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+      <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: width ?? 480 }}>
         <div className="dialog-header">
           <h3 className="dialog-title">{title}</h3>
           <button className="btn btn-ghost btn-sm dialog-close" onClick={handleCancel}>
@@ -56,7 +62,7 @@ export function CatalogoModal({
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="dialog-body">
+          <div className="dialog-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             {fields.map((f) => (
               <div key={f.key} className="form-group" style={{ marginBottom: 14 }}>
                 <label className="form-label">{f.label}</label>
@@ -86,6 +92,7 @@ export function CatalogoModal({
                 )}
               </div>
             ))}
+            {children}
           </div>
           <div className="dialog-footer">
             <button type="button" className="btn btn-secondary" onClick={handleCancel}>Cancelar</button>

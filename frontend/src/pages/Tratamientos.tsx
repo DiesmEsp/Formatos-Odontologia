@@ -116,6 +116,14 @@ function CrearTratamientoModal({
     if (nuevoTipo === 'CONTINUO') setMontoStr('');
   };
 
+  const filterNumeric = (val: string) => {
+    let cleaned = val.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) cleaned = parts[0] + '.' + parts.slice(1).join('');
+    if (parts[1] && parts[1].length > 2) cleaned = parts[0] + '.' + parts[1].slice(0, 2);
+    return cleaned;
+  };
+
   const handleMontoBlurOrEnter = () => {
     if (montoStr === '' || montoStr.trim() === '') setMontoStr('0');
   };
@@ -171,7 +179,7 @@ function CrearTratamientoModal({
 
             <div className="form-group">
               <label className="form-label">Monto total</label>
-              <input type="text" inputMode="decimal" className="text-field" value={montoStr} onChange={(e) => setMontoStr(e.target.value)}
+              <input type="text" inputMode="decimal" className="text-field" value={montoStr} onChange={(e) => setMontoStr(filterNumeric(e.target.value))}
                 onBlur={handleMontoBlurOrEnter} onKeyDown={handleMontoKeyDown}
                 disabled={tipo === 'CONTINUO'} placeholder="0.00"
                 style={{ width: '100%', ...(tipo === 'CONTINUO' ? { backgroundColor: '#e8ecec', color: 'var(--color-text-muted)', cursor: 'not-allowed' } : {}) }} />

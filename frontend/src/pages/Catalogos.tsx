@@ -427,19 +427,13 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
         ]}
         initialValues={modal?.edit ? { nombreTratamiento: modal.edit.nombreTratamiento, montoSugerido: modal.edit.montoSugerido ?? "" } : { nombreTratamiento: "", montoSugerido: "" }}
         onSave={handleSave} onCancel={() => { setModal(null); setMatRows([]); }} saving={saving}
-      />
-      {modal && (
-        <div className="dialog-overlay" onClick={() => { setModal(null); setMatRows([]); }} style={{ zIndex: 210 }}>
-          <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 540 }}>
-            <div className="dialog-header">
-              <h3 className="dialog-title">Materiales sugeridos</h3>
-            </div>
-            <div className="dialog-body">
-              <MaterialTable rows={matRows} materials={mats.data ?? []} onAdd={handleAddMat} onRemove={handleRemoveMat} onMaterialChange={handleMatChange} onCantidadChange={handleCantChange} />
-            </div>
-          </div>
+        width={560}
+      >
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 14, marginTop: 4 }}>
+          <h4 style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginBottom: 10, color: 'var(--color-text)' }}>Materiales sugeridos</h4>
+          <MaterialTable rows={matRows} materials={mats.data ?? []} onAdd={handleAddMat} onRemove={handleRemoveMat} onMaterialChange={handleMatChange} onCantidadChange={handleCantChange} />
         </div>
-      )}
+      </CatalogoModal>
       <ConfirmDialog open={!!deleteTarget} title="Eliminar tratamiento"
         message={`Confirme que desea eliminar "${deleteTarget?.nombreTratamiento}".`}
         confirmLabel="Eliminar" variant="danger" onConfirm={async () => {

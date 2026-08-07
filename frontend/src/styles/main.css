@@ -524,6 +524,7 @@ textarea.form-input,
   border-radius: var(--radius);
   margin-top: 4px;
   max-height: 240px;
+  min-height: 132px;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { Badge } from './Badge';
 
@@ -51,10 +51,10 @@ export function SearchableCombo({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSearch = useCallback((q: string) => {
-    setQuery(q);
-    onSearch?.(q);
-  }, [onSearch]);
+  useEffect(() => {
+    const t = setTimeout(() => onSearch?.(query), 250);
+    return () => clearTimeout(t);
+  }, [query, onSearch]);
 
   const handleSelect = (id: number) => {
     onChange(id);
@@ -72,7 +72,7 @@ export function SearchableCombo({
             type="text"
             className="search-box-input"
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
             autoFocus
           />

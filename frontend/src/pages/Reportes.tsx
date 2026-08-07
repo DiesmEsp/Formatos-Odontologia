@@ -31,8 +31,12 @@ export default function Reportes() {
   const abrirUbicacion = async (path: string) => {
     try {
       if (typeof window !== 'undefined' && window.api?.shell?.openPath) {
-        await window.api.shell.openPath(path);
-        addToast('success', 'Ubicacion abierta en el explorador');
+        const result = await window.api.shell.openPath(path);
+        if (result.success) {
+          addToast('success', 'Carpeta abierta en el explorador');
+        } else {
+          addToast('error', result.error || 'No se pudo abrir la ubicacion');
+        }
       } else {
         addToast('info', `Archivo generado en: ${path}`);
       }

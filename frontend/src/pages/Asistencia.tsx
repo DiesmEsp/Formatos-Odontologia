@@ -57,14 +57,15 @@ export default function Asistencia() {
           }
         }
 
-        setMaterialRows(defaultMats);
-      }
+      setMaterialRows(defaultMats);
+    }
 
-      addToast('success', `Asistencia abierta para ${nombre}`);
+    addToast('success', `Asistencia abierta para ${nombre}`);
+    asistenciaHoy.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al abrir asistencia');
     }
-  }, [fecha, addToast]);
+  }, [fecha, addToast, asistenciaHoy]);
 
   const handleSelectDocente = async (id: number | null) => {
     if (id === null) return;
@@ -106,6 +107,7 @@ export default function Asistencia() {
       await api.asistencia.anular(asistencia.asistenciaID, motivo);
       addToast('success', 'Asistencia anulada correctamente');
       setAsistencia(null); setMaterialRows([]); setSelectedDocente(null);
+      asistenciaHoy.refetch();
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular'); }
     setShowAnular(false);
   };
