@@ -17,7 +17,7 @@ export interface Operador {
   operadorID: number;
   nombres: string;
   apellidos: string;
-  dni: string;
+  dni?: string;
   grado: string;
   tipo: string;
   periodo: number;
@@ -183,7 +183,7 @@ export interface ApiError {
 export interface CrearOperadorDTO {
   nombres: string;
   apellidos: string;
-  dni: string;
+  dni?: string;
   grado: string;
   tipo: string;
   periodo: number;
@@ -240,5 +240,6 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info';
 export type TratamientoEstadoValue = 'ABIERTO' | 'CERRADO' | 'ANULADO';
 export type TratamientoTipo = 'NORMAL' | 'CONTINUO';
 export type EstadoPago = 'PENDIENTE' | 'PAGADO' | 'PARCIAL';
-export type GradoOperador = 'ESTUDIANTE' | 'ESPECIALISTA';
-export type TipoOperador = 'OPERADOR' | 'DOCENTE';
+export type GradoOperador = 'PRE' | 'POS';
+export type TipoOperadorPRE = '3' | '4' | '5';
+export type TipoOperadorPOS = 'R1' | 'R2' | 'R3';

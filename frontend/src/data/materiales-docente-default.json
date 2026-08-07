@@ -1,0 +1,7 @@
+{
+  "materiales": [
+    { "materialId": 1, "cantidad": 2 },
+    { "materialId": 2, "cantidad": 3 },
+    { "materialId": 3, "cantidad": 1 }
+  ]
+}

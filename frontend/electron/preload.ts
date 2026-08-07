@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
 const API_BASE = 'http://localhost:7070';
 
@@ -164,6 +164,10 @@ const electronAPI = {
       body: JSON.stringify({ anio }),
     }),
     listarRecientes: () => apiFetch<string[]>('/api/reportes/recientes'),
+  },
+
+  shell: {
+    openPath: (filePath: string) => ipcRenderer.invoke('shell:openPath', filePath),
   },
 };
 

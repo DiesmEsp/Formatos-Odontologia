@@ -413,6 +413,13 @@ body {
   transition: border-color 0.15s;
 }
 
+.text-field:disabled,
+.form-input:disabled {
+  background-color: #e8ecec;
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
 .text-field:focus,
 .form-input:focus {
   border-color: var(--color-primary);

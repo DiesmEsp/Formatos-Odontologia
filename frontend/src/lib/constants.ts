@@ -1,8 +1,10 @@
 export const TRATAMIENTO_TIPOS = ['NORMAL', 'CONTINUO'] as const;
 export const TRATAMIENTO_ESTADOS = ['ABIERTO', 'CERRADO', 'ANULADO'] as const;
 export const ESTADO_PAGOS = ['PENDIENTE', 'PAGADO', 'PARCIAL'] as const;
-export const GRADOS_OPERADOR = ['ESTUDIANTE', 'ESPECIALISTA'] as const;
-export const TIPOS_OPERADOR = ['OPERADOR', 'DOCENTE'] as const;
+export const GRADOS_OPERADOR = ['PRE', 'POS'] as const;
+export const TIPOS_OPERADOR_PRE = ['3', '4', '5'] as const;
+export const TIPOS_OPERADOR_POS = ['R1', 'R2', 'R3'] as const;
+export const GRADO_LABELS: Record<string, string> = { PRE: 'Pregrado', POS: 'Posgrado' };
 
 export const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

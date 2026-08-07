@@ -102,11 +102,8 @@ public class ReporteController {
     }
 
     private Path carpetaReportes() {
-        String appData = System.getenv("APPDATA");
-        if (appData == null || appData.isBlank()) {
-            appData = System.getProperty("user.home");
-        }
-        Path dir = Paths.get(appData, "FormatosOdontologia", "Reportes");
+        String userHome = System.getProperty("user.home");
+        Path dir = Paths.get(userHome, "Documents", "FormatosOdontologia", "Reportes");
         try {
             Files.createDirectories(dir);
         } catch (Exception e) {

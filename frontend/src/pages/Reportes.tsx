@@ -28,11 +28,17 @@ export default function Reportes() {
     }
   };
 
-  const abrirArchivo = (path: string) => {
-    if (window.api) {
-      window.api.health.check();
+  const abrirUbicacion = async (path: string) => {
+    try {
+      if (typeof window !== 'undefined' && window.api?.shell?.openPath) {
+        await window.api.shell.openPath(path);
+        addToast('success', 'Ubicacion abierta en el explorador');
+      } else {
+        addToast('info', `Archivo generado en: ${path}`);
+      }
+    } catch {
+      addToast('info', `Archivo generado en: ${path}`);
     }
-    window.open(`file://${path}`, '_blank');
   };
 
   const reportes = [
@@ -152,8 +158,8 @@ export default function Reportes() {
                   <td className="num" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--font-md)' }}>{r.nombre}</td>
                   <td className="num">{r.tamano} B</td>
                   <td>
-                    <button className="btn btn-ghost btn-sm" onClick={() => abrirArchivo(r.path)}>
-                      <FolderOpen size={14} /> Abrir
+                    <button className="btn btn-ghost btn-sm" onClick={() =>                       abrirUbicacion(r.path)}>
+                      <FolderOpen size={14} /> Abrir ubicacion
                     </button>
                   </td>
                 </tr>

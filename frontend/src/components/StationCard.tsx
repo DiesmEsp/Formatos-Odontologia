@@ -34,7 +34,7 @@ export function StationCard({ unidadNro, tratamiento, onClick }: StationCardProp
           <div className="ticket-meta">
             <div className="meta-row">
               <Stethoscope size={14} />
-              <span>Especialista #{tratamiento.operadorID}</span>
+              <span>Operador #{tratamiento.operadorID}</span>
             </div>
             <div className="meta-row">
               <User size={14} />

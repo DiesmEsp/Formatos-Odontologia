@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 
@@ -125,6 +125,10 @@ function stopJavaBackend(): void {
 }
 
 app.on('ready', async () => {
+  ipcMain.handle('shell:openPath', async (_event, filePath: string) => {
+    return shell.showItemInFolder(filePath);
+  });
+
   startJavaBackend();
 
   const ready = await waitForServer();
