@@ -1,9 +1,7 @@
-import type { ElectronAPI } from '../electron/preload';
+export {};
 
 declare global {
   interface Window {
-    api: ElectronAPI;
+    api: import('../electron/preload').ElectronAPI;
   }
 }
-
-export {};
