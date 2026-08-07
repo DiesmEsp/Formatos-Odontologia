@@ -16,7 +16,7 @@ const ATENCION_ITEMS = [
 ];
 
 const GESTION_ITEMS = [
-  { to: '/catalogos', icon: Archive, label: 'Catalogs' },
+  { to: '/catalogos', icon: Archive, label: 'Catalogos' },
   { to: '/reportes', icon: FileSpreadsheet, label: 'Reportes' },
   { to: '/unidades', icon: Monitor, label: 'Unidades' },
 ];
@@ -37,25 +37,25 @@ export function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <span className="nav-eyebrow">ATENCION</span>
+        <span className="nav-eyebrow">Atencion</span>
         {ATENCION_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/'}
-            className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
           >
             <item.icon size={18} />
             <span>{item.label}</span>
           </NavLink>
         ))}
 
-        <span className="nav-eyebrow">GESTION</span>
+        <span className="nav-eyebrow">Gestion</span>
         {GESTION_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
           >
             <item.icon size={18} />
             <span>{item.label}</span>
@@ -64,8 +64,7 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <span className="sidebar-footer-text">Clinica Odontologica UNMSM</span>
-        <span className="sidebar-footer-version">v2.0.0</span>
+        Clinica Odontologica UNMSM
       </div>
     </aside>
   );

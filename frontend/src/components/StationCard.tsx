@@ -1,5 +1,6 @@
 import { Badge } from './Badge';
 import { formatMonto } from '../lib/format';
+import { User, Stethoscope } from 'lucide-react';
 import type { Tratamiento } from '../api/types';
 
 interface StationCardProps {
@@ -18,24 +19,40 @@ export function StationCard({ unidadNro, tratamiento, onClick }: StationCardProp
     >
       <div className="station-header">
         <span className="station-num">Unidad {unidadNro}</span>
-        <span className="station-status">{ocupado ? 'Ocupada' : 'Libre'}</span>
+        <span className="station-status">
+          <span className={`led ${ocupado ? 'led-warn' : 'led-ok'}`} />
+          {ocupado ? 'En curso' : 'Libre'}
+        </span>
       </div>
 
       {ocupado && tratamiento ? (
         <div className="station-ticket">
-          <span className="ticket-nro">#{tratamiento.tratamientoID}</span>
-          <span className="ticket-tipo">{tratamiento.nombreTratamiento}</span>
+          <div className="ticket-head">
+            <span className="ticket-nro">#{tratamiento.tratamientoID}</span>
+            <span className="ticket-tipo">{tratamiento.nombreTratamiento}</span>
+          </div>
           <div className="ticket-meta">
-            <span>{tratamiento.tipo}</span>
+            <div className="meta-row">
+              <Stethoscope size={14} />
+              <span>Especialista #{tratamiento.operadorID}</span>
+            </div>
+            <div className="meta-row">
+              <User size={14} />
+              <span>Paciente #{tratamiento.pacienteID}</span>
+            </div>
+          </div>
+          <div className="ticket-monto">{formatMonto(tratamiento.monto)}</div>
+          <div className="ticket-actions">
             <Badge variant={tratamiento.estado === 'ABIERTO' ? 'info' : 'success'}>
               {tratamiento.estado}
             </Badge>
           </div>
-          <span className="ticket-monto">{formatMonto(tratamiento.monto)}</span>
         </div>
       ) : (
         <div className="station-empty">
-          <span className="station-empty-text">Click para iniciar tratamiento</span>
+          <button className="btn-station" onClick={(e) => { e.stopPropagation(); onClick(unidadNro); }}>
+            Nuevo tratamiento
+          </button>
         </div>
       )}
     </div>

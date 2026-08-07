@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Search, Plus } from 'lucide-react';
+import { Badge } from './Badge';
 
 export interface SearchableOption {
   id: number;
   label: string;
   extra?: string;
+  badge?: string;
 }
 
 interface SearchableComboProps {
@@ -93,14 +95,24 @@ export function SearchableCombo({
               className={`combo-option ${opt.id === value ? 'selected' : ''}`}
               onClick={() => handleSelect(opt.id)}
             >
-              <span>{opt.label}</span>
+              <span className="combo-option-id">{String(opt.id).padStart(3, '0')}</span>
+              <span className="combo-option-name">{opt.label}</span>
+              {opt.badge && <Badge variant="info">{opt.badge}</Badge>}
               {opt.extra && <span className="combo-option-extra">{opt.extra}</span>}
             </button>
           ))}
-          {allowCreate && onCreateNew && query.trim() && (
+          {!loading && options.length === 0 && allowCreate && onCreateNew && query.trim() && (
+            <div style={{ padding: '12px', textAlign: 'center' }}>
+              <span className="text-muted text-sm" style={{ display: 'block', marginBottom: 8 }}>Sin resultados</span>
+              <button className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
+                <Plus size={14} /> Crear &quot;{query}&quot;
+              </button>
+            </div>
+          )}
+          {!loading && allowCreate && onCreateNew && options.length > 0 && (
             <button className="combo-option combo-option-create" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
               <Plus size={14} />
-              <span>Crear &quot;{query}&quot;</span>
+              <span>Crear nuevo</span>
             </button>
           )}
         </div>

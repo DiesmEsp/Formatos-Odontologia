@@ -1,23 +1,26 @@
+import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi';
 import { api } from '../api';
 import { KpiCard } from '../components/KpiCard';
 import { LineChart } from '../components/Chart/LineChart';
-import { DonutChart } from '../components/Chart/DonutChart';
-import { BarChart } from '../components/Chart/BarChart';
 import { formatMonto, formatMes } from '../lib/format';
-import { DollarSign, Clock, Activity, Users } from 'lucide-react';
+import { DollarSign, Clock, Activity, Users, Archive, CalendarCheck, FileSpreadsheet, Stethoscope, Monitor } from 'lucide-react';
+import { COLORS_CHART } from '../lib/constants';
 
 export default function Dashboard() {
   const kpis = useApi(() => api.dashboard.kpis());
   const ingresos = useApi(() => api.dashboard.ingresosMensuales());
   const estados = useApi(() => api.dashboard.tratamientosEstado());
   const topMaterials = useApi(() => api.dashboard.topMateriales());
+  const asistenciaHoy = useApi(() => api.dashboard.asistenciaHoy());
+
+  const totalTratamientos = (estados.data ?? []).reduce((sum, e) => sum + e.count, 0);
 
   return (
     <div>
       <div className="view-header">
         <h1 className="view-title">Dashboard</h1>
-        <p className="view-subtitle">Resumen general de la clinica</p>
+        <p className="subtitle">Panel principal del sistema</p>
       </div>
 
       <div className="kpi-grid">
@@ -27,22 +30,134 @@ export default function Dashboard() {
         <KpiCard label="Docentes Hoy" value={kpis.loading ? '...' : kpis.data?.docentesHoy ?? 0} icon={Users} variant="success" />
       </div>
 
-      <div className="chart-grid">
+      <div className="chart-grid" style={{ marginTop: 20 }}>
         <LineChart
-          title="Ingresos Mensuales"
-          data={(ingresos.data ?? []).map((i) => ({ label: formatMes(i.mes), valor: i.monto }))}
+          title="Ingresos mensuales"
+          data={(ingresos.data ?? []).map((i) => ({ label: formatMes(i.mes).substring(0, 3), valor: i.monto }))}
         />
-        <BarChart
-          title="Top Materiales"
-          data={(topMaterials.data ?? []).map((m) => ({ label: m.nombre, valor: m.cantidad }))}
-        />
+
+        <div className="chart-card">
+          <div className="chart-head">
+            <div>
+              <span className="chart-title">Tratamientos por estado</span>
+            </div>
+          </div>
+          <div style={{ position: 'relative', height: 180 }}>
+            <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%' }} role="img">
+              <g transform="rotate(-90 60 60)">
+                {(estados.data ?? []).map((e, idx) => {
+                  const total = (estados.data ?? []).reduce((s, ee) => s + ee.count, 0);
+                  const pct = total > 0 ? (e.count / total) * 251.3 : 0;
+                  let offset = 0;
+                  for (let i = 0; i < idx; i++) {
+                    offset += total > 0 ? (estados.data![i].count / total) * 251.3 : 0;
+                  }
+                  return (
+                    <circle
+                      key={e.estado}
+                      cx="60" cy="60" r="40"
+                      fill="none"
+                      stroke={COLORS_CHART[idx % COLORS_CHART.length]}
+                      strokeWidth="15"
+                      strokeDasharray={`${pct} 251.3`}
+                      strokeDashoffset={-offset}
+                      strokeLinecap="butt"
+                    />
+                  );
+                })}
+              </g>
+              <text x="60" y="56" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="18" fontWeight="600" fill="var(--color-text)">{totalTratamientos}</text>
+              <text x="60" y="70" textAnchor="middle" fontSize="9" fill="var(--color-text-muted)">del mes</text>
+            </svg>
+          </div>
+          <div className="legend">
+            {(estados.data ?? []).map((e, idx) => (
+              <div key={e.estado} className="legend-item">
+                <span className="legend-swatch" style={{ background: COLORS_CHART[idx % COLORS_CHART.length] }} />
+                <span>{e.estado} {e.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="chart-grid chart-grid-3 mt-4">
-        <DonutChart
-          title="Estado de Tratamientos"
-          data={(estados.data ?? []).map((e) => ({ label: e.estado, valor: e.count }))}
-        />
+      <div className="chart-grid mt-4" style={{ marginTop: 14 }}>
+        <div className="chart-card">
+          <div className="chart-head">
+            <div>
+              <span className="chart-title">Materiales mas utilizados</span>
+            </div>
+            <span className="chart-meta">top 5</span>
+          </div>
+          <div className="chart-body">
+            {(topMaterials.data ?? []).map((m, idx) => {
+              const max = Math.max(...(topMaterials.data ?? []).map((x) => x.cantidad), 1);
+              const pct = (m.cantidad / max) * 100;
+              return (
+                <div key={idx} className="hbar">
+                  <span className="hbar-label">{m.nombre}</span>
+                  <div className="hbar-track">
+                    <div className="hbar-fill" style={{ width: `${pct}%`, background: COLORS_CHART[idx % COLORS_CHART.length] }} />
+                  </div>
+                  <span className="hbar-val">{m.cantidad}</span>
+                </div>
+              );
+            })}
+            {(topMaterials.data ?? []).length === 0 && (
+              <span className="text-muted text-sm">Sin datos</span>
+            )}
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <div className="chart-head">
+            <span className="chart-title">Asistencia docente hoy</span>
+          </div>
+          <div className="att-list">
+            {(asistenciaHoy.data ?? []).map((a) => (
+              <div key={a.docenteID} className="att-row">
+                <span className={`att-avatar ${a.presente ? '' : 'att-avatar-ausente'}`}>
+                  {a.nombres.charAt(0)}{a.apellidos.charAt(0)}
+                </span>
+                <div className="att-name">{a.nombres} {a.apellidos}</div>
+                <div className="att-flag">
+                  <span className={`led ${a.presente ? 'led-ok' : 'led-danger'}`} />
+                  <span>{a.presente ? 'Presente' : 'Ausente'}</span>
+                </div>
+              </div>
+            ))}
+            {asistenciaHoy.loading && <span className="text-muted text-sm">Cargando...</span>}
+          </div>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: 28, marginBottom: 12, color: 'var(--color-text)' }}>Acceso rapido</h3>
+      <div className="grid-cards">
+        <Link to="/tratamientos" className="dash-card">
+          <div className="dash-icon"><Stethoscope size={20} /></div>
+          <h4 className="dash-card-title">Tratamientos</h4>
+          <p className="dash-card-desc">Registro de atencion con materiales predefinidos y adicionales</p>
+        </Link>
+        <Link to="/asistencia" className="dash-card">
+          <div className="dash-icon"><CalendarCheck size={20} /></div>
+          <h4 className="dash-card-title">Asistencia Docente</h4>
+          <p className="dash-card-desc">Control diario de entrega de materiales a docentes</p>
+        </Link>
+        <Link to="/catalogos" className="dash-card">
+          <div className="dash-icon"><Archive size={20} /></div>
+          <h4 className="dash-card-title">Catalogos</h4>
+          <p className="dash-card-desc">Materiales, docentes, especialistas y tratamientos predefinidos</p>
+        </Link>
+        <Link to="/reportes" className="dash-card">
+          <div className="dash-icon"><FileSpreadsheet size={20} /></div>
+          <h4 className="dash-card-title">Reportes</h4>
+          <p className="dash-card-desc">Exportacion Excel de materiales, ingresos, docentes y especialistas</p>
+        </Link>
+        <Link to="/unidades" className="dash-card">
+          <div className="dash-icon"><Monitor size={20} /></div>
+          <h4 className="dash-card-title">Unidades</h4>
+          <p className="dash-card-desc">Gestion de unidades de atencion de la clinica</p>
+        </Link>
       </div>
     </div>
   );
