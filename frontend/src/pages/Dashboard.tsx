@@ -154,7 +154,7 @@ export default function Dashboard() {
         <Link to="/tratamientos" className="dash-card">
           <div className="dash-icon"><Stethoscope size={20} /></div>
           <h4 className="dash-card-title">Tratamientos</h4>
-          <p className="dash-card-desc">Registro de atencion con materiales predefinidos y adicionales</p>
+          <p className="dash-card-desc">Registro de atención con materiales predefinidos y adicionales</p>
         </Link>
         <Link to="/asistencia" className="dash-card">
           <div className="dash-icon"><CalendarCheck size={20} /></div>
@@ -174,7 +174,7 @@ export default function Dashboard() {
         <Link to="/unidades" className="dash-card">
           <div className="dash-icon"><Monitor size={20} /></div>
           <h4 className="dash-card-title">Unidades</h4>
-          <p className="dash-card-desc">Gestion de unidades de atencion de la clinica</p>
+          <p className="dash-card-desc">Gestión de unidades de atención de la clínica</p>
         </Link>
       </div>
     </div>

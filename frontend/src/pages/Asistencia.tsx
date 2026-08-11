@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { SearchableCombo, type SearchableOption } from '../components/SearchableCombo';
 import { MaterialTable, type MaterialRow } from '../components/MaterialTable';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -8,7 +8,7 @@ import { useToast } from '../hooks/useToast';
 import { api } from '../api';
 import { hoyISO, horaActual, formatearHora, calcularDuracion, nombreCompleto } from '../lib/format';
 import type { Asistencia, PeriodoAusencia } from '../api/types';
-import { X } from 'lucide-react';
+import { X, RotateCcw } from 'lucide-react';
 
 export default function Asistencia() {
   const [q, setQ] = useState('');
@@ -22,9 +22,16 @@ export default function Asistencia() {
   const [showEditDefaults, setShowEditDefaults] = useState(false);
   const [defaultMatRows, setDefaultMatRows] = useState<MaterialRow[]>([]);
   const [editDefaultsSaving, setEditDefaultsSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [savingMat, setSavingMat] = useState(false);
+  const [showRevertirSalida, setShowRevertirSalida] = useState(false);
   const { addToast } = useToast();
 
-  const asistenciaHoy = useApi(() => api.dashboard.asistenciaHoy());
+  const materialRowsRef = useRef<MaterialRow[]>([]);
+  const originalRowsRef = useRef<MaterialRow[]>([]);
+  const mounted = useRef(true);
+
+  const asistenciaPorFecha = useApi(() => api.asistencia.porFecha(fecha), [fecha]);
   const docentes = useApi(() => api.catalogos.docentes.listar(q || undefined), [q]);
   const materiales = useApi(() => api.catalogos.materiales.listar());
 
@@ -44,28 +51,48 @@ export default function Asistencia() {
   const cargarDetalle = useCallback(async (asistenciaId: number) => {
     try {
       const detalle = await api.asistencia.detalle(asistenciaId);
+      if (!mounted.current) return;
       setAsistencia(detalle.asistencia);
       setAusencias(detalle.ausencias);
 
       const mats = detalle.materiales;
       if (mats.length > 0) {
-        setMaterialRows(mats.map((m, i) => ({
+        const rows = mats.map((m, i) => ({
           key: `existing-${m.materialesListID ?? i}`,
           materialId: m.materialID, nombreMaterial: m.nombreMaterial, cantidad: m.cantidad,
-        })));
+        }));
+        setMaterialRows(rows);
+        materialRowsRef.current = rows;
+        originalRowsRef.current = rows.map((r) => ({ ...r }));
+        setDirty(false);
       } else {
         setMaterialRows([]);
+        materialRowsRef.current = [];
+        originalRowsRef.current = [];
+        setDirty(false);
       }
     } catch (err) {
-      addToast('error', err instanceof Error ? err.message : 'Error al cargar detalle');
+      if (mounted.current) addToast('error', err instanceof Error ? err.message : 'Error al cargar detalle');
     }
   }, [addToast]);
+
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
 
   useEffect(() => {
     if (asistencia?.asistenciaID) {
       cargarDetalle(asistencia.asistenciaID);
     }
   }, [asistencia?.asistenciaID, cargarDetalle]);
+
+  useEffect(() => {
+    setSelectedDocente(null);
+    setAsistencia(null);
+    setAusencias([]);
+    setMaterialRows([]);
+    materialRowsRef.current = [];
+    originalRowsRef.current = [];
+    setDirty(false);
+  }, [fecha]);
 
   const abrirAsistencia = useCallback(async (docenteId: number, nombre: string) => {
     try {
@@ -86,26 +113,66 @@ export default function Asistencia() {
         }));
         if (defaultMats.length > 0) {
           setMaterialRows(defaultMats);
+          materialRowsRef.current = defaultMats;
+          originalRowsRef.current = [];
+
           for (const dm of defaultMats) {
             if (dm.materialId) {
               try { await api.asistencia.acumularMaterial(a.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
             }
           }
+          setDirty(false);
         }
       }
-      asistenciaHoy.refetch();
+      asistenciaPorFecha.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al abrir asistencia');
     }
-  }, [fecha, addToast, asistenciaHoy, loadDefaults]);
+  }, [fecha, addToast, asistenciaPorFecha, loadDefaults]);
+
+  const guardarMaterialesEnBloque = async () => {
+    setSavingMat(true);
+    try {
+      const rows = materialRowsRef.current;
+      const original = originalRowsRef.current;
+
+      for (const row of rows) {
+        if (row.materialId == null) continue;
+        if (!asistencia) continue;
+
+        const orig = original.find((or) => or.key === row.key);
+
+        if (!orig) {
+          if (row.cantidad > 0) {
+            await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: row.materialId, cantidad: row.cantidad });
+          }
+        } else if (orig.cantidad !== row.cantidad || orig.materialId !== row.materialId) {
+          await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: row.materialId, cantidad: row.cantidad - orig.cantidad });
+        }
+      }
+
+      await cargarDetalle(asistencia!.asistenciaID);
+      setDirty(false);
+      addToast('success', 'Materiales guardados correctamente');
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Error al guardar materiales');
+    } finally {
+      setSavingMat(false);
+    }
+  };
 
   const handleSelectDocente = async (id: number | null) => {
     if (id === null) return;
+
+    if (asistencia && dirty) {
+      await guardarMaterialesEnBloque();
+    }
+
     const opt = docenteOptions.find((d) => d.id === id);
     if (!opt) return;
-    const estadoHoy = (asistenciaHoy.data ?? []).find((d) => d.docenteID === id);
-    if (estadoHoy?.presente && estadoHoy.asistenciaID) {
-      const detalle = await api.asistencia.detalle(estadoHoy.asistenciaID);
+    const estadoFecha = (asistenciaPorFecha.data ?? []).find((d) => d.docenteID === id);
+    if (estadoFecha?.presente && estadoFecha.asistenciaID) {
+      const detalle = await api.asistencia.detalle(estadoFecha.asistenciaID);
       setAsistencia(detalle.asistencia);
       setAusencias(detalle.ausencias);
       setSelectedDocente(opt);
@@ -121,10 +188,23 @@ export default function Asistencia() {
       await api.asistencia.registrarSalida(asistencia.asistenciaID, hora);
       setAsistencia((prev) => prev ? { ...prev, horaSalida: hora } : null);
       addToast('success', `Salida registrada a las ${formatearHora(hora)}`);
-      asistenciaHoy.refetch();
+      asistenciaPorFecha.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al registrar salida');
     }
+  };
+
+  const handleRevertirSalida = async () => {
+    if (!asistencia) return;
+    try {
+      await api.asistencia.revertirSalida(asistencia.asistenciaID);
+      setAsistencia((prev) => prev ? { ...prev, horaSalida: '' } : null);
+      addToast('success', 'Registro de salida revertido correctamente');
+      asistenciaPorFecha.refetch();
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Error al revertir salida');
+    }
+    setShowRevertirSalida(false);
   };
 
   const handleEditarEntrada = async (nuevaHora: string) => {
@@ -146,7 +226,7 @@ export default function Asistencia() {
       setAusencias((prev) => [...prev, nueva]);
       setMotivoAusencia('');
       addToast('info', `Ausencia iniciada a las ${formatearHora(hora)}`);
-      asistenciaHoy.refetch();
+      asistenciaPorFecha.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al iniciar ausencia');
     }
@@ -159,7 +239,7 @@ export default function Asistencia() {
       await api.asistencia.finalizarAusencia(asistencia.asistenciaID, ausId, hora);
       setAusencias((prev) => prev.map((a) => a.ausenciaID === ausId ? { ...a, horaFin: hora } : a));
       addToast('info', `Regreso registrado a las ${formatearHora(hora)}`);
-      asistenciaHoy.refetch();
+      asistenciaPorFecha.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al registrar regreso');
     }
@@ -171,38 +251,46 @@ export default function Asistencia() {
       await api.asistencia.eliminarAusencia(asistencia.asistenciaID, ausId);
       setAusencias((prev) => prev.filter((a) => a.ausenciaID !== ausId));
       addToast('success', 'Periodo de ausencia eliminado');
-      asistenciaHoy.refetch();
+      asistenciaPorFecha.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al eliminar ausencia');
     }
   };
 
   const handleAddMaterial = () => {
-    setMaterialRows((prev) => [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }]);
+    setMaterialRows((prev) => {
+      const next = [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }];
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
   };
 
   const handleRemoveMaterial = (key: string) => {
-    setMaterialRows((prev) => prev.filter((r) => r.key !== key));
+    setMaterialRows((prev) => {
+      const next = prev.filter((r) => r.key !== key);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
   };
 
-  const handleMaterialChange = async (key: string, materialId: number) => {
-    setMaterialRows((prev) => prev.map((r) => r.key === key ? { ...r, materialId } : r));
-    if (asistencia) {
-      const row = materialRows.find((r) => r.key === key);
-      if (row?.cantidad && row.cantidad > 0) {
-        try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId, cantidad: row.cantidad }); } catch {}
-      }
-    }
+  const handleMaterialChange = (key: string, materialId: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, materialId } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
   };
 
-  const handleCantidadChange = async (key: string, cantidad: number) => {
-    setMaterialRows((prev) => prev.map((r) => r.key === key ? { ...r, cantidad } : r));
-    if (asistencia) {
-      const row = materialRows.find((r) => r.key === key);
-      if (row?.materialId && cantidad > 0) {
-        try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: row.materialId, cantidad }); } catch {}
-      }
-    }
+  const handleCantidadChange = (key: string, cantidad: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, cantidad } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
   };
 
   const handleAnular = async (motivo?: string) => {
@@ -211,7 +299,10 @@ export default function Asistencia() {
       await api.asistencia.anular(asistencia.asistenciaID, motivo);
       addToast('success', 'Asistencia anulada correctamente');
       setAsistencia(null); setAusencias([]); setMaterialRows([]); setSelectedDocente(null);
-      asistenciaHoy.refetch();
+      setDirty(false);
+      materialRowsRef.current = [];
+      originalRowsRef.current = [];
+      asistenciaPorFecha.refetch();
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular'); }
     setShowAnular(false);
   };
@@ -226,17 +317,22 @@ export default function Asistencia() {
       cantidad: dm.cantidad,
     }));
     setMaterialRows(defaultMats);
+    materialRowsRef.current = defaultMats;
     for (const dm of defaultMats) {
       if (dm.materialId) {
         try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
       }
     }
+    originalRowsRef.current = defaultMats.map((r) => ({ ...r }));
+    setDirty(false);
     addToast('info', 'Lista de materiales restaurada al predeterminado');
   };
 
   const tieneAusenciaAbierta = ausencias.some((a) => !a.horaFin);
-  const diaCerrado = asistencia?.horaSalida != null;
+  const diaCerrado = asistencia?.horaSalida != null && asistencia.horaSalida !== '';
   const diaActivo = asistencia && asistencia.horaEntrada && !diaCerrado;
+  const totalMat = materialRows.filter((r) => r.materialId != null).length;
+  const esHoy = fecha === hoyISO();
 
   const openEditDefaults = async () => {
     const defaults = await loadDefaults();
@@ -303,12 +399,12 @@ export default function Asistencia() {
               </tr>
             </thead>
             <tbody>
-              {(asistenciaHoy.data ?? []).map((d) => {
+              {(asistenciaPorFecha.data ?? []).map((d) => {
                 let estadoBadge: React.ReactNode;
                 if (!d.presente) {
                   estadoBadge = <Badge variant="neutral"><span className="led led-danger" />Ausente</Badge>;
                 } else if (d.horaSalida) {
-                  estadoBadge = <Badge variant="neutral">Finalizo a las {formatearHora(d.horaSalida)}</Badge>;
+                  estadoBadge = <Badge variant="neutral">Finalizó a las {formatearHora(d.horaSalida)}</Badge>;
                 } else if (d.enAusencia) {
                   estadoBadge = <Badge variant="warning"><span className="led led-warning" />Ausente temporalmente</Badge>;
                 } else {
@@ -341,7 +437,7 @@ export default function Asistencia() {
 
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-header">
-          <h3 className="card-title">Busqueda manual</h3>
+          <h3 className="card-title">Búsqueda manual</h3>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, maxWidth: 400 }}>
@@ -358,13 +454,16 @@ export default function Asistencia() {
       {asistencia && selectedDocente && (
         <div className="card">
           <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="card-title">Registro del dia — {selectedDocente.label} — {fecha}</h3>
-            {diaCerrado
-              ? <Badge variant="neutral">Dia finalizado</Badge>
-              : tieneAusenciaAbierta
-                ? <Badge variant="warning"><span className="led led-warning" />Ausente temporalmente</Badge>
-                : <Badge variant="success"><span className="led led-ok" />En clinica</Badge>
-            }
+            <h3 className="card-title">Registro del día — {selectedDocente.label} — {fecha}</h3>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {!esHoy && <Badge variant="warning">Registro manual</Badge>}
+              {diaCerrado
+                ? <Badge variant="neutral">Día finalizado</Badge>
+                : tieneAusenciaAbierta
+                  ? <Badge variant="warning"><span className="led led-warning" />Ausente temporalmente</Badge>
+                  : <Badge variant="success"><span className="led led-ok" />En clínica</Badge>
+              }
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
@@ -380,7 +479,7 @@ export default function Asistencia() {
                   style={{ width: 160 }}
                 />
                 {diaActivo && (
-                  <span className="text-muted text-sm">en clinica desde las {formatearHora(asistencia.horaEntrada)}</span>
+                  <span className="text-muted text-sm">en clínica desde las {formatearHora(asistencia.horaEntrada)}</span>
                 )}
               </div>
             </div>
@@ -388,9 +487,14 @@ export default function Asistencia() {
               <label className="form-label">Hora de salida</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {diaCerrado ? (
-                  <span className="text-sm">
-                    <Badge variant="neutral">{formatearHora(asistencia.horaSalida)}</Badge>
-                  </span>
+                  <>
+                    <span className="text-sm">
+                      <Badge variant="neutral">{formatearHora(asistencia.horaSalida)}</Badge>
+                    </span>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setShowRevertirSalida(true)} title="Revertir registro de salida">
+                      <RotateCcw size={14} />
+                    </button>
+                  </>
                 ) : (
                   <button className="btn btn-primary btn-sm" onClick={handleRegistrarSalida} disabled={tieneAusenciaAbierta}>
                     Registrar salida ({formatearHora(horaActual())})
@@ -431,7 +535,7 @@ export default function Asistencia() {
                   <tr>
                     <th>Inicio</th>
                     <th>Fin</th>
-                    <th>Duracion</th>
+                    <th>Duración</th>
                     <th>Motivo</th>
                     <th style={{ width: 160 }} />
                   </tr>
@@ -460,7 +564,7 @@ export default function Asistencia() {
               </table>
             ) : (
               <div className="text-muted text-sm" style={{ padding: 12 }}>
-                El docente no ha registrado salidas temporales. Use el boton "Iniciar ausencia" cuando el docente se retire de la clinica temporalmente.
+                El docente no ha registrado salidas temporales. Use el botón "Iniciar ausencia" cuando el docente se retire de la clínica temporalmente.
               </div>
             )}
           </div>
@@ -468,8 +572,15 @@ export default function Asistencia() {
           <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddMaterial} onRemove={handleRemoveMaterial} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--color-border)' }}>
-            <span className="text-muted text-sm">{materialRows.length} materiales registrados hoy</span>
+            <span className="text-muted text-sm">
+              {totalMat} material(es){dirty && <span style={{ color: 'var(--color-warning-text)', marginLeft: 8 }}>(cambios sin guardar)</span>}
+            </span>
             <div style={{ display: 'flex', gap: 8 }}>
+              {dirty && (
+                <button className="btn btn-primary btn-sm" onClick={guardarMaterialesEnBloque} disabled={savingMat}>
+                  {savingMat ? 'Guardando...' : 'Guardar materiales'}
+                </button>
+              )}
               <button className="btn btn-ghost btn-sm" onClick={handleRestaurarDefault}>Restaurar lista predeterminada</button>
               <button className="btn btn-ghost btn-sm" onClick={openEditDefaults}>Editar lista predeterminada</button>
               <button className="btn btn-danger btn-sm" onClick={() => setShowAnular(true)}>Anular asistencia</button>
@@ -478,9 +589,14 @@ export default function Asistencia() {
         </div>
       )}
 
+      <ConfirmDialog open={showRevertirSalida} title="Revertir registro de salida"
+        message={`Confirme que desea revertir el registro de salida de ${selectedDocente?.label}. La asistencia quedará abierta nuevamente.`}
+        confirmLabel="Sí, revertir salida" variant="primary"
+        onConfirm={handleRevertirSalida} onCancel={() => setShowRevertirSalida(false)} />
+
       <ConfirmDialog open={showAnular} title="Anular asistencia docente"
-        message={`Confirme que desea anular la asistencia de ${selectedDocente?.label} del dia ${fecha}.`}
-        confirmLabel="Si, anular asistencia" variant="danger" requireMotivo
+        message={`Confirme que desea anular la asistencia de ${selectedDocente?.label} del día ${fecha}.`}
+        confirmLabel="Sí, anular asistencia" variant="danger" requireMotivo
         onConfirm={handleAnular} onCancel={() => setShowAnular(false)} />
 
       {showEditDefaults && (
@@ -491,7 +607,7 @@ export default function Asistencia() {
               <button className="btn btn-ghost btn-sm" onClick={() => setShowEditDefaults(false)}><X size={18} /></button>
             </div>
             <div className="dialog-body">
-              <p className="dialog-message">Estos materiales se asignaran automaticamente al abrir la asistencia de un docente.</p>
+              <p className="dialog-message">Estos materiales se asignarán automáticamente al abrir la asistencia de un docente.</p>
               <MaterialTable
                 rows={defaultMatRows}
                 materials={materiales.data ?? []}

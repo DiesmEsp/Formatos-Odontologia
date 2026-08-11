@@ -2,6 +2,7 @@ package com.odontologia.formatos.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odontologia.formatos.db.ConnectionManager;
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
@@ -14,6 +15,9 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -65,6 +69,16 @@ public class AsistenciaController {
             }
         });
 
+        app.delete("/api/asistencia/{id}/salida", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            try {
+                service.revertirSalida(id);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.post("/api/asistencia/{id}/ausencias", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
             var body = ctx.bodyAsClass(Map.class);
@@ -98,6 +112,15 @@ public class AsistenciaController {
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             }
+        });
+
+        app.get("/api/asistencia/por-fecha", ctx -> {
+            String fecha = ctx.queryParam("fecha");
+            if (fecha == null || !fecha.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                ctx.status(400).json(Map.of("error", "El parametro 'fecha' es obligatorio con formato AAAA-MM-DD."));
+                return;
+            }
+            ctx.json(asistenciaPorFecha(fecha));
         });
 
         app.get("/api/asistencia/{id}/detalle", ctx -> {
@@ -163,6 +186,51 @@ public class AsistenciaController {
             guardarDefaults(materiales);
             ctx.json(Map.of("ok", true));
         });
+    }
+
+    private List<Map<String, Object>> asistenciaPorFecha(String fecha) throws SQLException {
+        List<Map<String, Object>> resultado = new ArrayList<>();
+
+        try (Connection con = ConnectionManager.getInstance().getConnection()) {
+            String sql = """
+                    SELECT d.DocenteID, d.Nombres, d.Apellidos, a.Estado, a.AsistenciaID,
+                           a.HoraEntrada, a.HoraSalida
+                    FROM Docentes d
+                    LEFT JOIN Asistencia a ON d.DocenteID = a.DocenteID AND a.Fecha = ? AND a.Estado = 'ACTIVO'
+                    WHERE d.Estado = 1""";
+
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, fecha);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        Map<String, Object> entry = new LinkedHashMap<>();
+                        entry.put("docenteID", rs.getInt(1));
+                        entry.put("nombres", rs.getString(2));
+                        entry.put("apellidos", rs.getString(3));
+                        String estado = rs.getString(4);
+                        entry.put("presente", estado != null);
+                        entry.put("asistenciaID", estado != null ? rs.getInt(5) : null);
+                        entry.put("horaEntrada", estado != null ? rs.getString(6) : null);
+                        entry.put("horaSalida", estado != null ? rs.getString(7) : null);
+
+                        boolean enAusencia = false;
+                        if (estado != null) {
+                            try (PreparedStatement psAus = con.prepareStatement(
+                                    "SELECT 1 FROM PeriodoAusencia WHERE AsistenciaID = ? AND HoraFin IS NULL")) {
+                                psAus.setInt(1, rs.getInt(5));
+                                try (ResultSet rsAus = psAus.executeQuery()) {
+                                    enAusencia = rsAus.next();
+                                }
+                            }
+                        }
+                        entry.put("enAusencia", enAusencia);
+                        resultado.add(entry);
+                    }
+                }
+            }
+        }
+
+        return resultado;
     }
 
     private Path archivoDefaults() {

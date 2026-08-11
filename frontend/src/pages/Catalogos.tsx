@@ -114,7 +114,7 @@ function TabMateriales({ addToast }: { addToast: ReturnType<typeof useToast>["ad
         <button className="btn btn-primary btn-sm" onClick={() => setModal({})}><Plus size={14} /> Nuevo Material</button>
       </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar material..." onSearch={setQ} />
-      <CatalogoModal open={!!modal} title={modal?.edit ? "Editar Material" : "Nuevo Material"}
+      <CatalogoModal key={modal?.edit?.materialID ?? 'new'} open={!!modal} title={modal?.edit ? "Editar Material" : "Nuevo Material"}
         fields={[
           { key: "nombre", label: "Nombre", type: "text", placeholder: "Nombre del material" },
           { key: "unidad", label: "Unidad de medida", type: "text", placeholder: "ej. Caja, Paquete, Unidad" },
@@ -181,7 +181,7 @@ function TabDocentes({ addToast }: { addToast: ReturnType<typeof useToast>["addT
         <button className="btn btn-primary btn-sm" onClick={() => setModal({})}><Plus size={14} /> Nuevo Docente</button>
       </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar docente..." onSearch={setQ} />
-      <CatalogoModal open={!!modal} title={modal?.edit ? "Editar Docente" : "Nuevo Docente"}
+      <CatalogoModal key={modal?.edit?.docenteID ?? 'new'} open={!!modal} title={modal?.edit ? "Editar Docente" : "Nuevo Docente"}
         fields={[
           { key: "nombres", label: "Nombres", type: "text" },
           { key: "apellidos", label: "Apellidos", type: "text" },
@@ -249,7 +249,7 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
         <button className="btn btn-primary btn-sm" onClick={() => setModal({})}><Plus size={14} /> Nuevo Paciente</button>
       </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar paciente..." onSearch={setQ} />
-      <CatalogoModal open={!!modal} title={modal?.edit ? "Editar Paciente" : "Nuevo Paciente"}
+      <CatalogoModal key={modal?.edit?.pacienteID ?? 'new'} open={!!modal} title={modal?.edit ? "Editar Paciente" : "Nuevo Paciente"}
         fields={[
           { key: "nombres", label: "Nombres", type: "text" },
           { key: "apellidos", label: "Apellidos", type: "text" },
@@ -323,7 +323,7 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
         <button className="btn btn-primary btn-sm" onClick={openNew}><Plus size={14} /> Nuevo Operador</button>
       </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar operador..." onSearch={setQ} />
-      <CatalogoModal open={!!modal} title={modal?.edit ? "Editar Operador" : "Nuevo Operador"}
+      <CatalogoModal key={modal?.edit?.operadorID ?? 'new'} open={!!modal} title={modal?.edit ? "Editar Operador" : "Nuevo Operador"}
         fields={[
           { key: "nombres", label: "Nombres", type: "text" },
           { key: "apellidos", label: "Apellidos", type: "text" },
@@ -433,7 +433,7 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
           <MaterialesDetalle tratPredID={item.tratPredID} />
         </div>
       ))}
-      <CatalogoModal open={!!modal}
+      <CatalogoModal key={modal?.edit?.tratPredID ?? 'new'} open={!!modal}
         title={modal?.edit ? "Editar Tratamiento Predefinido" : "Nuevo Tratamiento Predefinido"}
         fields={[
           { key: "nombreTratamiento", label: "Nombre del tratamiento", type: "text" },

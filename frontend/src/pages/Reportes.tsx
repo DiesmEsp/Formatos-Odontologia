@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen, Clock, RotateCw } from 'lucide-react';
+import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen, Clock } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api';
@@ -100,6 +100,7 @@ export default function Reportes() {
           onGenerate={() => {}}
           generating={false}
           label=""
+          showButton={false}
         />
       </div>
 
@@ -143,38 +144,6 @@ export default function Reportes() {
             disabled={!!generating}
           >
             {generating === 'anual' ? 'Generando...' : `Generar Reporte Anual ${anio}`}
-          </button>
-        </div>
-      </div>
-
-      <div className="card" style={{ marginBottom: 20 }}>
-        <h3 className="card-title" style={{ marginBottom: 14 }}>Datos de muestra</h3>
-        <div className="report-card" style={{ maxWidth: 520 }}>
-          <div className="report-icon" style={{ backgroundColor: 'var(--color-warning-bg)' }}>
-            <RotateCw size={18} color="var(--color-warning-text)" />
-          </div>
-          <div className="report-info">
-            <span className="report-title">Reportes semilla</span>
-            <span className="report-desc">Genera todos los tipos de reporte a la vez para verificar formatos.</span>
-          </div>
-          <button
-            className="btn btn-warning btn-sm"
-            onClick={async () => {
-              setGenerating('semilla');
-              try {
-                const result = await api.reportes.generarSemilla();
-                const paths = Object.values(result);
-                addToast('success', `${paths.length} reportes generados en la carpeta de reportes`);
-                recientes.refetch();
-              } catch (err) {
-                addToast('error', err instanceof Error ? err.message : 'Error al generar reportes');
-              } finally {
-                setGenerating(null);
-              }
-            }}
-            disabled={!!generating}
-          >
-            {generating === 'semilla' ? 'Generando...' : 'Generar reportes de muestra'}
           </button>
         </div>
       </div>

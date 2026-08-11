@@ -84,6 +84,20 @@ public class AsistenciaService {
         });
     }
 
+    public void revertirSalida(int asistenciaID) throws SQLException {
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        if ("ANULADO".equals(a.getEstado())) {
+            throw new NegocioException("La asistencia está anulada.");
+        }
+        if (a.getHoraSalida() == null) {
+            throw new NegocioException("La asistencia no tiene una hora de salida registrada.");
+        }
+        TransaccionBD.ejecutar(con -> asistenciaRepository.revertirSalida(con, asistenciaID));
+    }
+
     public PeriodoAusencia iniciarAusencia(int asistenciaID, String horaInicio, String motivo) throws SQLException {
         validarHora(horaInicio, "hora de inicio de ausencia");
         Asistencia a = asistenciaRepository.findById(asistenciaID);

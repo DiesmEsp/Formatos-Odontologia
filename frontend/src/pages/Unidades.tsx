@@ -55,7 +55,7 @@ export default function Unidades() {
       <div className="view-header">
         <div>
           <h1 className="view-title">Gestion de Unidades</h1>
-          <p className="view-subtitle">Administre las unidades de atencion de la clinica</p>
+          <p className="view-subtitle">Administre las unidades de atención de la clínica</p>
         </div>
         <button className="btn btn-primary" onClick={handleCreate} disabled={creating}>
           <Plus size={16} />

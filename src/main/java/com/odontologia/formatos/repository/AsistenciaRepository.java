@@ -99,6 +99,15 @@ public class AsistenciaRepository {
         }
     }
 
+    public void revertirSalida(Connection con, int asistenciaID) throws SQLException {
+        String sql = "UPDATE Asistencia SET HoraSalida = NULL WHERE AsistenciaID = ?";
+        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, asistenciaID);
+            ps.executeUpdate();
+        }
+    }
+
     private Asistencia rowToModel(ResultSet rs) throws SQLException {
         return new Asistencia(
                 rs.getInt("AsistenciaID"),

@@ -54,7 +54,7 @@ export default function Tratamientos() {
         {unidadesList.length === 0 && (
           <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
             <span className="empty-title">No hay unidades registradas</span>
-            <span className="empty-text">Cree unidades en la seccion de Gestion para comenzar.</span>
+            <span className="empty-text">Cree unidades en la sección de Gestión para comenzar.</span>
           </div>
         )}
       </div>

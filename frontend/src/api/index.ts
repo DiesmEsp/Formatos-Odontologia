@@ -124,6 +124,10 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify({ horaSalida }),
     }),
+    revertirSalida: (asistenciaId: number) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/salida`, {
+      method: 'DELETE',
+    }),
+    porFecha: (fecha: string) => request<AsistenciaHoy[]>(`/api/asistencia/por-fecha?fecha=${encodeURIComponent(fecha)}`),
     iniciarAusencia: (asistenciaId: number, horaInicio: string, motivo?: string) => request<PeriodoAusencia>(`/api/asistencia/${asistenciaId}/ausencias`, {
       method: 'POST',
       body: JSON.stringify({ horaInicio, motivo }),

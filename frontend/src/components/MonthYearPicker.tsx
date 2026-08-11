@@ -10,6 +10,7 @@ interface MonthYearPickerProps {
   label?: string;
   showAnual?: boolean;
   onGenerateAnual?: () => void;
+  showButton?: boolean;
 }
 
 export function MonthYearPicker({
@@ -22,6 +23,7 @@ export function MonthYearPicker({
   label = 'Generar reporte',
   showAnual = false,
   onGenerateAnual,
+  showButton = true,
 }: MonthYearPickerProps) {
   const currentYear = new Date().getFullYear();
   const years: number[] = [];
@@ -42,9 +44,11 @@ export function MonthYearPicker({
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
-        <button className="btn btn-primary" onClick={onGenerate} disabled={generating}>
-          {generating ? 'Generando...' : label}
-        </button>
+        {showButton && (
+          <button className="btn btn-primary" onClick={onGenerate} disabled={generating}>
+            {generating ? 'Generando...' : label}
+          </button>
+        )}
         {showAnual && onGenerateAnual && (
           <button className="btn btn-secondary" onClick={onGenerateAnual} disabled={generating}>
             Anual {anio}
