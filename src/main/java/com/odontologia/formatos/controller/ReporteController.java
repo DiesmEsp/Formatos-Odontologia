@@ -4,6 +4,7 @@ import com.odontologia.formatos.export.ReporteEconomicoGenerator;
 import com.odontologia.formatos.export.ReporteGeneradorBase;
 import com.odontologia.formatos.export.ReporteMaterialesGenerator;
 import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
+import com.odontologia.formatos.export.ReporteConsolidadoGenerator;
 import com.odontologia.formatos.export.ReporteDocenteGenerator;
 import com.odontologia.formatos.export.ReporteEspecialistaGenerator;
 import com.odontologia.formatos.export.ReporteNomenclatura;
@@ -29,6 +30,7 @@ public class ReporteController {
     private final ReporteAsistenciaGenerator asistenciaGen = new ReporteAsistenciaGenerator();
     private final ReporteDocenteGenerator docenteGen = new ReporteDocenteGenerator();
     private final ReporteEspecialistaGenerator especialistaGen = new ReporteEspecialistaGenerator();
+    private final ReporteConsolidadoGenerator consolidadoGen = new ReporteConsolidadoGenerator();
 
     public void register(Javalin app) {
         app.post("/api/reportes/materiales/generar", ctx -> {
@@ -114,6 +116,21 @@ public class ReporteController {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/consolidado/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mesInicio = ((Number) body.get("mesInicio")).intValue();
+            int mesFin = ((Number) body.get("mesFin")).intValue();
+            try {
+                Path path = consolidadoGen.generar(anio, mesInicio, mesFin, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte consolidado: " + e.getMessage()));
             }
         });
 

@@ -245,6 +245,10 @@ export const api = {
     generarSemilla: () => request<Record<string, string>>('/api/reportes/semilla/generar', {
       method: 'POST',
     }),
+    generarConsolidado: (anio: number, mesInicio: number, mesFin: number) => request<ReporteGenerado>('/api/reportes/consolidado/generar', {
+      method: 'POST',
+      body: JSON.stringify({ anio, mesInicio, mesFin }),
+    }),
   },
 };
 

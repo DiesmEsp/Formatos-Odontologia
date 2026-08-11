@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen, Clock } from 'lucide-react';
+import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen, Clock, BarChart3 } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api';
 import { MonthYearPicker } from '../components/MonthYearPicker';
+import { MonthYearRangePicker } from '../components/MonthYearRangePicker';
 import { mesActual, anioActual } from '../lib/format';
 
 export default function Reportes() {
   const [mes, setMes] = useState(mesActual());
   const [anio, setAnio] = useState(anioActual());
   const [generating, setGenerating] = useState<string | null>(null);
+  const [rangoMesInicio, setRangoMesInicio] = useState(mesActual());
+  const [rangoAnioInicio, setRangoAnioInicio] = useState(anioActual());
+  const [rangoMesFin, setRangoMesFin] = useState(mesActual());
+  const [rangoAnioFin, setRangoAnioFin] = useState(anioActual());
   const { addToast } = useToast();
 
   const recientes = useApi(() => api.reportes.listarRecientes());
@@ -23,6 +28,29 @@ export default function Reportes() {
       recientes.refetch();
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al generar reporte');
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  const validarRango = (): boolean => {
+    if (rangoAnioInicio > rangoAnioFin) return false;
+    if (rangoAnioInicio === rangoAnioFin && rangoMesInicio > rangoMesFin) return false;
+    return true;
+  };
+
+  const generarConsolidado = async () => {
+    if (!validarRango()) {
+      addToast('error', 'El rango de fechas no es válido. El inicio debe ser anterior al fin.');
+      return;
+    }
+    setGenerating('consolidado');
+    try {
+      const result = await api.reportes.generarConsolidado(rangoAnioInicio, rangoMesInicio, rangoMesFin);
+      addToast('success', `Reporte consolidado generado: ${result.path.split(/[/\\]/).pop()}`);
+      recientes.refetch();
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Error al generar reporte consolidado');
     } finally {
       setGenerating(null);
     }
@@ -146,6 +174,31 @@ export default function Reportes() {
             {generating === 'anual' ? 'Generando...' : `Generar Reporte Anual ${anio}`}
           </button>
         </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h3 className="card-title" style={{ marginBottom: 14 }}>Reporte consolidado por período</h3>
+        <p className="text-muted text-sm" style={{ marginBottom: 14 }}>
+          Genere un reporte unificado (materiales, ingresos y asistencia) para un rango personalizado de meses.
+        </p>
+        <MonthYearRangePicker
+          mesInicio={rangoMesInicio}
+          anioInicio={rangoAnioInicio}
+          mesFin={rangoMesFin}
+          anioFin={rangoAnioFin}
+          onMesInicioChange={setRangoMesInicio}
+          onAnioInicioChange={setRangoAnioInicio}
+          onMesFinChange={setRangoMesFin}
+          onAnioFinChange={setRangoAnioFin}
+          onGenerate={generarConsolidado}
+          generating={generating === 'consolidado'}
+        />
+        {!validarRango() && (
+          <div className="alert-banner alert-warning" style={{ marginTop: 12 }}>
+            <BarChart3 size={16} />
+            <span>La fecha de inicio debe ser anterior o igual a la fecha de fin.</span>
+          </div>
+        )}
       </div>
 
       <div className="card">
