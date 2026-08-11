@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './hooks/useToast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import Dashboard from './pages/Dashboard';
 import Tratamientos from './pages/Tratamientos';
 import Asistencia from './pages/Asistencia';
@@ -12,7 +13,8 @@ export default function App() {
   return (
     <HashRouter>
       <ToastProvider>
-        <Routes>
+        <ErrorBoundary>
+          <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tratamientos" element={<Tratamientos />} />
@@ -21,7 +23,8 @@ export default function App() {
             <Route path="/reportes" element={<Reportes />} />
             <Route path="/unidades" element={<Unidades />} />
           </Route>
-        </Routes>
+          </Routes>
+        </ErrorBoundary>
       </ToastProvider>
     </HashRouter>
   );

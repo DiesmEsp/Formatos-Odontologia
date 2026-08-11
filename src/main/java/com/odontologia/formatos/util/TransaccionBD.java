@@ -34,6 +34,9 @@ public final class TransaccionBD {
             } catch (SQLException e) {
                 con.rollback();
                 throw e;
+            } catch (RuntimeException e) {
+                con.rollback();
+                throw e;
             } finally {
                 con.setAutoCommit(true);
             }
@@ -48,6 +51,9 @@ public final class TransaccionBD {
                 con.commit();
                 return resultado;
             } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } catch (RuntimeException e) {
                 con.rollback();
                 throw e;
             } finally {

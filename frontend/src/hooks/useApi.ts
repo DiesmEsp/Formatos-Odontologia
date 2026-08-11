@@ -16,11 +16,13 @@ export function useApi<T>(
     error: null,
   });
   const mounted = useRef(true);
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
 
   const execute = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const data = await fetcher();
+      const data = await fetcherRef.current();
       if (mounted.current) {
         setState({ data, loading: false, error: null });
       }

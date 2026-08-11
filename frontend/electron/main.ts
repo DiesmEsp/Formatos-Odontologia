@@ -85,8 +85,8 @@ function createMainWindow(): void {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
-      webSecurity: false,
+      sandbox: true,
+      webSecurity: true,
     },
   });
 
@@ -116,13 +116,18 @@ function stopJavaBackend(): void {
 
   setTimeout(() => {
     if (serverProcess && !serverProcess.killed) {
-      if (process.platform === 'win32') {
-        spawn('taskkill', ['/pid', String(serverProcess.pid), '/f', '/t']);
-      } else {
-        serverProcess.kill('SIGTERM');
-      }
+      killProcess();
     }
   }, 5000);
+}
+
+function killProcess(): void {
+  if (!serverProcess) return;
+  if (process.platform === 'win32') {
+    spawn('taskkill', ['/pid', String(serverProcess.pid), '/f', '/t']);
+  } else {
+    serverProcess.kill('SIGTERM');
+  }
 }
 
 app.on('ready', async () => {

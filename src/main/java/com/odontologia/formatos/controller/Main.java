@@ -10,10 +10,13 @@ import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 
     private static final int DEFAULT_PORT = 7070;
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         LogConfig.configurar();
@@ -24,8 +27,8 @@ public class Main {
             config.http.defaultContentType = ContentType.JSON;
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> {
-                    it.anyHost();
-                    it.allowCredentials = false;
+                    it.reflectClientOrigin = true;
+                    it.allowCredentials = true;
                 });
             });
         });
@@ -39,17 +42,18 @@ public class Main {
         });
 
         app.exception(Exception.class, (e, ctx) -> {
-            System.err.println("Error no manejado: " + e.getMessage());
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Error no manejado: " + e.getMessage(), e);
             ctx.status(500).json(Map.of("error", "Error interno del servidor"));
         });
 
         app.get("/health", ctx -> ctx.json(Map.of("status", "OK")));
 
-        app.post("/shutdown", ctx -> {
-            ctx.json(Map.of("status", "shutting_down"));
-            app.stop();
-        });
+        if (!"production".equals(System.getProperty("app.env", "development"))) {
+            app.post("/shutdown", ctx -> {
+                ctx.json(Map.of("status", "shutting_down"));
+                app.stop();
+            });
+        }
 
         new TratamientoController().register(app);
         new AsistenciaController().register(app);

@@ -72,39 +72,59 @@ public class AsistenciaRepository {
 
     public void anular(Connection con, int asistenciaID) throws SQLException {
         String sql = "UPDATE Asistencia SET Estado = 'ANULADO' WHERE AsistenciaID = ?";
-        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, asistenciaID);
             ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
         }
     }
 
     public void registrarEntrada(Connection con, int asistenciaID, String horaEntrada) throws SQLException {
         String sql = "UPDATE Asistencia SET HoraEntrada = ? WHERE AsistenciaID = ?";
-        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, horaEntrada);
             ps.setInt(2, asistenciaID);
             ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
         }
     }
 
     public void registrarSalida(Connection con, int asistenciaID, String horaSalida) throws SQLException {
         String sql = "UPDATE Asistencia SET HoraSalida = ? WHERE AsistenciaID = ?";
-        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, horaSalida);
             ps.setInt(2, asistenciaID);
             ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
         }
     }
 
     public void revertirSalida(Connection con, int asistenciaID) throws SQLException {
         String sql = "UPDATE Asistencia SET HoraSalida = NULL WHERE AsistenciaID = ?";
-        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, asistenciaID);
             ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
         }
     }
 
