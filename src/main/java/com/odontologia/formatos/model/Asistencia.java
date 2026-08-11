@@ -6,6 +6,8 @@ public class Asistencia {
     private int docenteID;
     private String fecha;
     private String estado;
+    private String horaEntrada;
+    private String horaSalida;
 
     public Asistencia() {
     }
@@ -15,6 +17,16 @@ public class Asistencia {
         this.docenteID = docenteID;
         this.fecha = fecha;
         this.estado = estado;
+    }
+
+    public Asistencia(int asistenciaID, int docenteID, String fecha, String estado,
+                      String horaEntrada, String horaSalida) {
+        this.asistenciaID = asistenciaID;
+        this.docenteID = docenteID;
+        this.fecha = fecha;
+        this.estado = estado;
+        this.horaEntrada = horaEntrada;
+        this.horaSalida = horaSalida;
     }
 
     public int getAsistenciaID() {
@@ -47,5 +59,21 @@ public class Asistencia {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getHoraEntrada() {
+        return horaEntrada;
+    }
+
+    public void setHoraEntrada(String horaEntrada) {
+        this.horaEntrada = horaEntrada;
+    }
+
+    public String getHoraSalida() {
+        return horaSalida;
+    }
+
+    public void setHoraSalida(String horaSalida) {
+        this.horaSalida = horaSalida;
     }
 }
