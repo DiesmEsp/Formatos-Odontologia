@@ -242,6 +242,57 @@ public class ReporteRepository {
         return String.format("%04d-%02d%%", anio, mes);
     }
 
+    public List<FilaAsistencia> datosAsistencia(int anio, int mes) throws SQLException {
+        String sql = """
+                SELECT d.DocenteID, d.Nombres || ' ' || d.Apellidos AS Docente,
+                       a.Fecha, a.HoraEntrada, a.HoraSalida
+                FROM Asistencia a
+                JOIN Docentes d ON d.DocenteID = a.DocenteID
+                WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ?
+                ORDER BY a.Fecha, d.Apellidos, d.Nombres""";
+        List<FilaAsistencia> lista = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, patronMes(anio, mes));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int asistenciaID = rs.getInt("DocenteID");
+                    String docente = rs.getString("Docente");
+                    String fecha = rs.getString("Fecha");
+                    String horaEntrada = rs.getString("HoraEntrada");
+                    String horaSalida = rs.getString("HoraSalida");
+                    List<FilaAusencia> ausencias = ausenciasPorAsistencia(con, fecha, docente);
+                    lista.add(new FilaAsistencia(asistenciaID, docente, fecha, horaEntrada, horaSalida, ausencias));
+                }
+            }
+        }
+        return lista;
+    }
+
+    private List<FilaAusencia> ausenciasPorAsistencia(Connection con, String fecha, String docente) throws SQLException {
+        String sql = """
+                SELECT pa.HoraInicio, pa.HoraFin, pa.Motivo
+                FROM PeriodoAusencia pa
+                JOIN Asistencia a ON a.AsistenciaID = pa.AsistenciaID
+                JOIN Docentes d ON d.DocenteID = a.DocenteID
+                WHERE d.Nombres || ' ' || d.Apellidos = ? AND a.Fecha = ? AND a.Estado = 'ACTIVO'
+                ORDER BY pa.HoraInicio""";
+        List<FilaAusencia> lista = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, docente);
+            ps.setString(2, fecha);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new FilaAusencia(
+                            rs.getString("HoraInicio"),
+                            rs.getString("HoraFin"),
+                            rs.getString("Motivo")));
+                }
+            }
+        }
+        return lista;
+    }
+
     public static class FilaMaterial {
         private final int materialID;
         private final String nombre;
@@ -516,5 +567,47 @@ public class ReporteRepository {
         public double getMontoPendiente() {
             return montoPendiente;
         }
+    }
+
+    public static class FilaAsistencia {
+        private final int docenteID;
+        private final String docente;
+        private final String fecha;
+        private final String horaEntrada;
+        private final String horaSalida;
+        private final List<FilaAusencia> ausencias;
+
+        public FilaAsistencia(int docenteID, String docente, String fecha,
+                              String horaEntrada, String horaSalida, List<FilaAusencia> ausencias) {
+            this.docenteID = docenteID;
+            this.docente = docente;
+            this.fecha = fecha;
+            this.horaEntrada = horaEntrada;
+            this.horaSalida = horaSalida;
+            this.ausencias = ausencias;
+        }
+
+        public int getDocenteID() { return docenteID; }
+        public String getDocente() { return docente; }
+        public String getFecha() { return fecha; }
+        public String getHoraEntrada() { return horaEntrada; }
+        public String getHoraSalida() { return horaSalida; }
+        public List<FilaAusencia> getAusencias() { return ausencias; }
+    }
+
+    public static class FilaAusencia {
+        private final String horaInicio;
+        private final String horaFin;
+        private final String motivo;
+
+        public FilaAusencia(String horaInicio, String horaFin, String motivo) {
+            this.horaInicio = horaInicio;
+            this.horaFin = horaFin;
+            this.motivo = motivo;
+        }
+
+        public String getHoraInicio() { return horaInicio; }
+        public String getHoraFin() { return horaFin; }
+        public String getMotivo() { return motivo; }
     }
 }

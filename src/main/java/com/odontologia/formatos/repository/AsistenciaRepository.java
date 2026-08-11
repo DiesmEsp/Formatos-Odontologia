@@ -16,13 +16,14 @@ public class AsistenciaRepository {
     }
 
     public int insert(Connection con, Asistencia asistencia) throws SQLException {
-        String sql = "INSERT INTO Asistencia (DocenteID, Fecha, Estado) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Asistencia (DocenteID, Fecha, Estado, HoraEntrada) VALUES (?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, asistencia.getDocenteID());
             ps.setString(2, asistencia.getFecha());
             ps.setString(3, asistencia.getEstado());
+            ps.setString(4, asistencia.getHoraEntrada());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -78,11 +79,33 @@ public class AsistenciaRepository {
         }
     }
 
+    public void registrarEntrada(Connection con, int asistenciaID, String horaEntrada) throws SQLException {
+        String sql = "UPDATE Asistencia SET HoraEntrada = ? WHERE AsistenciaID = ?";
+        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, horaEntrada);
+            ps.setInt(2, asistenciaID);
+            ps.executeUpdate();
+        }
+    }
+
+    public void registrarSalida(Connection con, int asistenciaID, String horaSalida) throws SQLException {
+        String sql = "UPDATE Asistencia SET HoraSalida = ? WHERE AsistenciaID = ?";
+        Connection conexion = con != null ? con : ConnectionManager.getInstance().getConnection();
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, horaSalida);
+            ps.setInt(2, asistenciaID);
+            ps.executeUpdate();
+        }
+    }
+
     private Asistencia rowToModel(ResultSet rs) throws SQLException {
         return new Asistencia(
                 rs.getInt("AsistenciaID"),
                 rs.getInt("DocenteID"),
                 rs.getString("Fecha"),
-                rs.getString("Estado"));
+                rs.getString("Estado"),
+                rs.getString("HoraEntrada"),
+                rs.getString("HoraSalida"));
     }
 }
