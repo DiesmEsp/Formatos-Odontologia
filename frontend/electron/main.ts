@@ -100,7 +100,7 @@ function createMainWindow(): void {
   if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
     mainWindow.loadURL(`http://localhost:5173`);
   } else {
-    mainWindow.loadURL(`http://localhost:${PORT}`);
+    mainWindow.loadFile(resolveResource('public', 'index.html'));
   }
 }
 
