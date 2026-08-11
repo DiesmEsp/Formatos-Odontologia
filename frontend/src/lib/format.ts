@@ -50,3 +50,29 @@ export function anioActual(): number {
 export function nombreCompleto(nombres: string, apellidos: string): string {
   return `${nombres} ${apellidos}`;
 }
+
+export function horaActual(): string {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+export function formatearHora(hhmmss: string | null): string {
+  if (!hhmmss) return '';
+  return hhmmss.substring(0, 5);
+}
+
+export function calcularDuracion(inicio: string | null, fin: string | null): string {
+  if (!inicio || !fin) return '';
+  const [h1, m1] = inicio.split(':').map(Number);
+  const [h2, m2] = fin.split(':').map(Number);
+  const totalMin = (h2 * 60 + m2) - (h1 * 60 + m1);
+  if (totalMin <= 0) return '';
+  const horas = Math.floor(totalMin / 60);
+  const minutos = totalMin % 60;
+  if (horas === 0) return `${minutos}m`;
+  if (minutos === 0) return `${horas}h`;
+  return `${horas}h ${minutos}m`;
+}

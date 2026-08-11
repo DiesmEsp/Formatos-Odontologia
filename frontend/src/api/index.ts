@@ -1,5 +1,6 @@
 import type {
   Asistencia,
+  AsistenciaDetalle,
   AsistenciaHoy,
   CrearAsistenciaDTO,
   CrearConversionDTO,
@@ -18,6 +19,7 @@ import type {
   MaterialesRegistrarDTO,
   Operador,
   Paciente,
+  PeriodoAusencia,
   ReporteAnualGenerado,
   ReporteGenerado,
   ReporteReciente,
@@ -114,6 +116,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(dto),
     }),
+    registrarEntrada: (asistenciaId: number, horaEntrada: string) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/entrada`, {
+      method: 'PUT',
+      body: JSON.stringify({ horaEntrada }),
+    }),
+    registrarSalida: (asistenciaId: number, horaSalida: string) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/salida`, {
+      method: 'PUT',
+      body: JSON.stringify({ horaSalida }),
+    }),
+    iniciarAusencia: (asistenciaId: number, horaInicio: string, motivo?: string) => request<PeriodoAusencia>(`/api/asistencia/${asistenciaId}/ausencias`, {
+      method: 'POST',
+      body: JSON.stringify({ horaInicio, motivo }),
+    }),
+    finalizarAusencia: (asistenciaId: number, ausenciaId: number, horaFin: string) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/ausencias/${ausenciaId}/regresar`, {
+      method: 'PUT',
+      body: JSON.stringify({ horaFin }),
+    }),
+    eliminarAusencia: (asistenciaId: number, ausenciaId: number) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/ausencias/${ausenciaId}`, {
+      method: 'DELETE',
+    }),
+    detalle: (asistenciaId: number) => request<AsistenciaDetalle>(`/api/asistencia/${asistenciaId}/detalle`),
     registrarMateriales: (dto: MaterialesRegistrarDTO) => request<{ ok: boolean }>('/api/asistencia/materiales', {
       method: 'POST',
       body: JSON.stringify(dto),
@@ -205,6 +227,10 @@ export const api = {
       body: JSON.stringify({ anio }),
     }),
     listarRecientes: () => request<ReporteReciente[]>('/api/reportes/recientes'),
+    generarAsistencia: (anio: number, mes: number) => request<ReporteGenerado>('/api/reportes/asistencia/generar', {
+      method: 'POST',
+      body: JSON.stringify({ anio, mes }),
+    }),
   },
 };
 

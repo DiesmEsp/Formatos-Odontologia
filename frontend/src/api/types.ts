@@ -83,6 +83,22 @@ export interface Asistencia {
   docenteID: number;
   fecha: string;
   estado: string;
+  horaEntrada: string | null;
+  horaSalida: string | null;
+}
+
+export interface PeriodoAusencia {
+  ausenciaID: number;
+  asistenciaID: number;
+  horaInicio: string;
+  horaFin: string | null;
+  motivo: string | null;
+}
+
+export interface AsistenciaDetalle {
+  asistencia: Asistencia;
+  ausencias: PeriodoAusencia[];
+  materiales: TratamientoMaterialConNombre[];
 }
 
 export interface AsistenciaMaterial {
@@ -159,6 +175,9 @@ export interface AsistenciaHoy {
   apellidos: string;
   presente: boolean;
   asistenciaID: number | null;
+  horaEntrada: string | null;
+  horaSalida: string | null;
+  enAusencia: boolean;
 }
 
 export interface ReporteGenerado {
@@ -220,6 +239,7 @@ export interface CrearConversionDTO {
 export interface CrearAsistenciaDTO {
   docenteId: number;
   fecha: string;
+  horaEntrada?: string;
 }
 
 export interface MaterialCantidadDTO {
