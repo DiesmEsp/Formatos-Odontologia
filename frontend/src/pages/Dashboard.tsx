@@ -3,7 +3,7 @@ import { useApi } from '../hooks/useApi';
 import { api } from '../api';
 import { KpiCard } from '../components/KpiCard';
 import { LineChart } from '../components/Chart/LineChart';
-import { formatMonto, formatMes } from '../lib/format';
+import { formatMonto, formatMes, formatearHora } from '../lib/format';
 import { DollarSign, Clock, Activity, Users, Archive, CalendarCheck, FileSpreadsheet, Stethoscope, Monitor } from 'lucide-react';
 import { COLORS_CHART } from '../lib/constants';
 
@@ -114,18 +114,36 @@ export default function Dashboard() {
             <span className="chart-title">Asistencia docente hoy</span>
           </div>
           <div className="att-list">
-            {(asistenciaHoy.data ?? []).map((a) => (
-              <div key={a.docenteID} className="att-row">
-                <span className={`att-avatar ${a.presente ? '' : 'att-avatar-ausente'}`}>
-                  {a.nombres.charAt(0)}{a.apellidos.charAt(0)}
-                </span>
-                <div className="att-name">{a.nombres} {a.apellidos}</div>
-                <div className="att-flag">
-                  <span className={`led ${a.presente ? 'led-ok' : 'led-danger'}`} />
-                  <span>{a.presente ? 'Presente' : 'Ausente'}</span>
+            {(asistenciaHoy.data ?? []).map((a) => {
+              let estadoLabel: string;
+              let ledClass: string;
+              if (!a.presente) {
+                estadoLabel = 'Ausente';
+                ledClass = 'led-danger';
+              } else if (a.horaSalida) {
+                estadoLabel = `Finalizo ${formatearHora(a.horaSalida)}`;
+                ledClass = '';
+              } else if (a.enAusencia) {
+                estadoLabel = 'Ausente temp.';
+                ledClass = 'led-warning';
+              } else {
+                estadoLabel = a.horaEntrada ? `Desde ${formatearHora(a.horaEntrada)}` : 'Presente';
+                ledClass = 'led-ok';
+              }
+
+              return (
+                <div key={a.docenteID} className="att-row">
+                  <span className={`att-avatar ${!a.presente ? 'att-avatar-ausente' : a.enAusencia ? '' : ''}`}>
+                    {a.nombres.charAt(0)}{a.apellidos.charAt(0)}
+                  </span>
+                  <div className="att-name">{a.nombres} {a.apellidos}</div>
+                  <div className="att-flag">
+                    <span className={`led ${ledClass}`} />
+                    <span>{estadoLabel}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {asistenciaHoy.loading && <span className="text-muted text-sm">Cargando...</span>}
           </div>
         </div>
