@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen } from 'lucide-react';
+import { FileSpreadsheet, DollarSign, Users, GraduationCap, Calendar, FolderOpen, Clock } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api';
@@ -73,6 +73,13 @@ export default function Reportes() {
       title: 'Consumo Especialista',
       desc: 'Materiales consumidos por especialista en tratamientos cerrados.',
       generar: () => api.reportes.generarEspecialista(anio, mes),
+    },
+    {
+      tipo: 'asistencia',
+      icon: Clock,
+      title: 'Asistencia Docente',
+      desc: 'Horas de presencia, ausencias y periodos de salida por docente.',
+      generar: () => api.reportes.generarAsistencia(anio, mes),
     },
   ];
 
