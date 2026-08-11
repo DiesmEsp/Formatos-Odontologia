@@ -34,7 +34,7 @@ public class TratamientoPredefinidoRepository {
     }
 
     public void update(TratamientoPredefinido tratamiento) throws SQLException {
-        String sql = "UPDATE Tratamiento_PRED SET NombreTratamiento = ?, MontoSugerido = ? WHERE TratPredID = ?";
+        String sql = "UPDATE Tratamiento_PRED SET NombreTratamiento = ?, MontoSugerido = ?, Estado = ? WHERE TratPredID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, tratamiento.getNombreTratamiento());
@@ -43,7 +43,8 @@ public class TratamientoPredefinidoRepository {
             } else {
                 ps.setNull(2, java.sql.Types.REAL);
             }
-            ps.setInt(3, tratamiento.getTratPredID());
+            ps.setInt(3, tratamiento.getEstado());
+            ps.setInt(4, tratamiento.getTratPredID());
             ps.executeUpdate();
         }
     }
@@ -112,6 +113,7 @@ public class TratamientoPredefinidoRepository {
         return new TratamientoPredefinido(
                 rs.getInt("TratPredID"),
                 rs.getString("NombreTratamiento"),
-                monto);
+                monto,
+                rs.getInt("Estado"));
     }
 }

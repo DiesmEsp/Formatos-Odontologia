@@ -214,6 +214,9 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
     { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.pacienteID}</span> },
     { key: "nombres", header: "Nombres", render: (r) => r.nombres },
     { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos },
+    { key: "estado", header: "Estado", width: 100, render: (r) => (
+      <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
+    )},
     { key: "acciones", header: "Acciones", width: 100, className: "text-center", render: (r) => (
       <div className="flex gap-4 justify-center">
         <button className="btn btn-ghost btn-sm" onClick={() => setModal({ edit: r })}><Pencil size={14} /></button>
@@ -226,7 +229,10 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
     setSaving(true);
     try {
       if (modal?.edit) {
-        await api.catalogos.pacientes.actualizar({ pacienteID: modal.edit.pacienteID, nombres: values.nombres, apellidos: values.apellidos });
+        await api.catalogos.pacientes.actualizar({
+          pacienteID: modal.edit.pacienteID, nombres: values.nombres, apellidos: values.apellidos,
+          estado: Number(values.estado ?? modal.edit.estado),
+        });
         addToast("success", "Paciente actualizado");
       } else {
         await api.catalogos.pacientes.crear({ nombres: values.nombres, apellidos: values.apellidos });
@@ -244,8 +250,12 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
       </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar paciente..." onSearch={setQ} />
       <CatalogoModal open={!!modal} title={modal?.edit ? "Editar Paciente" : "Nuevo Paciente"}
-        fields={[{ key: "nombres", label: "Nombres", type: "text" }, { key: "apellidos", label: "Apellidos", type: "text" }]}
-        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos } : { nombres: "", apellidos: "" }}
+        fields={[
+          { key: "nombres", label: "Nombres", type: "text" },
+          { key: "apellidos", label: "Apellidos", type: "text" },
+          ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
+        ]}
+        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, estado: String(modal.edit.estado) } : { nombres: "", apellidos: "" }}
         onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar paciente"
         message={`Confirme que desea eliminar a "${deleteTarget?.nombres} ${deleteTarget?.apellidos}".`}
@@ -360,6 +370,9 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
     { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratPredID}</span> },
     { key: "nombre", header: "Nombre", render: (r) => r.nombreTratamiento },
     { key: "costo", header: "Costo", width: 100, render: (r) => r.montoSugerido != null ? `S/ ${r.montoSugerido.toFixed(2)}` : "-" },
+    { key: "estado", header: "Estado", width: 100, render: (r) => (
+      <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
+    )},
     { key: "acciones", header: "", width: 80, className: "text-center", render: (r) => (
       <div className="flex gap-4 justify-center">
         <button className="btn btn-ghost btn-sm" onClick={async () => {
@@ -378,9 +391,10 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
     setSaving(true);
     try {
       const monto = values.montoSugerido !== "" && values.montoSugerido != null ? Number(values.montoSugerido) : null;
+      const estado = modal?.edit ? Number(values.estado ?? modal.edit.estado) : 1;
       let id: number;
       if (modal?.edit) {
-        await api.catalogos.tratamientosPred.actualizar({ tratPredID: modal.edit.tratPredID, nombreTratamiento: values.nombreTratamiento, montoSugerido: monto });
+        await api.catalogos.tratamientosPred.actualizar({ tratPredID: modal.edit.tratPredID, nombreTratamiento: values.nombreTratamiento, montoSugerido: monto, estado });
         id = modal.edit.tratPredID;
         addToast("success", "Tratamiento actualizado");
       } else {
@@ -424,8 +438,9 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
         fields={[
           { key: "nombreTratamiento", label: "Nombre del tratamiento", type: "text" },
           { key: "montoSugerido", label: "Monto sugerido", type: "number", placeholder: "0.00" },
+          ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
-        initialValues={modal?.edit ? { nombreTratamiento: modal.edit.nombreTratamiento, montoSugerido: modal.edit.montoSugerido ?? "" } : { nombreTratamiento: "", montoSugerido: "" }}
+        initialValues={modal?.edit ? { nombreTratamiento: modal.edit.nombreTratamiento, montoSugerido: modal.edit.montoSugerido ?? "", estado: String(modal.edit.estado) } : { nombreTratamiento: "", montoSugerido: "" }}
         onSave={handleSave} onCancel={() => { setModal(null); setMatRows([]); }} saving={saving}
         width={560}
       >

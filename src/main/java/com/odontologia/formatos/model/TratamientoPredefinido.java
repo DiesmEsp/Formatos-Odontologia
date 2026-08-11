@@ -5,6 +5,7 @@ public class TratamientoPredefinido {
     private int tratPredID;
     private String nombreTratamiento;
     private Double montoSugerido;
+    private int estado;
 
     public TratamientoPredefinido() {
     }
@@ -13,6 +14,13 @@ public class TratamientoPredefinido {
         this.tratPredID = tratPredID;
         this.nombreTratamiento = nombreTratamiento;
         this.montoSugerido = montoSugerido;
+    }
+
+    public TratamientoPredefinido(int tratPredID, String nombreTratamiento, Double montoSugerido, int estado) {
+        this.tratPredID = tratPredID;
+        this.nombreTratamiento = nombreTratamiento;
+        this.montoSugerido = montoSugerido;
+        this.estado = estado;
     }
 
     public int getTratPredID() {
@@ -37,6 +45,14 @@ public class TratamientoPredefinido {
 
     public void setMontoSugerido(Double montoSugerido) {
         this.montoSugerido = montoSugerido;
+    }
+
+    public int getEstado() {
+        return estado;
+    }
+
+    public void setEstado(int estado) {
+        this.estado = estado;
     }
 
     @Override

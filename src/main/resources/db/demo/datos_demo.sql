@@ -23,7 +23,7 @@ INSERT OR IGNORE INTO Operadores (OperadorID, Nombres, Apellidos, DNI, Grado, Ti
     (2,'Sofia','Lopez Garcia','73542189','POS','R1',2026,1),
     (3,'Diego','Marquez Rojas','70123567','PRE','5',2025,1),
     (4,'Lucia','Fernandez Paz','74523190','POS','R3',2026,1),
-    (5,'Jorge','Alvarez Mori','75412098','PRE','6',2026,1),
+    (5,'Jorge','Alvarez Mori','75412098','PRE','5',2026,1),
     (6,'Carmen','Torres Silva','76843901','POS','R2',2025,1),
     (7,'Miguel','Rios Ortega','71234987','PRE','4',2025,1),
     (8,'Valeria','Paredes Cueva','78901234','POS','R1',2026,1);

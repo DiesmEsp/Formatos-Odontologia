@@ -24,12 +24,13 @@ public class PacienteRepository {
     }
 
     public void update(Paciente p) throws SQLException {
-        String sql = "UPDATE Pacientes SET Nombres = ?, Apellidos = ? WHERE PacienteID = ?";
+        String sql = "UPDATE Pacientes SET Nombres = ?, Apellidos = ?, Estado = ? WHERE PacienteID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, p.getNombres());
             ps.setString(2, p.getApellidos());
-            ps.setInt(3, p.getPacienteID());
+            ps.setInt(3, p.getEstado());
+            ps.setInt(4, p.getPacienteID());
             ps.executeUpdate();
         }
     }
@@ -78,6 +79,6 @@ public class PacienteRepository {
     }
 
     private Paciente rowToModel(ResultSet rs) throws SQLException {
-        return new Paciente(rs.getInt("PacienteID"), rs.getString("Nombres"), rs.getString("Apellidos"));
+        return new Paciente(rs.getInt("PacienteID"), rs.getString("Nombres"), rs.getString("Apellidos"), rs.getInt("Estado"));
     }
 }

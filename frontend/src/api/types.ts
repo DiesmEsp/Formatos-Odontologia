@@ -28,6 +28,7 @@ export interface Paciente {
   pacienteID: number;
   nombres: string;
   apellidos: string;
+  estado: number;
 }
 
 export interface Unidad {
@@ -39,6 +40,7 @@ export interface TratamientoPredefinido {
   tratPredID: number;
   nombreTratamiento: string;
   montoSugerido: number | null;
+  estado: number;
 }
 
 export interface TratamientoPredefinidoMaterial {
