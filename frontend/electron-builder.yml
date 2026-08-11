@@ -1,0 +1,22 @@
+appId: com.odontologia.formatos
+productName: Formatos Odontologicos
+directories:
+  output: D:/electron-build/release
+  buildResources: build
+files:
+  - dist/**/*
+  - dist-electron/**/*
+extraResources:
+  - from: ../build/jre-minimal
+    to: jre
+  - from: ../build/libs/FormatosOdontologia-2.0.0-all.jar
+    to: backend.jar
+asar: false
+electronDist: C:/Users/Diego/AppData/Local/Temp/electron-dist-temp
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

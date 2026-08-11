@@ -56,7 +56,7 @@ task buildJre(type: Exec) {
     def outputDir = "${layout.buildDirectory.get()}/jre-minimal"
 
     doFirst {
-        file(outputDir).mkdirs()
+        file(outputDir).deleteDir()
     }
 
     commandLine jlinkBin,
