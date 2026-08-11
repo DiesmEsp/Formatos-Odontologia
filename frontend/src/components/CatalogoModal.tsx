@@ -62,36 +62,38 @@ export function CatalogoModal({
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="dialog-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-            {fields.map((f) => (
-              <div key={f.key} className="form-group" style={{ marginBottom: 14 }}>
-                <label className="form-label">{f.label}</label>
-                {f.type === 'select' ? (
-                  <select
-                    className="combo-box"
-                    value={values[f.key] ?? ''}
-                    onChange={(e) => setField(f.key, e.target.value)}
-                    style={{ width: '100%' }}
-                  >
-                    <option value="">Seleccionar...</option>
-                    {f.options?.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={f.type === 'number' ? 'number' : 'text'}
-                    className="text-field"
-                    value={values[f.key] ?? ''}
-                    onChange={(e) => setField(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)}
-                    placeholder={f.placeholder}
-                    readOnly={f.type === 'readonly'}
-                    step={f.type === 'number' ? '0.01' : undefined}
-                    style={{ width: '100%' }}
-                  />
-                )}
-              </div>
-            ))}
+          <div className="dialog-body">
+            <div style={{ maxHeight: '40vh', overflowY: 'auto', marginBottom: children ? 8 : 0 }}>
+              {fields.map((f) => (
+                <div key={f.key} className="form-group" style={{ marginBottom: 14 }}>
+                  <label className="form-label">{f.label}</label>
+                  {f.type === 'select' ? (
+                    <select
+                      className="combo-box"
+                      value={values[f.key] ?? ''}
+                      onChange={(e) => setField(f.key, e.target.value)}
+                      style={{ width: '100%' }}
+                    >
+                      <option value="">Seleccionar...</option>
+                      {f.options?.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={f.type === 'number' ? 'number' : 'text'}
+                      className="text-field"
+                      value={values[f.key] ?? ''}
+                      onChange={(e) => setField(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)}
+                      placeholder={f.placeholder}
+                      readOnly={f.type === 'readonly'}
+                      step={f.type === 'number' ? '0.01' : undefined}
+                      style={{ width: '100%' }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
             {children}
           </div>
           <div className="dialog-footer">
