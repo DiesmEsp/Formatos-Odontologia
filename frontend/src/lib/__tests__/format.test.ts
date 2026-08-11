@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatMonto, formatFecha, formatMes, formatDateTime, formatBytes, hoyISO, mesActual, anioActual, nombreCompleto } from '../format';
+import { formatMonto, formatFecha, formatMes, formatDateTime, formatBytes, hoyISO, mesActual, anioActual, nombreCompleto, horaActual, formatearHora, calcularDuracion } from '../format';
 
 describe('formatMonto', () => {
   it('formatea montos positivos', () => {
@@ -88,5 +88,53 @@ describe('anioActual', () => {
 describe('nombreCompleto', () => {
   it('concatena nombres y apellidos', () => {
     expect(nombreCompleto('Maria', 'Gonzalez')).toBe('Maria Gonzalez');
+  });
+});
+
+describe('horaActual', () => {
+  it('retorna formato HH:mm:ss', () => {
+    expect(horaActual()).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+  });
+});
+
+describe('formatearHora', () => {
+  it('retorna HH:mm desde HH:mm:ss', () => {
+    expect(formatearHora('08:30:00')).toBe('08:30');
+    expect(formatearHora('13:45:22')).toBe('13:45');
+  });
+
+  it('retorna HH:mm desde HH:mm', () => {
+    expect(formatearHora('08:30')).toBe('08:30');
+  });
+
+  it('retorna vacio para null', () => {
+    expect(formatearHora(null)).toBe('');
+  });
+});
+
+describe('calcularDuracion', () => {
+  it('calcula horas y minutos', () => {
+    expect(calcularDuracion('08:00', '09:30')).toBe('1h 30m');
+  });
+
+  it('calcula solo minutos', () => {
+    expect(calcularDuracion('08:00', '08:45')).toBe('45m');
+  });
+
+  it('calcula solo horas', () => {
+    expect(calcularDuracion('08:00', '10:00')).toBe('2h');
+  });
+
+  it('retorna vacio si inicio es null', () => {
+    expect(calcularDuracion(null, '10:00')).toBe('');
+  });
+
+  it('retorna vacio si fin es null', () => {
+    expect(calcularDuracion('08:00', null)).toBe('');
+  });
+
+  it('retorna vacio si fin <= inicio', () => {
+    expect(calcularDuracion('10:00', '08:00')).toBe('');
+    expect(calcularDuracion('10:00', '10:00')).toBe('');
   });
 });
