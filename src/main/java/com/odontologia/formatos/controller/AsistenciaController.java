@@ -1,9 +1,8 @@
 package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.model.Asistencia;
-import com.odontologia.formatos.model.AsistenciaMaterial;
+import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
-import com.odontologia.formatos.repository.AsistenciaRepository;
 import com.odontologia.formatos.service.AsistenciaService;
 import com.odontologia.formatos.service.NegocioException;
 import io.javalin.Javalin;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 public class AsistenciaController {
 
     private final AsistenciaService service = new AsistenciaService();
-    private final AsistenciaMaterialRepository materialRepository = new AsistenciaMaterialRepository();
 
     public void register(Javalin app) {
 
@@ -24,8 +22,81 @@ public class AsistenciaController {
             var body = ctx.bodyAsClass(Map.class);
             int docenteId = ((Number) body.get("docenteId")).intValue();
             String fecha = (String) body.get("fecha");
-            Asistencia a = service.abrirDia(docenteId, fecha);
-            ctx.status(201).json(a);
+            String horaEntrada = (String) body.get("horaEntrada");
+            try {
+                Asistencia a = service.abrirDia(docenteId, fecha, horaEntrada);
+                ctx.status(201).json(a);
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.put("/api/asistencia/{id}/entrada", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var body = ctx.bodyAsClass(Map.class);
+            String horaEntrada = (String) body.get("horaEntrada");
+            try {
+                service.registrarEntrada(id, horaEntrada);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.put("/api/asistencia/{id}/salida", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var body = ctx.bodyAsClass(Map.class);
+            String horaSalida = (String) body.get("horaSalida");
+            try {
+                service.registrarSalida(id, horaSalida);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.post("/api/asistencia/{id}/ausencias", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            var body = ctx.bodyAsClass(Map.class);
+            String horaInicio = (String) body.get("horaInicio");
+            String motivo = (String) body.get("motivo");
+            try {
+                PeriodoAusencia ausencia = service.iniciarAusencia(id, horaInicio, motivo);
+                ctx.status(201).json(ausencia);
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.put("/api/asistencia/{id}/ausencias/{ausId}/regresar", ctx -> {
+            int ausId = Integer.parseInt(ctx.pathParam("ausId"));
+            var body = ctx.bodyAsClass(Map.class);
+            String horaFin = (String) body.get("horaFin");
+            try {
+                service.finalizarAusencia(ausId, horaFin);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.delete("/api/asistencia/{id}/ausencias/{ausId}", ctx -> {
+            int ausId = Integer.parseInt(ctx.pathParam("ausId"));
+            try {
+                service.eliminarAusencia(ausId);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.get("/api/asistencia/{id}/detalle", ctx -> {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            try {
+                ctx.json(service.obtenerDetalle(id));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
         });
 
         app.post("/api/asistencia/{id}/materiales", ctx -> {

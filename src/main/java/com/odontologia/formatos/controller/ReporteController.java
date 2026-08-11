@@ -3,6 +3,7 @@ package com.odontologia.formatos.controller;
 import com.odontologia.formatos.export.ReporteEconomicoGenerator;
 import com.odontologia.formatos.export.ReporteGeneradorBase;
 import com.odontologia.formatos.export.ReporteMaterialesGenerator;
+import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
 import com.odontologia.formatos.export.ReporteNomenclatura;
 import com.odontologia.formatos.export.ReporteException;
 import com.odontologia.formatos.service.NegocioException;
@@ -22,6 +23,7 @@ public class ReporteController {
 
     private final ReporteMaterialesGenerator materialesGen = new ReporteMaterialesGenerator();
     private final ReporteEconomicoGenerator economicoGen = new ReporteEconomicoGenerator();
+    private final ReporteAsistenciaGenerator asistenciaGen = new ReporteAsistenciaGenerator();
 
     public void register(Javalin app) {
         app.post("/api/reportes/materiales/generar", ctx -> {
@@ -89,6 +91,20 @@ public class ReporteController {
                 ctx.json(Map.of(
                         "reporteMateriales", pathMat.toAbsolutePath().toString(),
                         "reporteEconomico", pathEco.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/asistencia/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = asistenciaGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {

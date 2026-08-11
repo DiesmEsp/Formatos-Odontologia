@@ -151,7 +151,8 @@ public class DashboardController {
 
         try (Connection con = ConnectionManager.getInstance().getConnection()) {
             String sql = """
-                    SELECT d.DocenteID, d.Nombres, d.Apellidos, a.Estado, a.AsistenciaID
+                    SELECT d.DocenteID, d.Nombres, d.Apellidos, a.Estado, a.AsistenciaID,
+                           a.HoraEntrada, a.HoraSalida
                     FROM Docentes d
                     LEFT JOIN Asistencia a ON d.DocenteID = a.DocenteID AND a.Fecha = ? AND a.Estado = 'ACTIVO'
                     WHERE d.Estado = 1""";
@@ -161,12 +162,27 @@ public class DashboardController {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         Map<String, Object> entry = new LinkedHashMap<>();
-                        entry.put("docenteID", rs.getInt(1));
+                        int id = rs.getInt(1);
+                        entry.put("docenteID", id);
                         entry.put("nombres", rs.getString(2));
                         entry.put("apellidos", rs.getString(3));
                         String estado = rs.getString(4);
                         entry.put("presente", estado != null);
                         entry.put("asistenciaID", estado != null ? rs.getInt(5) : null);
+                        entry.put("horaEntrada", estado != null ? rs.getString(6) : null);
+                        entry.put("horaSalida", estado != null ? rs.getString(7) : null);
+
+                        boolean enAusencia = false;
+                        if (estado != null) {
+                            try (PreparedStatement psAus = con.prepareStatement(
+                                    "SELECT 1 FROM PeriodoAusencia WHERE AsistenciaID = ? AND HoraFin IS NULL")) {
+                                psAus.setInt(1, rs.getInt(5));
+                                try (ResultSet rsAus = psAus.executeQuery()) {
+                                    enAusencia = rsAus.next();
+                                }
+                            }
+                        }
+                        entry.put("enAusencia", enAusencia);
                         resultado.add(entry);
                     }
                 }
