@@ -44,20 +44,33 @@ class ApiError extends Error {
 }
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    let message = body;
-    try {
-      message = JSON.parse(body).error || body;
-    } catch {}
-    throw new ApiError(message, res.status);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      ...options,
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      let message = body;
+      try {
+        message = JSON.parse(body).error || body;
+      } catch {}
+      throw new ApiError(message, res.status);
+    }
+    if (res.status === 204) return undefined as T;
+    return res.json();
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new ApiError('La solicitud ha excedido el tiempo de espera (15s).', 408);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  if (res.status === 204) return undefined as T;
-  return res.json();
 }
 
 export const api = {

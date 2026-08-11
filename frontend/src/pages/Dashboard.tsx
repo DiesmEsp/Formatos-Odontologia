@@ -16,12 +16,20 @@ export default function Dashboard() {
 
   const totalTratamientos = (estados.data ?? []).reduce((sum, e) => sum + e.count, 0);
 
+  const errors = [kpis.error, ingresos.error, estados.error, topMaterials.error, asistenciaHoy.error].filter(Boolean);
+
   return (
     <div>
       <div className="view-header">
         <h1 className="view-title">Dashboard</h1>
         <p className="subtitle">Panel principal del sistema</p>
       </div>
+
+      {errors.length > 0 && (
+        <div className="alert-banner alert-warning" style={{ marginBottom: 16 }}>
+          <span>No se pudieron cargar algunos datos. {errors[0]}</span>
+        </div>
+      )}
 
       <div className="kpi-grid">
         <KpiCard label="Ingresos del Mes" value={kpis.loading ? '...' : formatMonto(kpis.data?.ingresosMes ?? 0)} icon={DollarSign} />

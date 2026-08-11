@@ -64,7 +64,9 @@ export default function Unidades() {
       </div>
 
       <div className="card">
-        {lista.length === 0 ? (
+        {unidades.loading ? (
+          <div className="empty-state"><span className="empty-text">Cargando unidades...</span></div>
+        ) : lista.length === 0 ? (
           <div className="empty-state">
             <span className="empty-title">No hay unidades registradas</span>
             <span className="empty-text">Cree la primera unidad para comenzar.</span>
