@@ -4,6 +4,7 @@ import com.odontologia.formatos.model.TratamientoPredefinido;
 import com.odontologia.formatos.model.TratamientoPredefinidoMaterial;
 import com.odontologia.formatos.repository.TratamientoPredefinidoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoRepository;
+import com.odontologia.formatos.util.TransaccionBD;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -32,8 +33,10 @@ public class TratamientoPredefinidoService {
     }
 
     public void eliminar(int tratPredID) throws SQLException {
-        materialRepository.deleteByTratPredID(tratPredID);
-        repository.delete(tratPredID);
+        TransaccionBD.ejecutar(con -> {
+            materialRepository.deleteByTratPredID(con, tratPredID);
+            repository.delete(con, tratPredID);
+        });
     }
 
     public List<TratamientoPredefinidoMaterial> materiales(int tratPredID) throws SQLException {

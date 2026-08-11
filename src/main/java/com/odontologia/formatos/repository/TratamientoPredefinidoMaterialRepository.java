@@ -67,9 +67,14 @@ public class TratamientoPredefinidoMaterialRepository {
     }
 
     public void deleteByTratPredID(int tratPredID) throws SQLException {
+        try (Connection con = ConnectionManager.getInstance().getConnection()) {
+            deleteByTratPredID(con, tratPredID);
+        }
+    }
+
+    public void deleteByTratPredID(Connection con, int tratPredID) throws SQLException {
         String sql = "DELETE FROM Materiales_List_PRED WHERE TratPredID = ?";
-        try (Connection con = ConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, tratPredID);
             ps.executeUpdate();
         }

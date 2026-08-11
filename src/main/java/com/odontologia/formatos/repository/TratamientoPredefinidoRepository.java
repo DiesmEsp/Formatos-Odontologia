@@ -50,9 +50,14 @@ public class TratamientoPredefinidoRepository {
     }
 
     public void delete(int tratPredID) throws SQLException {
+        try (Connection con = ConnectionManager.getInstance().getConnection()) {
+            delete(con, tratPredID);
+        }
+    }
+
+    public void delete(Connection con, int tratPredID) throws SQLException {
         String sql = "DELETE FROM Tratamiento_PRED WHERE TratPredID = ?";
-        try (Connection con = ConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, tratPredID);
             ps.executeUpdate();
         }
