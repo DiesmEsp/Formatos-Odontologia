@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './hooks/useToast';
 import Dashboard from './pages/Dashboard';
@@ -10,7 +10,7 @@ import Unidades from './pages/Unidades';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ToastProvider>
         <Routes>
           <Route element={<Layout />}>
@@ -23,6 +23,6 @@ export default function App() {
           </Route>
         </Routes>
       </ToastProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
