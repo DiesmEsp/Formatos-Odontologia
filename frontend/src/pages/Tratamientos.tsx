@@ -314,8 +314,12 @@ function DetalleTratamientoSubventana({
   const [showAnular, setShowAnular] = useState(false);
   const [abono, setAbono] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [savingMat, setSavingMat] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const materiales = useApi(() => api.catalogos.materiales.listar());
   const mounted = useRef(true);
+  const originalRowsRef = useRef<MaterialRow[]>([]);
+  const materialRowsRef = useRef<MaterialRow[]>([]);
 
   const cargarDatos = useCallback(async () => {
     try {
@@ -324,34 +328,156 @@ function DetalleTratamientoSubventana({
       setTratamiento(t);
       const mats = await api.tratamientos.materialesConNombre(t.tratamientoID);
       if (!mounted.current) return;
-      setMaterialRows(mats.map((m) => ({ key: `mat-${m.materialesListID}`, materialId: m.materialID, nombreMaterial: m.nombreMaterial, cantidad: m.cantidad })));
-    } catch {}
-  }, [initialTrat.tratamientoID]);
+      const rows: MaterialRow[] = mats.map((m) => ({
+        key: `mat-${m.materialesListID}`,
+        materialId: m.materialID,
+        nombreMaterial: m.nombreMaterial,
+        cantidad: m.cantidad,
+      }));
+      setMaterialRows(rows);
+      materialRowsRef.current = rows;
+      originalRowsRef.current = rows.map((r) => ({ ...r }));
+      setDirty(false);
+    } catch {
+      if (mounted.current) addToast('error', 'Error al cargar los datos del tratamiento');
+    }
+  }, [initialTrat.tratamientoID, addToast]);
 
   useEffect(() => { mounted.current = true; cargarDatos(); return () => { mounted.current = false; }; }, [cargarDatos]);
 
-  const handleAddRow = () => { setMaterialRows((prev) => [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }]); };
+  const handleAddRow = () => {
+    setMaterialRows((prev) => {
+      const next = [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }];
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
+  };
 
-  const handleRemoveRow = async (key: string) => {
-    const row = materialRows.find((r) => r.key === key);
-    if (row?.key.startsWith('mat-')) {
-      try { await api.tratamientos.quitarMaterial(Number(row.key.replace('mat-', ''))); addToast('success', 'Material eliminado'); }
-      catch (err) { addToast('error', err instanceof Error ? err.message : 'Error'); return; }
+  const handleRemoveRow = (key: string) => {
+    setMaterialRows((prev) => {
+      const next = prev.filter((r) => r.key !== key);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
+  };
+
+  const handleMaterialChange = (key: string, materialId: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, materialId } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
+  };
+
+  const handleCantidadChange = (key: string, cantidad: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, cantidad } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
+    setDirty(true);
+  };
+
+  const handleSaveMaterials = async () => {
+    const rows = materialRowsRef.current;
+    const original = originalRowsRef.current;
+    if (rows.length === 0 && original.length === 0) return;
+
+    setSavingMat(true);
+    try {
+      const removedKeys = original.filter((or) => !rows.some((r) => r.key === or.key));
+
+      for (const row of removedKeys) {
+        const id = Number(row.key.replace('mat-', ''));
+        await api.tratamientos.quitarMaterial(id);
+      }
+
+      for (const row of rows) {
+        if (row.materialId == null) continue;
+
+        if (row.key.startsWith('new-')) {
+          if (row.cantidad > 0 || row.materialId != null) {
+            await api.tratamientos.agregarMaterial(tratamiento.tratamientoID, {
+              materialId: row.materialId,
+              cantidad: row.cantidad > 0 ? row.cantidad : 1,
+            });
+          }
+        } else {
+          const orig = original.find((or) => or.key === row.key);
+          const id = Number(row.key.replace('mat-', ''));
+
+          if (orig && orig.materialId !== row.materialId) {
+            await api.tratamientos.quitarMaterial(id);
+            await api.tratamientos.agregarMaterial(tratamiento.tratamientoID, {
+              materialId: row.materialId,
+              cantidad: row.cantidad > 0 ? row.cantidad : 1,
+            });
+          } else if (orig && orig.cantidad !== row.cantidad) {
+            await api.tratamientos.actualizarCantidad(id, row.cantidad);
+          }
+        }
+      }
+
+      addToast('success', 'Materiales guardados correctamente');
+      await cargarDatos();
+      setDirty(false);
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Error al guardar materiales');
+    } finally {
+      setSavingMat(false);
     }
-    setMaterialRows((prev) => prev.filter((r) => r.key !== key));
   };
 
-  const handleMaterialChange = async (key: string, materialId: number) => {
-    setMaterialRows((prev) => prev.map((r) => r.key === key ? { ...r, materialId } : r));
-    if (!key.startsWith('new-')) return;
-    try { await api.tratamientos.agregarMaterial(tratamiento.tratamientoID, { materialId, cantidad: 0 }); cargarDatos(); }
-    catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al agregar material'); }
-  };
+  const handleClose = async () => {
+    if (dirty) {
+      setSavingMat(true);
+      try {
+        const rows = materialRowsRef.current;
+        const original = originalRowsRef.current;
+        const removedKeys = original.filter((or) => !rows.some((r) => r.key === or.key));
 
-  const handleCantidadChange = async (key: string, cantidad: number) => {
-    setMaterialRows((prev) => prev.map((r) => r.key === key ? { ...r, cantidad } : r));
-    if (!key.startsWith('mat-')) return;
-    try { await api.tratamientos.actualizarCantidad(Number(key.replace('mat-', '')), cantidad); } catch {}
+        for (const row of removedKeys) {
+          const id = Number(row.key.replace('mat-', ''));
+          await api.tratamientos.quitarMaterial(id);
+        }
+
+        for (const row of rows) {
+          if (row.materialId == null) continue;
+
+          if (row.key.startsWith('new-')) {
+            if (row.cantidad > 0 || row.materialId != null) {
+              await api.tratamientos.agregarMaterial(tratamiento.tratamientoID, {
+                materialId: row.materialId,
+                cantidad: row.cantidad > 0 ? row.cantidad : 1,
+              });
+            }
+          } else {
+            const orig = original.find((or) => or.key === row.key);
+            const id = Number(row.key.replace('mat-', ''));
+
+            if (orig && orig.materialId !== row.materialId) {
+              await api.tratamientos.quitarMaterial(id);
+              await api.tratamientos.agregarMaterial(tratamiento.tratamientoID, {
+                materialId: row.materialId,
+                cantidad: row.cantidad > 0 ? row.cantidad : 1,
+              });
+            } else if (orig && orig.cantidad !== row.cantidad) {
+              await api.tratamientos.actualizarCantidad(id, row.cantidad);
+            }
+          }
+        }
+
+        addToast('success', 'Materiales guardados automáticamente');
+      } catch (err) {
+        addToast('error', err instanceof Error ? err.message : 'Error al guardar materiales');
+      } finally {
+        setSavingMat(false);
+      }
+    }
+    onClose();
   };
 
   const handleCerrar = async () => { setSaving(true); try { await api.tratamientos.cerrar(tratamiento.tratamientoID); addToast('success', 'Tratamiento cerrado'); onClose(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cerrar'); } finally { setSaving(false); } };
@@ -362,6 +488,7 @@ function DetalleTratamientoSubventana({
 
   const getEstadoVariant = (e: string) => e === 'CERRADO' ? 'success' : e === 'ANULADO' ? 'danger' : 'info';
   const saldo = tratamiento.monto - tratamiento.montoPagado;
+  const totalMat = materialRows.filter((r) => r.materialId != null).length;
 
   return (
     <>
@@ -371,7 +498,7 @@ function DetalleTratamientoSubventana({
             <div><h3 className="dialog-title">Detalle de Tratamiento #{tratamiento.tratamientoID}</h3></div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <Badge variant={getEstadoVariant(tratamiento.estado)}>{tratamiento.estado}</Badge>
-              <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
+              <button className="btn btn-ghost btn-sm" onClick={handleClose}><X size={18} /></button>
             </div>
           </div>
           <div className="subventana-body">
@@ -391,8 +518,15 @@ function DetalleTratamientoSubventana({
             <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddRow} onRemove={handleRemoveRow} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
           </div>
           <div className="subventana-footer">
-            <span className="text-muted text-sm">{materialRows.length} materiales registrados</span>
+            <span className="text-muted text-sm">
+              {totalMat} material(es){dirty && <span style={{ color: 'var(--color-warning-text)', marginLeft: 8 }}>(cambios sin guardar)</span>}
+            </span>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {dirty && (
+                <button className="btn btn-primary" onClick={handleSaveMaterials} disabled={savingMat}>
+                  {savingMat ? 'Guardando...' : 'Guardar materiales'}
+                </button>
+              )}
               {tratamiento.estado === 'ABIERTO' && (
                 <>
                   <button className="btn btn-success" onClick={handleCerrar} disabled={saving}>Cerrar tratamiento</button>
