@@ -33,13 +33,13 @@ export function DonutChart({ data, title }: DonutChartProps) {
           <Tooltip
             contentStyle={{
               borderRadius: '6px',
-              border: '1px solid #dce4e4',
+              border: '1px solid var(--color-border)',
               boxShadow: '0 4px 6px -1px rgb(20 42 51 / 0.06)',
               fontSize: '12px',
             }}
           />
           <Legend
-            wrapperStyle={{ fontSize: '11px', color: '#5c7178' }}
+            wrapperStyle={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}
             iconType="circle"
             iconSize={8}
           />

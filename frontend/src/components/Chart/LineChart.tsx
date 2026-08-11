@@ -17,13 +17,13 @@ export function LineChart({ data, title, color = COLORS_CHART[0] }: LineChartPro
       )}
       <ResponsiveContainer width="100%" height={220}>
         <RechartsLine data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#dce4e4" />
-          <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#5c7178' }} axisLine={{ stroke: '#dce4e4' }} />
-          <YAxis tick={{ fontSize: 11, fill: '#5c7178' }} axisLine={{ stroke: '#dce4e4' }} width={60} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+          <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} axisLine={{ stroke: 'var(--color-border)' }} />
+          <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }} axisLine={{ stroke: 'var(--color-border)' }} width={60} />
           <Tooltip
             contentStyle={{
               borderRadius: '6px',
-              border: '1px solid #dce4e4',
+              border: '1px solid var(--color-border)',
               boxShadow: '0 4px 6px -1px rgb(20 42 51 / 0.06)',
               fontSize: '12px',
             }}

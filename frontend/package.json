@@ -8,7 +8,7 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "electron:dev": "cross-env VITE_ELECTRON=true vite",
     "electron:build": "cross-env VITE_ELECTRON=true vite build && electron-builder",

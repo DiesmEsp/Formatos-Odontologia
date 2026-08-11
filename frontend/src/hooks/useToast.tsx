@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
 import type { ToastType } from '../api/types';
 import { X } from 'lucide-react';
 
@@ -20,15 +20,29 @@ let nextId = 1;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timeoutsRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((t) => clearTimeout(t));
+      timeoutsRef.current.clear();
+    };
+  }, []);
 
   const removeToast = useCallback((id: number) => {
+    const timer = timeoutsRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timeoutsRef.current.delete(id);
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const addToast = useCallback((type: ToastType, message: string) => {
     const id = nextId++;
     setToasts((prev) => [...prev, { id, type, message }]);
-    setTimeout(() => removeToast(id), 4000);
+    const timer = setTimeout(() => removeToast(id), 4000);
+    timeoutsRef.current.set(id, timer);
   }, [removeToast]);
 
   return (

@@ -23,7 +23,7 @@ const GESTION_ITEMS = [
 
 export function Sidebar() {
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" role="navigation" aria-label="Navegación principal">
       <div className="sidebar-brand">
         <div className="brand-row">
           <div className="brand-mark">

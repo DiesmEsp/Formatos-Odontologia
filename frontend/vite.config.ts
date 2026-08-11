@@ -3,11 +3,11 @@ import react from '@vitejs/plugin-react';
 
 const USE_ELECTRON = process.env.VITE_ELECTRON === 'true';
 
-const plugins: any[] = [react()];
+const plugins: import('vite').PluginOption[] = [react()];
 
 if (USE_ELECTRON) {
-  const electron = require('vite-plugin-electron').default;
-  const renderer = require('vite-plugin-electron-renderer').default;
+  const electron = require('vite-plugin-electron').default as typeof import('vite-plugin-electron').default;
+  const renderer = require('vite-plugin-electron-renderer').default as typeof import('vite-plugin-electron-renderer').default;
 
   plugins.push(
     electron([
@@ -24,7 +24,7 @@ if (USE_ELECTRON) {
       },
       {
         entry: 'electron/preload.ts',
-        onstart(options: any) {
+        onstart(options: { reload: () => void }) {
           options.reload();
         },
         vite: {
