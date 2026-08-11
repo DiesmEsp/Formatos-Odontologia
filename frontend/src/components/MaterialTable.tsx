@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { SearchableCombo, type SearchableOption } from './SearchableCombo';
 import type { Materiales } from '../api/types';
@@ -21,6 +22,10 @@ interface MaterialTableProps {
   readOnly?: boolean;
 }
 
+function toDisplay(cantidad: number): string {
+  return cantidad === 0 ? '' : String(cantidad);
+}
+
 export function MaterialTable({
   rows,
   materials,
@@ -32,6 +37,53 @@ export function MaterialTable({
   loading = false,
   readOnly = false,
 }: MaterialTableProps) {
+  const displayValues = useRef<Record<string, string>>({});
+
+  const getDisplay = useCallback((key: string, cantidad: number): string => {
+    if (key in displayValues.current) return displayValues.current[key];
+    return toDisplay(cantidad);
+  }, []);
+
+  const setDisplay = (key: string, val: string) => {
+    displayValues.current = { ...displayValues.current, [key]: val };
+  };
+
+  const syncToParent = (key: string, val: string) => {
+    const cleaned = val.replace(/[^0-9.]/g, '');
+    const parsed = cleaned === '' || cleaned === '.' ? 0 : Number(cleaned);
+    delete displayValues.current[key];
+    onCantidadChange(key, parsed);
+  };
+
+  const handleNumericKeyDown = (e: React.KeyboardEvent, currentVal: string) => {
+    const allowed = ['Backspace','Delete','Tab','Escape','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];
+    if (allowed.includes(e.key)) return;
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key === '.' && !currentVal.includes('.')) return;
+    if (e.key >= '0' && e.key <= '9') return;
+    e.preventDefault();
+  };
+
+  const handleInputChange = (key: string, val: string) => {
+    const cleaned = val.replace(/[^0-9.]/g, '');
+    setDisplay(key, cleaned);
+    const parsed = cleaned === '' || cleaned === '.' ? 0 : Number(cleaned);
+    onCantidadChange(key, parsed);
+  };
+
+  const handleInputBlur = (key: string, val: string) => {
+    syncToParent(key, val);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent, key: string, val: string) => {
+    handleNumericKeyDown(e, val);
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      syncToParent(key, val);
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+
   const materialOptions: SearchableOption[] = materials.map((m) => ({
     id: m.materialID,
     label: m.nombre,
@@ -68,12 +120,10 @@ export function MaterialTable({
             type="text"
             inputMode="decimal"
             className="text-field material-row-input"
-            value={row.cantidad === 0 ? '' : row.cantidad}
-            onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9.]/g, '');
-              const num = val === '' || val === '.' ? 0 : Number(val);
-              onCantidadChange(row.key, num);
-            }}
+            value={getDisplay(row.key, row.cantidad)}
+            onChange={(e) => handleInputChange(row.key, e.target.value)}
+            onBlur={(e) => handleInputBlur(row.key, e.target.value)}
+            onKeyDown={(e) => handleInputKeyDown(e, row.key, e.currentTarget.value)}
             min={0}
             step={0.01}
             readOnly={readOnly}

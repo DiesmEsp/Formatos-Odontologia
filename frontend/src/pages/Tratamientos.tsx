@@ -124,11 +124,17 @@ function CrearTratamientoModal({
     return cleaned;
   };
 
-  const handleMontoBlurOrEnter = () => {
-    if (montoStr === '' || montoStr.trim() === '') setMontoStr('0');
+  const handleNumericKeyDown = (e: React.KeyboardEvent) => {
+    const allowed = ['Backspace','Delete','Tab','Escape','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];
+    if (allowed.includes(e.key)) return;
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key === '.' && !montoStr.includes('.')) return;
+    if (e.key >= '0' && e.key <= '9') return;
+    e.preventDefault();
   };
 
   const handleMontoKeyDown = (e: React.KeyboardEvent) => {
+    handleNumericKeyDown(e);
     if (e.key === 'Enter') {
       e.preventDefault();
       if (montoStr === '' || montoStr.trim() === '') setMontoStr('0');
@@ -180,7 +186,7 @@ function CrearTratamientoModal({
             <div className="form-group">
               <label className="form-label">Monto total</label>
               <input type="text" inputMode="decimal" className="text-field" value={montoStr} onChange={(e) => setMontoStr(filterNumeric(e.target.value))}
-                onBlur={handleMontoBlurOrEnter} onKeyDown={handleMontoKeyDown}
+                onKeyDown={handleMontoKeyDown}
                 disabled={tipo === 'CONTINUO'} placeholder="0.00"
                 style={{ width: '100%', ...(tipo === 'CONTINUO' ? { backgroundColor: '#e8ecec', color: 'var(--color-text-muted)', cursor: 'not-allowed' } : {}) }} />
             </div>
