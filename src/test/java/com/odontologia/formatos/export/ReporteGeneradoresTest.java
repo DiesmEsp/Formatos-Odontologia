@@ -6,6 +6,7 @@ import com.odontologia.formatos.model.Docente;
 import com.odontologia.formatos.model.Materiales;
 import com.odontologia.formatos.model.Operador;
 import com.odontologia.formatos.model.Paciente;
+import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.model.Tratamiento;
 import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.model.UnidadConversion;
@@ -16,6 +17,7 @@ import com.odontologia.formatos.repository.DocenteRepository;
 import com.odontologia.formatos.repository.MaterialRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
+import com.odontologia.formatos.repository.PeriodoAusenciaRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoRepository;
 import com.odontologia.formatos.repository.UnidadConversionRepository;
@@ -49,6 +51,7 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
     private final AsistenciaRepository asistenciaRepository = new AsistenciaRepository();
     private final AsistenciaMaterialRepository asistenciaMaterialRepository = new AsistenciaMaterialRepository();
     private final UnidadConversionRepository conversionRepository = new UnidadConversionRepository();
+    private final PeriodoAusenciaRepository ausenciaRepository = new PeriodoAusenciaRepository();
 
     private int algodon;
     private int anestesia;
@@ -252,5 +255,63 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
         item.setMaterialID(materialID);
         item.setCantidad(cantidad);
         asistenciaMaterialRepository.insert(item);
+    }
+
+    @Test
+    void asistenciaGeneraArchivoMensual() throws Exception {
+        int id = insertarAsistenciaConHorario("2024-10-25", "ACTIVO", "08:00:00", "13:00:00");
+        insertarAusencia(id, "09:00:00", "10:00:00", "Reunion");
+        insertarAusencia(id, "12:00:00", "13:00:00", null);
+
+        Path archivo = new ReporteAsistenciaGenerator().generar(2024, 10, carpeta);
+
+        assertTrue(Files.exists(archivo));
+        assertTrue(archivo.toString().endsWith(".xlsx"));
+        assertTrue(archivo.getFileName().toString().contains("Asistencia"));
+
+        Workbook libro = WorkbookFactory.create(Files.newInputStream(archivo));
+        assertEquals(2, libro.getNumberOfSheets());
+
+        Sheet resumen = libro.getSheet("Resumen");
+        assertNotNull(resumen);
+        assertTrue(resumen.getLastRowNum() >= 3);
+
+        Sheet detalle = libro.getSheet("Detalle Ausencias");
+        assertNotNull(detalle);
+        assertTrue(detalle.getLastRowNum() >= 3);
+
+        libro.close();
+    }
+
+    @Test
+    void asistenciaMesSinDatosGeneraArchivoVacio() throws Exception {
+        Path archivo = new ReporteAsistenciaGenerator().generar(2024, 6, carpeta);
+
+        assertTrue(Files.exists(archivo));
+
+        Workbook libro = WorkbookFactory.create(Files.newInputStream(archivo));
+        assertEquals(2, libro.getNumberOfSheets());
+        libro.close();
+    }
+
+    private int insertarAsistenciaConHorario(String fecha, String estado,
+                                              String horaEntrada, String horaSalida) throws SQLException {
+        Asistencia a = new Asistencia();
+        a.setDocenteID(docenteID);
+        a.setFecha(fecha);
+        a.setEstado(estado);
+        a.setHoraEntrada(horaEntrada);
+        a.setHoraSalida(horaSalida);
+        return asistenciaRepository.insert(a);
+    }
+
+    private void insertarAusencia(int asistenciaID, String horaInicio, String horaFin, String motivo)
+            throws SQLException {
+        PeriodoAusencia pa = new PeriodoAusencia();
+        pa.setAsistenciaID(asistenciaID);
+        pa.setHoraInicio(horaInicio);
+        pa.setHoraFin(horaFin);
+        pa.setMotivo(motivo);
+        ausenciaRepository.insert(pa);
     }
 }

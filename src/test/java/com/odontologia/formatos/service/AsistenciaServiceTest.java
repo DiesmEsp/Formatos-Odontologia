@@ -2,6 +2,7 @@ package com.odontologia.formatos.service;
 
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.Docente;
+import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
 import com.odontologia.formatos.repository.AsistenciaRepository;
 import com.odontologia.formatos.repository.DocenteRepository;
@@ -15,7 +16,9 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AsistenciaServiceTest extends BaseRepositoryTest {
 
@@ -135,5 +138,85 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
         assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), null));
         assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), "  "));
+    }
+
+    @Test
+    void abrirDiaGuardaHoraEntrada() throws SQLException {
+        Asistencia dia = service.abrirDia(docenteID, "2026-08-03", "08:30:00");
+
+        assertEquals("08:30:00", dia.getHoraEntrada());
+        assertNull(dia.getHoraSalida());
+    }
+
+    @Test
+    void abrirDiaReutilizadoConservaHoraEntradaOriginal() throws SQLException {
+        Asistencia primero = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        Asistencia segundo = service.abrirDia(docenteID, "2026-08-03", "09:00:00");
+
+        assertEquals(primero.getAsistenciaID(), segundo.getAsistenciaID());
+        assertEquals("08:00:00", segundo.getHoraEntrada());
+    }
+
+    @Test
+    void registrarSalidaGuardaHora() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.registrarSalida(a.getAsistenciaID(), "13:00:00");
+
+        Asistencia actualizada = asistenciaRepository.findById(a.getAsistenciaID());
+        assertEquals("13:00:00", actualizada.getHoraSalida());
+    }
+
+    @Test
+    void registrarSalidaDosVecesArrojaError() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.registrarSalida(a.getAsistenciaID(), "13:00:00");
+
+        assertThrows(NegocioException.class,
+                () -> service.registrarSalida(a.getAsistenciaID(), "14:00:00"));
+    }
+
+    @Test
+    void registrarSalidaConAusenciaAbiertaArrojaError() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.iniciarAusencia(a.getAsistenciaID(), "10:00:00", null);
+
+        assertThrows(NegocioException.class,
+                () -> service.registrarSalida(a.getAsistenciaID(), "13:00:00"));
+    }
+
+    @Test
+    void iniciarAusenciaCreaPeriodo() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        PeriodoAusencia ausencia = service.iniciarAusencia(a.getAsistenciaID(), "10:00:00", "Reunion");
+
+        assertNotNull(ausencia.getAusenciaID());
+        assertEquals("10:00:00", ausencia.getHoraInicio());
+        assertEquals("Reunion", ausencia.getMotivo());
+        assertNull(ausencia.getHoraFin());
+    }
+
+    @Test
+    void iniciarAusenciaSinMotivoPermiteNull() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        PeriodoAusencia ausencia = service.iniciarAusencia(a.getAsistenciaID(), "10:00:00", null);
+
+        assertNull(ausencia.getMotivo());
+    }
+
+    @Test
+    void iniciarAusenciaDosVecesArrojaError() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.iniciarAusencia(a.getAsistenciaID(), "10:00:00", null);
+
+        assertThrows(NegocioException.class,
+                () -> service.iniciarAusencia(a.getAsistenciaID(), "11:00:00", null));
+    }
+
+    @Test
+    void registrarSalidaRechazaHoraSalidaInvalida() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+
+        assertThrows(NegocioException.class,
+                () -> service.registrarSalida(a.getAsistenciaID(), "13"));
     }
 }
