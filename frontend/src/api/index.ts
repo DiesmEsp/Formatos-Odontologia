@@ -231,6 +231,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ anio, mes }),
     }),
+    generarSemilla: () => request<Record<string, string>>('/api/reportes/semilla/generar', {
+      method: 'POST',
+    }),
   },
 };
 

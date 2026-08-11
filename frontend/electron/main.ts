@@ -128,10 +128,12 @@ function stopJavaBackend(): void {
 app.on('ready', async () => {
   ipcMain.handle('shell:openPath', async (_event, filePath: string) => {
     const normalized = path.normalize(filePath);
+    console.log('[Electron] Abriendo ubicacion:', normalized);
     try {
-      await shell.openPath(path.dirname(normalized));
+      await shell.showItemInFolder(normalized);
       return { success: true };
-    } catch {
+    } catch (err) {
+      console.error('[Electron] Error al abrir ubicacion:', err);
       return { success: false, error: 'No se pudo abrir la ubicacion' };
     }
   });

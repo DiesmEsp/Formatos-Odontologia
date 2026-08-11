@@ -4,6 +4,8 @@ import com.odontologia.formatos.export.ReporteEconomicoGenerator;
 import com.odontologia.formatos.export.ReporteGeneradorBase;
 import com.odontologia.formatos.export.ReporteMaterialesGenerator;
 import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
+import com.odontologia.formatos.export.ReporteDocenteGenerator;
+import com.odontologia.formatos.export.ReporteEspecialistaGenerator;
 import com.odontologia.formatos.export.ReporteNomenclatura;
 import com.odontologia.formatos.export.ReporteException;
 import com.odontologia.formatos.service.NegocioException;
@@ -14,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +27,8 @@ public class ReporteController {
     private final ReporteMaterialesGenerator materialesGen = new ReporteMaterialesGenerator();
     private final ReporteEconomicoGenerator economicoGen = new ReporteEconomicoGenerator();
     private final ReporteAsistenciaGenerator asistenciaGen = new ReporteAsistenciaGenerator();
+    private final ReporteDocenteGenerator docenteGen = new ReporteDocenteGenerator();
+    private final ReporteEspecialistaGenerator especialistaGen = new ReporteEspecialistaGenerator();
 
     public void register(Javalin app) {
         app.post("/api/reportes/materiales/generar", ctx -> {
@@ -59,7 +64,7 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
-                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                Path path = docenteGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -73,7 +78,7 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
-                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                Path path = especialistaGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -115,6 +120,28 @@ public class ReporteController {
         app.get("/api/reportes/recientes", ctx -> {
             ctx.json(archivosRecientes());
         });
+
+        app.post("/api/reportes/semilla/generar", ctx -> {
+            try {
+                int mes = mesActual();
+                int anio = anioActual();
+                Path matPath = materialesGen.generar(anio, mes, carpetaReportes());
+                Path ecoPath = economicoGen.generar(anio, mes, carpetaReportes());
+                Path docPath = docenteGen.generar(anio, mes, carpetaReportes());
+                Path espPath = especialistaGen.generar(anio, mes, carpetaReportes());
+                Path asisPath = asistenciaGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of(
+                        "materiales", matPath.toAbsolutePath().toString(),
+                        "economico", ecoPath.toAbsolutePath().toString(),
+                        "docente", docPath.toAbsolutePath().toString(),
+                        "especialista", espPath.toAbsolutePath().toString(),
+                        "asistencia", asisPath.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reportes: " + e.getMessage()));
+            }
+        });
     }
 
     private Path carpetaReportes() {
@@ -147,5 +174,13 @@ public class ReporteController {
 
         lista.sort((a, b) -> b.get("nombre").compareTo(a.get("nombre")));
         return lista;
+    }
+
+    private int mesActual() {
+        return LocalDate.now().getMonthValue();
+    }
+
+    private int anioActual() {
+        return LocalDate.now().getYear();
     }
 }

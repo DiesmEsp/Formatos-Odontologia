@@ -164,6 +164,13 @@ const electronAPI = {
       body: JSON.stringify({ anio }),
     }),
     listarRecientes: () => apiFetch<string[]>('/api/reportes/recientes'),
+    generarAsistencia: (anio: number, mes: number) => apiFetch<{ path: string }>('/api/reportes/asistencia/generar', {
+      method: 'POST',
+      body: JSON.stringify({ anio, mes }),
+    }),
+    generarSemilla: () => apiFetch<Record<string, string>>('/api/reportes/semilla/generar', {
+      method: 'POST',
+    }),
   },
 
   shell: {
