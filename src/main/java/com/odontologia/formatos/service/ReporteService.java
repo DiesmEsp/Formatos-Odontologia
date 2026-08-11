@@ -48,6 +48,11 @@ public class ReporteService {
         return repository.ingresosPorOperador(anio, mes);
     }
 
+    public List<ReporteRepository.FilaAsistencia> datosAsistencia(int anio, int mes) throws SQLException {
+        validarMes(mes);
+        return repository.datosAsistencia(anio, mes);
+    }
+
     private void validarMes(int mes) {
         if (mes < 1 || mes > 12) {
             throw new NegocioException("El mes debe estar entre 1 y 12.");

@@ -2,47 +2,154 @@ package com.odontologia.formatos.service;
 
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.AsistenciaMaterial;
+import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
 import com.odontologia.formatos.repository.AsistenciaRepository;
 import com.odontologia.formatos.repository.DocenteRepository;
 import com.odontologia.formatos.repository.MaterialRepository;
+import com.odontologia.formatos.repository.PeriodoAusenciaRepository;
 import com.odontologia.formatos.repository.RegistroAnulacionRepository;
 import com.odontologia.formatos.util.TransaccionBD;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Control diario de docentes (RF-1.2.1, RF-1.2.2, RD-3.1.4).
- * Un registro por docente y día; los materiales se acumulan sobre el registro ACTIVO.
- */
 public class AsistenciaService {
 
     private final AsistenciaRepository asistenciaRepository = new AsistenciaRepository();
     private final AsistenciaMaterialRepository materialRepository = new AsistenciaMaterialRepository();
+    private final PeriodoAusenciaRepository ausenciaRepository = new PeriodoAusenciaRepository();
     private final DocenteRepository docenteRepository = new DocenteRepository();
     private final MaterialRepository materialRepositoryCatalogo = new MaterialRepository();
     private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
 
-    public Asistencia abrirDia(int docenteID, String fecha) throws SQLException {
+    public Asistencia abrirDia(int docenteID, String fecha, String horaEntrada) throws SQLException {
         validarDocente(docenteID);
         validarFecha(fecha);
+        validarHora(horaEntrada, "hora de entrada");
         return TransaccionBD.ejecutarConResultado(con -> {
             Asistencia existente = asistenciaRepository.findActivoPorDocenteYFecha(con, docenteID, fecha);
             if (existente != null) {
+                if (existente.getHoraEntrada() == null && horaEntrada != null) {
+                    asistenciaRepository.registrarEntrada(con, existente.getAsistenciaID(), horaEntrada);
+                    existente.setHoraEntrada(horaEntrada);
+                }
                 return existente;
             }
             Asistencia nueva = new Asistencia();
             nueva.setDocenteID(docenteID);
             nueva.setFecha(fecha);
             nueva.setEstado("ACTIVO");
+            nueva.setHoraEntrada(horaEntrada);
             int id = asistenciaRepository.insert(con, nueva);
             nueva.setAsistenciaID(id);
             return nueva;
         });
+    }
+
+    public void registrarEntrada(int asistenciaID, String horaEntrada) throws SQLException {
+        validarHora(horaEntrada, "hora de entrada");
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        if ("ANULADO".equals(a.getEstado())) {
+            throw new NegocioException("La asistencia está anulada.");
+        }
+        TransaccionBD.ejecutar(con -> asistenciaRepository.registrarEntrada(con, asistenciaID, horaEntrada));
+    }
+
+    public void registrarSalida(int asistenciaID, String horaSalida) throws SQLException {
+        validarHora(horaSalida, "hora de salida");
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        if ("ANULADO".equals(a.getEstado())) {
+            throw new NegocioException("La asistencia está anulada.");
+        }
+        if (a.getHoraSalida() != null) {
+            throw new NegocioException("La asistencia ya tiene una hora de salida registrada.");
+        }
+        TransaccionBD.ejecutar(con -> {
+            PeriodoAusencia abierta = ausenciaRepository.findAbierta(con, asistenciaID);
+            if (abierta != null) {
+                throw new NegocioException("El docente tiene un periodo de ausencia activo. Debe registrar su regreso antes de finalizar el día.");
+            }
+            asistenciaRepository.registrarSalida(con, asistenciaID, horaSalida);
+        });
+    }
+
+    public PeriodoAusencia iniciarAusencia(int asistenciaID, String horaInicio, String motivo) throws SQLException {
+        validarHora(horaInicio, "hora de inicio de ausencia");
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        if ("ANULADO".equals(a.getEstado())) {
+            throw new NegocioException("La asistencia está anulada.");
+        }
+        if (a.getHoraEntrada() == null) {
+            throw new NegocioException("Debe registrar la hora de entrada antes de iniciar una ausencia.");
+        }
+        return TransaccionBD.ejecutarConResultado(con -> {
+            PeriodoAusencia abierta = ausenciaRepository.findAbierta(con, asistenciaID);
+            if (abierta != null) {
+                throw new NegocioException("El docente ya tiene un periodo de ausencia activo desde las "
+                        + formatearHora(abierta.getHoraInicio()) + ". Registre su regreso antes de iniciar uno nuevo.");
+            }
+            PeriodoAusencia nueva = new PeriodoAusencia();
+            nueva.setAsistenciaID(asistenciaID);
+            nueva.setHoraInicio(horaInicio);
+            if (motivo != null && !motivo.isBlank()) {
+                nueva.setMotivo(motivo.trim());
+            }
+            int id = ausenciaRepository.insert(con, nueva);
+            nueva.setAusenciaID(id);
+            return nueva;
+        });
+    }
+
+    public void finalizarAusencia(int ausenciaID, String horaFin) throws SQLException {
+        validarHora(horaFin, "hora de regreso");
+        PeriodoAusencia ausencia = ausenciaRepository.findById(ausenciaID);
+        if (ausencia == null) {
+            throw new NegocioException("El periodo de ausencia no existe.");
+        }
+        if (ausencia.getHoraFin() != null) {
+            throw new NegocioException("El periodo de ausencia ya fue finalizado.");
+        }
+        if (horaFin.compareTo(ausencia.getHoraInicio()) <= 0) {
+            throw new NegocioException("La hora de regreso debe ser posterior a la hora de inicio de la ausencia.");
+        }
+        TransaccionBD.ejecutar(con -> ausenciaRepository.finalizar(con, ausenciaID, horaFin));
+    }
+
+    public void eliminarAusencia(int ausenciaID) throws SQLException {
+        PeriodoAusencia ausencia = ausenciaRepository.findById(ausenciaID);
+        if (ausencia == null) {
+            throw new NegocioException("El periodo de ausencia no existe.");
+        }
+        TransaccionBD.ejecutar(con -> ausenciaRepository.delete(con, ausenciaID));
+    }
+
+    public Map<String, Object> obtenerDetalle(int asistenciaID) throws SQLException {
+        Asistencia a = asistenciaRepository.findById(asistenciaID);
+        if (a == null) {
+            throw new NegocioException("La asistencia no existe.");
+        }
+        List<PeriodoAusencia> ausencias = ausenciaRepository.findByAsistenciaID(asistenciaID);
+        List<AsistenciaMaterialRepository.MaterialConCantidad> materiales =
+                materialRepository.findMaterialesConNombre(asistenciaID);
+        Map<String, Object> detalle = new LinkedHashMap<>();
+        detalle.put("asistencia", a);
+        detalle.put("ausencias", ausencias);
+        detalle.put("materiales", materiales);
+        return detalle;
     }
 
     public void registrarMateriales(int docenteID, String fecha, Map<Integer, Double> materiales)
@@ -137,6 +244,19 @@ public class AsistenciaService {
         if (fecha == null || !fecha.matches("\\d{4}-\\d{2}-\\d{2}")) {
             throw new NegocioException("La fecha debe tener el formato AAAA-MM-DD.");
         }
+    }
+
+    private void validarHora(String hora, String campo) {
+        if (hora == null || !hora.matches("\\d{2}:\\d{2}(:\\d{2})?")) {
+            throw new NegocioException("La " + campo + " debe tener el formato HH:mm o HH:mm:ss.");
+        }
+    }
+
+    private String formatearHora(String hora) {
+        if (hora != null && hora.length() >= 5) {
+            return hora.substring(0, 5);
+        }
+        return hora;
     }
 
     private void validarMaterialesExisten(Map<Integer, Double> materiales) throws SQLException {

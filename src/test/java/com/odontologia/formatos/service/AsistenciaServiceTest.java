@@ -36,7 +36,7 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void abrirDiaCreaRegistroActivo() throws SQLException {
-        Asistencia dia = service.abrirDia(docenteID, "2026-08-03");
+        Asistencia dia = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
 
         assertNotNull(dia);
         assertEquals("ACTIVO", dia.getEstado());
@@ -44,8 +44,8 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void abrirDiaReutilizaRegistroExistente() throws SQLException {
-        Asistencia primero = service.abrirDia(docenteID, "2026-08-03");
-        Asistencia segundo = service.abrirDia(docenteID, "2026-08-03");
+        Asistencia primero = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        Asistencia segundo = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
 
         assertEquals(primero.getAsistenciaID(), segundo.getAsistenciaID());
     }
@@ -84,12 +84,12 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void rechazaDocenteInexistente() {
-        assertThrows(NegocioException.class, () -> service.abrirDia(9999, "2026-08-03"));
+        assertThrows(NegocioException.class, () -> service.abrirDia(9999, "2026-08-03", "08:00:00"));
     }
 
     @Test
     void rechazaFechaInvalida() {
-        assertThrows(NegocioException.class, () -> service.abrirDia(docenteID, "03/08/2026"));
+        assertThrows(NegocioException.class, () -> service.abrirDia(docenteID, "03/08/2026", "08:00:00"));
     }
 
     @Test
@@ -112,7 +112,7 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void anularCambiaEstado() throws SQLException {
-        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
         service.registrarMateriales(docenteID, "2026-08-03", Map.of(1, 2.0));
 
         service.anular(a.getAsistenciaID(), "Motivo de prueba");
@@ -123,7 +123,7 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void anularYaAnuladoArrojaError() throws SQLException {
-        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
         service.anular(a.getAsistenciaID(), "Motivo");
 
         assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), "Otra vez"));
@@ -131,7 +131,7 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
 
     @Test
     void anularSinMotivoArrojaError() throws SQLException {
-        Asistencia a = service.abrirDia(docenteID, "2026-08-03");
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
 
         assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), null));
         assertThrows(NegocioException.class, () -> service.anular(a.getAsistenciaID(), "  "));
