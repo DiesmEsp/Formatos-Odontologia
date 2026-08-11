@@ -86,7 +86,7 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", predID, null, "NORMAL");
 
         Tratamiento t = tratamientoRepository.findById(id);
-        assertEquals("Exodoncia simple", t.getNombreTratamiento());
+        assertEquals("Tratamiento de prueba unico", t.getNombreTratamiento());
         assertEquals(150.0, t.getMonto(), 0.001);
 
         List<TratamientoMaterialRepository.MaterialConCantidad> materiales = service.materialesConNombre(id);
@@ -342,7 +342,7 @@ class TratamientoServiceTest extends BaseRepositoryTest {
 
     private int crearPlantillaConMateriales() throws SQLException {
         TratamientoPredefinido pred = new TratamientoPredefinido();
-        pred.setNombreTratamiento("Exodoncia simple");
+        pred.setNombreTratamiento("Tratamiento de prueba unico");
         pred.setMontoSugerido(150.0);
         int predID = predRepository.insert(pred);
 

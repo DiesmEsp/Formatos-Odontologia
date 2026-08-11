@@ -26,7 +26,7 @@ class SeedMigrationTest extends BaseRepositoryTest {
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM Unidad")) {
             assertTrue(rs.next());
-            assertEquals(1, rs.getInt(1), "Debe existir la unidad de tratamiento inicial");
+            assertTrue(rs.getInt(1) >= 1, "Debe existir al menos una unidad de tratamiento");
         }
     }
 

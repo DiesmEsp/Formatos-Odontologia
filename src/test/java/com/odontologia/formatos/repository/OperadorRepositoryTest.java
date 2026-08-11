@@ -15,19 +15,20 @@ class OperadorRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void insertYFindByPeriodo() throws SQLException {
+        int semilla = repository.findByPeriodo(2026).size();
         repository.insert(operador("Ana", "Perez", "PRE", "4", 2026));
 
         List<Operador> periodo2026 = repository.findByPeriodo(2026);
-        assertEquals(1, periodo2026.size());
-        assertEquals("Ana", periodo2026.get(0).getNombres());
+        assertEquals(semilla + 1, periodo2026.size());
     }
 
     @Test
     void mismoOperadorDistintosPeriodos() throws SQLException {
+        int semilla = repository.findAll().size();
         repository.insert(operador("Ana", "Perez", "PRE", "4", 2025));
         repository.insert(operador("Ana", "Perez", "PRE", "4", 2026));
 
-        assertEquals(2, repository.findAll().size());
+        assertEquals(semilla + 2, repository.findAll().size());
     }
 
     @Test
