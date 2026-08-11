@@ -8,7 +8,7 @@ import { useToast } from '../hooks/useToast';
 import { api } from '../api';
 import { hoyISO, horaActual, formatearHora, calcularDuracion, nombreCompleto } from '../lib/format';
 import type { Asistencia, PeriodoAusencia } from '../api/types';
-import materialesDefaultData from '../data/materiales-docente-default.json';
+import { X } from 'lucide-react';
 
 export default function Asistencia() {
   const [q, setQ] = useState('');
@@ -19,6 +19,9 @@ export default function Asistencia() {
   const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
   const [showAnular, setShowAnular] = useState(false);
   const [motivoAusencia, setMotivoAusencia] = useState('');
+  const [showEditDefaults, setShowEditDefaults] = useState(false);
+  const [defaultMatRows, setDefaultMatRows] = useState<MaterialRow[]>([]);
+  const [editDefaultsSaving, setEditDefaultsSaving] = useState(false);
   const { addToast } = useToast();
 
   const asistenciaHoy = useApi(() => api.dashboard.asistenciaHoy());
@@ -29,6 +32,14 @@ export default function Asistencia() {
     id: d.docenteID,
     label: nombreCompleto(d.nombres, d.apellidos),
   }));
+
+  const loadDefaults = useCallback(async (): Promise<{ materialId: number; cantidad: number }[]> => {
+    try {
+      return await api.asistencia.materialesDefault.listar();
+    } catch {
+      return [];
+    }
+  }, []);
 
   const cargarDetalle = useCallback(async (asistenciaId: number) => {
     try {
@@ -66,16 +77,19 @@ export default function Asistencia() {
 
       const existingMats = await api.asistencia.materialesDelDia(a.asistenciaID);
       if (existingMats.length === 0) {
-        const defaultMats: MaterialRow[] = materialesDefaultData.materiales.map((dm, i) => ({
+        const defaults = await loadDefaults();
+        const defaultMats: MaterialRow[] = defaults.map((dm, i) => ({
           key: `default-${i}-${Date.now()}`,
           materialId: dm.materialId,
           nombreMaterial: '',
           cantidad: dm.cantidad,
         }));
-        setMaterialRows(defaultMats);
-        for (const dm of defaultMats) {
-          if (dm.materialId) {
-            try { await api.asistencia.acumularMaterial(a.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
+        if (defaultMats.length > 0) {
+          setMaterialRows(defaultMats);
+          for (const dm of defaultMats) {
+            if (dm.materialId) {
+              try { await api.asistencia.acumularMaterial(a.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
+            }
           }
         }
       }
@@ -83,7 +97,7 @@ export default function Asistencia() {
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'Error al abrir asistencia');
     }
-  }, [fecha, addToast, asistenciaHoy]);
+  }, [fecha, addToast, asistenciaHoy, loadDefaults]);
 
   const handleSelectDocente = async (id: number | null) => {
     if (id === null) return;
@@ -204,7 +218,8 @@ export default function Asistencia() {
 
   const handleRestaurarDefault = async () => {
     if (!asistencia) return;
-    const defaultMats: MaterialRow[] = materialesDefaultData.materiales.map((dm, i) => ({
+    const defaults = await loadDefaults();
+    const defaultMats: MaterialRow[] = defaults.map((dm, i) => ({
       key: `default-${i}-${Date.now()}`,
       materialId: dm.materialId,
       nombreMaterial: '',
@@ -222,6 +237,49 @@ export default function Asistencia() {
   const tieneAusenciaAbierta = ausencias.some((a) => !a.horaFin);
   const diaCerrado = asistencia?.horaSalida != null;
   const diaActivo = asistencia && asistencia.horaEntrada && !diaCerrado;
+
+  const openEditDefaults = async () => {
+    const defaults = await loadDefaults();
+    setDefaultMatRows(defaults.map((dm, i) => ({
+      key: `def-${i}-${Date.now()}`,
+      materialId: dm.materialId,
+      nombreMaterial: '',
+      cantidad: dm.cantidad,
+    })));
+    setShowEditDefaults(true);
+  };
+
+  const handleEditDefaultsAdd = () => {
+    setDefaultMatRows((prev) => [...prev, { key: `defnew-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }]);
+  };
+
+  const handleEditDefaultsRemove = (key: string) => {
+    setDefaultMatRows((prev) => prev.filter((r) => r.key !== key));
+  };
+
+  const handleEditDefaultsMatChange = (key: string, materialId: number) => {
+    setDefaultMatRows((prev) => prev.map((r) => r.key === key ? { ...r, materialId } : r));
+  };
+
+  const handleEditDefaultsCantChange = (key: string, cantidad: number) => {
+    setDefaultMatRows((prev) => prev.map((r) => r.key === key ? { ...r, cantidad } : r));
+  };
+
+  const handleGuardarDefaults = async () => {
+    setEditDefaultsSaving(true);
+    try {
+      const payload = defaultMatRows
+        .filter((r) => r.materialId != null && r.cantidad > 0)
+        .map((r) => ({ materialId: r.materialId!, cantidad: r.cantidad }));
+      await api.asistencia.materialesDefault.guardar(payload);
+      addToast('success', 'Lista predeterminada guardada');
+      setShowEditDefaults(false);
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Error al guardar');
+    } finally {
+      setEditDefaultsSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -413,6 +471,7 @@ export default function Asistencia() {
             <span className="text-muted text-sm">{materialRows.length} materiales registrados hoy</span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="btn btn-ghost btn-sm" onClick={handleRestaurarDefault}>Restaurar lista predeterminada</button>
+              <button className="btn btn-ghost btn-sm" onClick={openEditDefaults}>Editar lista predeterminada</button>
               <button className="btn btn-danger btn-sm" onClick={() => setShowAnular(true)}>Anular asistencia</button>
             </div>
           </div>
@@ -423,6 +482,34 @@ export default function Asistencia() {
         message={`Confirme que desea anular la asistencia de ${selectedDocente?.label} del dia ${fecha}.`}
         confirmLabel="Si, anular asistencia" variant="danger" requireMotivo
         onConfirm={handleAnular} onCancel={() => setShowAnular(false)} />
+
+      {showEditDefaults && (
+        <div className="dialog-overlay" onClick={() => setShowEditDefaults(false)}>
+          <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 560 }}>
+            <div className="dialog-header">
+              <h3 className="dialog-title">Editar lista predeterminada de materiales</h3>
+              <button className="btn btn-ghost btn-sm" onClick={() => setShowEditDefaults(false)}><X size={18} /></button>
+            </div>
+            <div className="dialog-body">
+              <p className="dialog-message">Estos materiales se asignaran automaticamente al abrir la asistencia de un docente.</p>
+              <MaterialTable
+                rows={defaultMatRows}
+                materials={materiales.data ?? []}
+                onAdd={handleEditDefaultsAdd}
+                onRemove={handleEditDefaultsRemove}
+                onMaterialChange={handleEditDefaultsMatChange}
+                onCantidadChange={handleEditDefaultsCantChange}
+              />
+            </div>
+            <div className="dialog-footer">
+              <button className="btn btn-secondary" onClick={() => setShowEditDefaults(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={handleGuardarDefaults} disabled={editDefaultsSaving}>
+                {editDefaultsSaving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

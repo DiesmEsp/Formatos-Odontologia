@@ -149,6 +149,13 @@ export const api = {
       body: JSON.stringify({ motivo }),
     }),
     materialesDelDia: (asistenciaId: number) => request<TratamientoMaterialConNombre[]>(`/api/asistencia/${asistenciaId}/materiales`),
+    materialesDefault: {
+      listar: () => request<{ materialId: number; cantidad: number }[]>('/api/asistencia/materiales-default'),
+      guardar: (materiales: { materialId: number; cantidad: number }[]) => request<{ ok: boolean }>('/api/asistencia/materiales-default', {
+        method: 'PUT',
+        body: JSON.stringify({ materiales }),
+      }),
+    },
   },
 
   catalogos: {

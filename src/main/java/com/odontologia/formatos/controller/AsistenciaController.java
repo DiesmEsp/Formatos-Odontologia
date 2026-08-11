@@ -1,5 +1,7 @@
 package com.odontologia.formatos.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
@@ -7,14 +9,22 @@ import com.odontologia.formatos.service.AsistenciaService;
 import com.odontologia.formatos.service.NegocioException;
 import io.javalin.Javalin;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AsistenciaController {
 
     private final AsistenciaService service = new AsistenciaService();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public void register(Javalin app) {
 
@@ -141,5 +151,61 @@ public class AsistenciaController {
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.json(service.materialesDelDia(id));
         });
+
+        app.get("/api/asistencia/materiales-default", ctx -> {
+            ctx.json(leerDefaults());
+        });
+
+        app.put("/api/asistencia/materiales-default", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> materiales = (List<Map<String, Object>>) body.get("materiales");
+            guardarDefaults(materiales);
+            ctx.json(Map.of("ok", true));
+        });
+    }
+
+    private Path archivoDefaults() {
+        String userHome = System.getProperty("user.home");
+        Path dir = Paths.get(userHome, "Documents", "FormatosOdontologia", "Config");
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException ignored) {}
+        return dir.resolve("materiales-default.json");
+    }
+
+    private List<Map<String, Object>> leerDefaults() {
+        Path archivo = archivoDefaults();
+        if (!Files.exists(archivo)) {
+            List<Map<String, Object>> defaults = new ArrayList<>();
+            defaults.add(crearEntry(1, 2.0));
+            defaults.add(crearEntry(2, 3.0));
+            defaults.add(crearEntry(3, 1.0));
+            guardarDefaults(defaults);
+            return defaults;
+        }
+        try {
+            String json = Files.readString(archivo);
+            List<Map<String, Object>> lista = mapper.readValue(json, new TypeReference<List<Map<String, Object>>>() {});
+            return lista != null ? lista : new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private void guardarDefaults(List<Map<String, Object>> materiales) {
+        Path archivo = archivoDefaults();
+        try {
+            Files.writeString(archivo, mapper.writeValueAsString(materiales));
+        } catch (IOException e) {
+            throw new NegocioException("No se pudo guardar la configuracion de materiales predeterminados.");
+        }
+    }
+
+    private Map<String, Object> crearEntry(int materialId, double cantidad) {
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("materialId", materialId);
+        entry.put("cantidad", cantidad);
+        return entry;
     }
 }

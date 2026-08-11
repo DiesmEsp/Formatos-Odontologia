@@ -80,6 +80,13 @@ const electronAPI = {
       body: JSON.stringify({ materialId, cantidad }),
     }),
     materialesDelDia: (asistenciaId: number) => apiFetch<any[]>(`/api/asistencia/${asistenciaId}/materiales`),
+    materialesDefault: {
+      listar: () => apiFetch<any[]>('/api/asistencia/materiales-default'),
+      guardar: (materiales: any[]) => apiFetch<void>('/api/asistencia/materiales-default', {
+        method: 'PUT',
+        body: JSON.stringify({ materiales }),
+      }),
+    },
   },
 
   catalogos: {
