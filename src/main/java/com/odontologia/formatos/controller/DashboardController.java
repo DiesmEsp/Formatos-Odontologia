@@ -1,30 +1,21 @@
 package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.db.ConnectionManager;
-import com.odontologia.formatos.model.Asistencia;
-import com.odontologia.formatos.repository.AsistenciaRepository;
 import io.javalin.Javalin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DashboardController {
 
     public void register(Javalin app) {
         app.get("/api/dashboard/kpis", ctx -> ctx.json(obtenerKpis()));
-
         app.get("/api/dashboard/ingresos-mensuales", ctx -> ctx.json(ingresosMensuales()));
-
         app.get("/api/dashboard/tratamientos-estado", ctx -> ctx.json(tratamientosEstado()));
-
         app.get("/api/dashboard/top-materiales", ctx -> ctx.json(topMateriales()));
-
         app.get("/api/dashboard/asistencia-hoy", ctx -> ctx.json(asistenciaHoy()));
     }
 
@@ -157,6 +148,15 @@ public class DashboardController {
                     LEFT JOIN Asistencia a ON d.DocenteID = a.DocenteID AND a.Fecha = ? AND a.Estado = 'ACTIVO'
                     WHERE d.Estado = 1""";
 
+            Map<Integer, Boolean> ausenciaCache = new HashMap<>();
+            String sqlAusencias = "SELECT DISTINCT AsistenciaID FROM PeriodoAusencia WHERE HoraFin IS NULL";
+            try (PreparedStatement psAus = con.prepareStatement(sqlAusencias);
+                 ResultSet rsAus = psAus.executeQuery()) {
+                while (rsAus.next()) {
+                    ausenciaCache.put(rsAus.getInt(1), true);
+                }
+            }
+
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, hoy);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -171,18 +171,7 @@ public class DashboardController {
                         entry.put("asistenciaID", estado != null ? rs.getInt(5) : null);
                         entry.put("horaEntrada", estado != null ? rs.getString(6) : null);
                         entry.put("horaSalida", estado != null ? rs.getString(7) : null);
-
-                        boolean enAusencia = false;
-                        if (estado != null) {
-                            try (PreparedStatement psAus = con.prepareStatement(
-                                    "SELECT 1 FROM PeriodoAusencia WHERE AsistenciaID = ? AND HoraFin IS NULL")) {
-                                psAus.setInt(1, rs.getInt(5));
-                                try (ResultSet rsAus = psAus.executeQuery()) {
-                                    enAusencia = rsAus.next();
-                                }
-                            }
-                        }
-                        entry.put("enAusencia", enAusencia);
+                        entry.put("enAusencia", estado != null && ausenciaCache.containsKey(rs.getInt(5)));
                         resultado.add(entry);
                     }
                 }

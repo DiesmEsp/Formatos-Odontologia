@@ -6,6 +6,7 @@ import com.odontologia.formatos.db.DemoDataLoader;
 import com.odontologia.formatos.service.EntidadDuplicadaException;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.LogConfig;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 
@@ -34,6 +35,10 @@ public class Main {
         });
 
         app.exception(NegocioException.class, (e, ctx) -> {
+            ctx.status(400).json(Map.of("error", e.getMessage()));
+        });
+
+        app.exception(ControllerUtil.ValidationException.class, (e, ctx) -> {
             ctx.status(400).json(Map.of("error", e.getMessage()));
         });
 

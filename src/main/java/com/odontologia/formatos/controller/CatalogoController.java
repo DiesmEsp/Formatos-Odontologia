@@ -3,6 +3,7 @@ package com.odontologia.formatos.controller;
 import com.odontologia.formatos.model.*;
 import com.odontologia.formatos.repository.*;
 import com.odontologia.formatos.service.*;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.sql.SQLException;
@@ -56,7 +57,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/operadores/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             Operador o = new Operador();
             o.setOperadorID(id);
@@ -72,7 +73,7 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/operadores/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             operadorService.eliminar(id);
             ctx.status(204);
         });
@@ -98,7 +99,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/docentes/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             Docente d = new Docente();
             d.setDocenteID(id);
@@ -111,7 +112,7 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/docentes/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             docenteService.eliminar(id);
             ctx.status(204);
         });
@@ -136,7 +137,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/pacientes/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             Paciente p = new Paciente();
             p.setPacienteID(id);
@@ -148,7 +149,7 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/pacientes/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             pacienteService.eliminar(id);
             ctx.status(204);
         });
@@ -165,7 +166,7 @@ public class CatalogoController {
         });
 
         app.get("/api/catalogos/materiales/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             Materiales m = materialService.buscarPorId(id);
             if (m == null) {
                 ctx.status(404).json(Map.of("error", "Material no encontrado"));
@@ -183,7 +184,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/materiales/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             Materiales m = new Materiales();
             m.setMaterialID(id);
@@ -195,7 +196,7 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/materiales/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             materialService.eliminar(id);
             ctx.status(204);
         });
@@ -221,7 +222,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/tratamientos-pred/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             TratamientoPredefinido tp = new TratamientoPredefinido();
             tp.setTratPredID(id);
@@ -233,18 +234,18 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/tratamientos-pred/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             tratPredService.eliminar(id);
             ctx.status(204);
         });
 
         app.get("/api/catalogos/tratamientos-pred/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(tratPredService.materiales(id));
         });
 
         app.put("/api/catalogos/tratamientos-pred/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> raw = (List<Map<String, Object>>) body.get("materiales");
@@ -265,7 +266,7 @@ public class CatalogoController {
         });
 
         app.get("/api/catalogos/conversiones/material/{id}", ctx -> {
-            int materialId = Integer.parseInt(ctx.pathParam("id"));
+            int materialId = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(conversionService.buscarPorMaterial(materialId));
         });
 
@@ -280,7 +281,7 @@ public class CatalogoController {
         });
 
         app.put("/api/catalogos/conversiones/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(UnidadConversion.class);
             body.setConversionID(id);
             conversionService.actualizar(body);
@@ -288,7 +289,7 @@ public class CatalogoController {
         });
 
         app.delete("/api/catalogos/conversiones/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             conversionService.eliminar(id);
             ctx.status(204);
         });

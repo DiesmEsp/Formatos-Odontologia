@@ -8,6 +8,7 @@ import com.odontologia.formatos.model.PeriodoAusencia;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
 import com.odontologia.formatos.service.AsistenciaService;
 import com.odontologia.formatos.service.NegocioException;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class AsistenciaController {
         });
 
         app.put("/api/asistencia/{id}/entrada", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String horaEntrada = (String) body.get("horaEntrada");
             try {
@@ -58,7 +59,7 @@ public class AsistenciaController {
         });
 
         app.put("/api/asistencia/{id}/salida", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String horaSalida = (String) body.get("horaSalida");
             try {
@@ -70,7 +71,7 @@ public class AsistenciaController {
         });
 
         app.delete("/api/asistencia/{id}/salida", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
                 service.revertirSalida(id);
                 ctx.json(Map.of("ok", true));
@@ -80,7 +81,7 @@ public class AsistenciaController {
         });
 
         app.post("/api/asistencia/{id}/ausencias", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String horaInicio = (String) body.get("horaInicio");
             String motivo = (String) body.get("motivo");
@@ -93,7 +94,7 @@ public class AsistenciaController {
         });
 
         app.put("/api/asistencia/{id}/ausencias/{ausId}/regresar", ctx -> {
-            int ausId = Integer.parseInt(ctx.pathParam("ausId"));
+            int ausId = ControllerUtil.parseIdPathParam(ctx, "ausId");
             var body = ctx.bodyAsClass(Map.class);
             String horaFin = (String) body.get("horaFin");
             try {
@@ -105,7 +106,7 @@ public class AsistenciaController {
         });
 
         app.delete("/api/asistencia/{id}/ausencias/{ausId}", ctx -> {
-            int ausId = Integer.parseInt(ctx.pathParam("ausId"));
+            int ausId = ControllerUtil.parseIdPathParam(ctx, "ausId");
             try {
                 service.eliminarAusencia(ausId);
                 ctx.json(Map.of("ok", true));
@@ -124,7 +125,7 @@ public class AsistenciaController {
         });
 
         app.get("/api/asistencia/{id}/detalle", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
                 ctx.json(service.obtenerDetalle(id));
             } catch (NegocioException e) {
@@ -133,7 +134,7 @@ public class AsistenciaController {
         });
 
         app.post("/api/asistencia/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             int materialId = ((Number) body.get("materialId")).intValue();
             double cantidad = ((Number) body.get("cantidad")).doubleValue();
@@ -142,7 +143,7 @@ public class AsistenciaController {
         });
 
         app.post("/api/asistencia/{id}/registrar", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             int docenteId = ((Number) body.get("docenteId")).intValue();
             String fecha = (String) body.get("fecha");
@@ -159,7 +160,7 @@ public class AsistenciaController {
         });
 
         app.post("/api/asistencia/{id}/anular", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String motivo = (String) body.get("motivo");
             try {
@@ -171,7 +172,7 @@ public class AsistenciaController {
         });
 
         app.get("/api/asistencia/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.materialesDelDia(id));
         });
 

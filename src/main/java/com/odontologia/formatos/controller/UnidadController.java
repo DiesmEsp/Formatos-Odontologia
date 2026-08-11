@@ -4,6 +4,7 @@ import com.odontologia.formatos.model.Unidad;
 import com.odontologia.formatos.repository.UnidadRepository;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.service.UnidadService;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.sql.SQLException;
@@ -27,7 +28,7 @@ public class UnidadController {
         });
 
         app.delete("/api/unidades/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
                 service.eliminar(id);
                 ctx.status(204);

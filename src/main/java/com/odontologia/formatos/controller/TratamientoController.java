@@ -5,6 +5,7 @@ import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.service.TratamientoService;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.sql.SQLException;
@@ -23,12 +24,12 @@ public class TratamientoController {
         });
 
         app.get("/api/tratamientos/unidad/{id}", ctx -> {
-            int unidadId = Integer.parseInt(ctx.pathParam("id"));
+            int unidadId = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.porUnidad(unidadId));
         });
 
         app.get("/api/tratamientos/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             Tratamiento t = service.buscarPorId(id);
             if (t == null) {
                 ctx.status(404).json(Map.of("error", "Tratamiento no encontrado"));
@@ -59,7 +60,7 @@ public class TratamientoController {
         });
 
         app.post("/api/tratamientos/{id}/cerrar", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
                 service.cerrar(id);
                 ctx.json(Map.of("ok", true));
@@ -69,7 +70,7 @@ public class TratamientoController {
         });
 
         app.post("/api/tratamientos/{id}/anular", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String motivo = (String) body.get("motivo");
             try {
@@ -81,7 +82,7 @@ public class TratamientoController {
         });
 
         app.post("/api/tratamientos/{id}/reabrir", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
                 service.reabrir(id);
                 ctx.json(Map.of("ok", true));
@@ -91,7 +92,7 @@ public class TratamientoController {
         });
 
         app.post("/api/tratamientos/{id}/pago", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             double abono = ((Number) body.get("abono")).doubleValue();
             try {
@@ -103,7 +104,7 @@ public class TratamientoController {
         });
 
         app.post("/api/tratamientos/{id}/cambiar-tipo", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             String tipo = (String) body.get("tipo");
             try {
@@ -115,7 +116,7 @@ public class TratamientoController {
         });
 
         app.put("/api/tratamientos/{id}/editar", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
 
             TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
@@ -152,12 +153,12 @@ public class TratamientoController {
         });
 
         app.get("/api/tratamientos/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.materialesConNombre(id));
         });
 
         app.post("/api/tratamientos/{id}/materiales", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             int materialId = ((Number) body.get("materialId")).intValue();
             double cantidad = ((Number) body.get("cantidad")).doubleValue();
@@ -170,7 +171,7 @@ public class TratamientoController {
         });
 
         app.put("/api/tratamientos/materiales/{mlid}", ctx -> {
-            int mlid = Integer.parseInt(ctx.pathParam("mlid"));
+            int mlid = ControllerUtil.parseIdPathParam(ctx, "mlid");
             var body = ctx.bodyAsClass(Map.class);
             double cantidad = ((Number) body.get("cantidad")).doubleValue();
             try {
@@ -182,7 +183,7 @@ public class TratamientoController {
         });
 
         app.delete("/api/tratamientos/materiales/{mlid}", ctx -> {
-            int mlid = Integer.parseInt(ctx.pathParam("mlid"));
+            int mlid = ControllerUtil.parseIdPathParam(ctx, "mlid");
             service.quitarMaterial(mlid);
             ctx.status(204);
         });
