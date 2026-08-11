@@ -292,7 +292,7 @@ export default function Asistencia() {
         <div className="card-header">
           <h3 className="card-title">Docentes registrados</h3>
         </div>
-        <div className="table-container">
+        <div className="table-container asistencia-table-container">
           <table className="data-table">
             <thead>
               <tr>

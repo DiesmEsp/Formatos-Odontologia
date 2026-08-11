@@ -1191,6 +1191,11 @@ textarea.form-input,
   overflow-x: auto;
 }
 
+.asistencia-table-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
