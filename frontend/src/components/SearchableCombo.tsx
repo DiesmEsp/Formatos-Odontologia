@@ -41,6 +41,10 @@ export function SearchableCombo({
 
   const selectedOption = options.find((o) => o.id === value);
 
+  const filteredOptions = query.trim()
+    ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -86,10 +90,10 @@ export function SearchableCombo({
       {open && (
         <div className="combo-dropdown">
           {loading && <div className="combo-dropdown-loading">Buscando...</div>}
-          {!loading && options.length === 0 && !allowCreate && (
+          {!loading && filteredOptions.length === 0 && !allowCreate && (
             <div className="combo-dropdown-empty">Sin resultados</div>
           )}
-          {!loading && options.map((opt) => (
+          {!loading && filteredOptions.map((opt) => (
             <button
               key={opt.id}
               className={`combo-option ${opt.id === value ? 'selected' : ''}`}
@@ -101,7 +105,7 @@ export function SearchableCombo({
               {opt.extra && <span className="combo-option-extra">{opt.extra}</span>}
             </button>
           ))}
-          {!loading && options.length === 0 && allowCreate && onCreateNew && query.trim() && (
+          {!loading && filteredOptions.length === 0 && allowCreate && onCreateNew && query.trim() && (
             <div style={{ padding: '12px', textAlign: 'center' }}>
               <span className="text-muted text-sm" style={{ display: 'block', marginBottom: 8 }}>Sin resultados</span>
               <button className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
@@ -109,7 +113,7 @@ export function SearchableCombo({
               </button>
             </div>
           )}
-          {!loading && allowCreate && onCreateNew && options.length > 0 && (
+          {!loading && allowCreate && onCreateNew && filteredOptions.length > 0 && (
             <button className="combo-option combo-option-create" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
               <Plus size={14} />
               <span>Crear nuevo</span>
