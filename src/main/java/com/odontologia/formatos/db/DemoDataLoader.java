@@ -32,24 +32,20 @@ public final class DemoDataLoader {
                 return;
             }
 
-            StringBuilder sql = new StringBuilder();
+            StringBuilder sqlBuilder = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String trimmed = line.trim();
                     if (trimmed.isEmpty() || trimmed.startsWith("--")) continue;
-                    sql.append(trimmed).append(' ');
+                    sqlBuilder.append(trimmed).append(' ');
                 }
             }
 
-            String[] statements = sql.toString().split(";");
+            String sql = sqlBuilder.toString();
             try (Statement stmt = con.createStatement()) {
                 con.setAutoCommit(false);
-                for (String st : statements) {
-                    String s = st.trim();
-                    if (s.isEmpty()) continue;
-                    stmt.execute(s);
-                }
+                stmt.executeUpdate(sql);
                 con.commit();
                 LOG.info("Demo data cargada exitosamente.");
             } catch (Exception e) {

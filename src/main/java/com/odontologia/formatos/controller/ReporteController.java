@@ -170,7 +170,9 @@ public class ReporteController {
             dir = Paths.get(System.getProperty("java.io.tmpdir"), "FormatosOdontologia", "Reportes");
             try {
                 Files.createDirectories(dir);
-            } catch (Exception ignored) { }
+            } catch (Exception ex) {
+                throw new NegocioException("No se pudo crear la carpeta de reportes: " + ex.getMessage());
+            }
         }
         return dir;
     }

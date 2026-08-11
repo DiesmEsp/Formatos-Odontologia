@@ -196,19 +196,16 @@ public class TratamientoService {
     }
 
     public void reabrir(int tratamientoID) throws SQLException {
-        Tratamiento t = repository.findById(tratamientoID);
-        if (t == null) {
-            throw new NegocioException("El tratamiento no existe.");
-        }
-        if (!"CERRADO".equals(t.getEstado())) {
-            throw new NegocioException("Solo se puede reabrir un tratamiento cerrado.");
-        }
-        if (t.getUnidadID() != null && repository.existeOtroAbiertoEnUnidad(t.getUnidadID(), tratamientoID)) {
-            throw new NegocioException("La unidad de tratamiento ya está ocupada por otro tratamiento activo.");
-        }
-        t.setEstado("ABIERTO");
-        t.setCerradoEn(null);
-        repository.update(t);
+        TransaccionBD.ejecutar(con -> {
+            Tratamiento t = repository.findById(tratamientoID);
+            if (t == null) throw new NegocioException("El tratamiento no existe.");
+            if (!"CERRADO".equals(t.getEstado())) throw new NegocioException("Solo se puede reabrir un tratamiento cerrado.");
+            if (t.getUnidadID() != null && repository.existeOtroAbiertoEnUnidad(t.getUnidadID(), tratamientoID))
+                throw new NegocioException("La unidad de tratamiento ya está ocupada por otro tratamiento activo.");
+            t.setEstado("ABIERTO");
+            t.setCerradoEn(null);
+            repository.update(con, t);
+        });
     }
 
     public void cambiarTipo(int tratamientoID, String tipo) throws SQLException {

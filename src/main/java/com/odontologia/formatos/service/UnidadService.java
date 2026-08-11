@@ -14,16 +14,20 @@ public class UnidadService {
     private final UnidadRepository repository = new UnidadRepository();
 
     public int crear() throws SQLException {
-        int siguienteNro = repository.maxUnidadNro() + 1;
-        Unidad unidad = new Unidad();
-        unidad.setUnidadNro(siguienteNro);
-        return repository.insert(unidad);
+        String sql = "INSERT INTO Unidad (UnidadNro) SELECT COALESCE(MAX(UnidadNro), 0) + 1 FROM Unidad";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        throw new SQLException("No se pudo crear la unidad.");
     }
 
     public void eliminar(int unidadID) throws SQLException {
         if (tieneTratamientoAbierto(unidadID)) {
-            throw new NegocioException(
-                    "La unidad tiene un tratamiento en curso (ABIERTO) y no puede eliminarse.");
+            throw new NegocioException("La unidad tiene un tratamiento en curso (ABIERTO) y no puede eliminarse.");
         }
         repository.delete(unidadID);
     }

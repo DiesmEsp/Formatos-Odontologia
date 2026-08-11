@@ -57,9 +57,17 @@ public class CatalogoController {
 
         app.put("/api/catalogos/operadores/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            var body = ctx.bodyAsClass(Operador.class);
-            body.setOperadorID(id);
-            operadorService.actualizar(body);
+            var body = ctx.bodyAsClass(Map.class);
+            Operador o = new Operador();
+            o.setOperadorID(id);
+            o.setNombres((String) body.getOrDefault("nombres", ""));
+            o.setApellidos((String) body.getOrDefault("apellidos", ""));
+            o.setDni((String) body.get("dni"));
+            o.setGrado((String) body.getOrDefault("grado", ""));
+            o.setTipo((String) body.getOrDefault("tipo", ""));
+            o.setPeriodo(body.get("periodo") != null ? ((Number) body.get("periodo")).intValue() : 0);
+            o.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : operadorRepo.findById(id).getEstado());
+            operadorService.actualizar(o);
             ctx.json(Map.of("ok", true));
         });
 
@@ -91,9 +99,14 @@ public class CatalogoController {
 
         app.put("/api/catalogos/docentes/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            var body = ctx.bodyAsClass(Docente.class);
-            body.setDocenteID(id);
-            docenteService.actualizar(body);
+            var body = ctx.bodyAsClass(Map.class);
+            Docente d = new Docente();
+            d.setDocenteID(id);
+            d.setNombres((String) body.getOrDefault("nombres", ""));
+            d.setApellidos((String) body.getOrDefault("apellidos", ""));
+            d.setTelefono((String) body.getOrDefault("telefono", ""));
+            d.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : docenteRepo.findById(id).getEstado());
+            docenteService.actualizar(d);
             ctx.json(Map.of("ok", true));
         });
 
@@ -124,9 +137,13 @@ public class CatalogoController {
 
         app.put("/api/catalogos/pacientes/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            var body = ctx.bodyAsClass(Paciente.class);
-            body.setPacienteID(id);
-            pacienteService.actualizar(body);
+            var body = ctx.bodyAsClass(Map.class);
+            Paciente p = new Paciente();
+            p.setPacienteID(id);
+            p.setNombres((String) body.getOrDefault("nombres", ""));
+            p.setApellidos((String) body.getOrDefault("apellidos", ""));
+            p.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : pacienteRepo.findById(id).getEstado());
+            pacienteService.actualizar(p);
             ctx.json(Map.of("ok", true));
         });
 
@@ -167,9 +184,13 @@ public class CatalogoController {
 
         app.put("/api/catalogos/materiales/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            var body = ctx.bodyAsClass(Materiales.class);
-            body.setMaterialID(id);
-            materialService.actualizar(body);
+            var body = ctx.bodyAsClass(Map.class);
+            Materiales m = new Materiales();
+            m.setMaterialID(id);
+            m.setNombre((String) body.getOrDefault("nombre", ""));
+            m.setUnidad((String) body.getOrDefault("unidad", ""));
+            m.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : materialService.buscarPorId(id).getEstado());
+            materialService.actualizar(m);
             ctx.json(Map.of("ok", true));
         });
 
@@ -201,9 +222,13 @@ public class CatalogoController {
 
         app.put("/api/catalogos/tratamientos-pred/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
-            var body = ctx.bodyAsClass(TratamientoPredefinido.class);
-            body.setTratPredID(id);
-            tratPredService.actualizar(body);
+            var body = ctx.bodyAsClass(Map.class);
+            TratamientoPredefinido tp = new TratamientoPredefinido();
+            tp.setTratPredID(id);
+            tp.setNombreTratamiento((String) body.getOrDefault("nombreTratamiento", ""));
+            tp.setMontoSugerido(body.get("montoSugerido") != null ? ((Number) body.get("montoSugerido")).doubleValue() : 0.0);
+            tp.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : tratPredRepo.findById(id).getEstado());
+            tratPredService.actualizar(tp);
             ctx.json(Map.of("ok", true));
         });
 
