@@ -1,57 +1,117 @@
-# Formatos-Odontologia
+# Formatos Odontologicos
 
-Estado actual: Fases 0 a 4 (backend) implementadas. Compila y tests pasan.
+Aplicacion de escritorio para gestion clinica odontologica (UNMSM).
 
-Aplicación de escritorio en Java (JavaFX) con base de datos local SQLite y exportación a Excel.
+Arquitectura: **Electron + React 19** (frontend) + **Java 21 + Javalin** (backend REST) + **SQLite** (local).
 
-## Estado de implementación
+## Stack
 
-- **Fase 0 (completada)**: build Gradle 8.14.2 (wrapper), Java 21, JavaFX 21, migraciones Flyway, `ConnectionManager`, configuración por `application.properties`, seed de materiales (V2) y utilidades de logging/errores.
-- **Modelos (completados)**: 13 clases POJO alineadas con el esquema V1.
-- **Fase 1 (completada)**: repositorios y servicios de catálogos (Materiales, Docentes, Operadores, Pacientes, Unidad, Tratamiento_PRED + Materiales_List_PRED) con validaciones (unicidad RF-1.1.3, grado/tipo RD-3.1.1, numeración secuencial de unidades, bloqueo por ocupación).
-- **Fase 2 (completada)**: asistencia docente diaria (Asistencia + Materiales_Asistencia) con acumulación automática y unicidad por docente/fecha (RD-3.1.4).
-- **Fase 3 (completada)**: flujo de tratamientos (Paciente, Tratamiento, Materiales_List) con carga desde plantilla, consumo dinámico acumulativo, cierre/reapertura, tipo CONTINUO y pagos parciales (RF-1.4.x, RD-3.1.12/13).
-- **Fase 4 (completada, backend)**: reportes a Excel con Apache POI — Materiales, Ingresos, Docente (consolidado + detalle diario), Especialista y Anual (12 meses) con nomenclatura `{Tipo}_{Mes}_{Año}.xlsx` (RNF-2.3.2). Conversión a unidad base vía `Unidad_Conversion` (factor 1 si no hay). Incluye `UnidadConversion` (repositorio + servicio).
-- **Tests**: JUnit 5 contra SQLite en archivo temporal (mismo motor que producción).
-- **Pendiente**: UI de JavaFX (catálogos, asistencia, tratamientos, selector de reportes, spinner de Anual), Fase 5 (anulación/auditoría) y Fase 6 (préstamo de equipos).
+| Capa | Tecnologia |
+|---|---|
+| Desktop Shell | Electron 35 |
+| Frontend | React 19, TypeScript, Vite 6, Recharts |
+| Backend API | Javalin 6.5 (REST en puerto 7070) |
+| Base de datos | SQLite (archivo local) |
+| Migraciones | Flyway |
+| Excel | Apache POI 5.5 |
+| Build Backend | Gradle 8.14 (Shadow JAR, jlink) |
+| Build Frontend | Vite + electron-builder (NSIS .exe) |
+| Tests Backend | JUnit 5 (125 tests) |
+| Tests Frontend | Vitest (128 tests) + Playwright (E2E) |
+
+## Arquitectura
+
+El Electron main process spawn el JAR del backend Java (JRE minima via jlink), espera el health check en `localhost:7070`, y carga la SPA de React desde el sistema de archivos. El frontend consume la API REST via `fetch()`.
+
+## Requisitos
+
+- **JDK 21** (para compilar y ejecutar)
+- **Node.js 22+** (para frontend y empaquetado)
 
 ## Comandos
 
-```text
-.\gradlew.bat compileJava   # compilar
-.\gradlew.bat test          # ejecutar tests
-.\gradlew.bat run           # lanzar la app
+### Desarrollo
+
+```bash
+# Backend
+.\gradlew.bat compileJava
+
+# Frontend (modo dev con Vite, backend debe estar corriendo aparte)
+cd frontend
+npm install
+npm run dev
+
+# Electron en modo dev (spawnea backend + frontend)
+npm run electron:dev
 ```
 
-## Referencia funcional actual
+### Tests
 
-- `REGISTRO_DE_CONSUMOS_VBA.xlsm`: ejemplo del Excel que sirve como referencia para el formato final de salida.
+```bash
+# Backend
+.\gradlew.bat test
 
-## Estructura propuesta
+# Frontend unitarios
+cd frontend
+npm test
 
-```text
-src/
-  main/
-    java/
-      com/odontologia/formatos/
-        config/
-        db/
-        model/
-        repository/
-        service/
-        export/
-        ui/
-          controller/
-    resources/
-      db/
-      templates/
-      ui/
-      styles/
-  test/
-    java/
-      com/odontologia/formatos/
+# Frontend TypeScript check
+npm run typecheck
+
+# E2E (Playwright, requiere backend corriendo)
+npm run test:e2e
 ```
 
-## Nota
+### Build de produccion
 
-Por ahora solo se dejaron carpetas y archivos `README.md` para documentar que debe ir en cada lugar. La implementacion se agregara despues, por modulos.
+```bash
+# 1. Compilar backend (fat JAR + JRE minima)
+.\gradlew.bat shadowJar buildJre prepareElectronResources
+
+# 2. Empaquetar Electron (genera instalador .exe)
+cd frontend
+npm run electron:build
+```
+
+El instalador se genera en `frontend/release/Formatos Odontologicos Setup *.exe`.
+
+## Estructura del proyecto
+
+```
+Formatos-Odontologia/
+├── build.gradle                    # Java build (shadowJar, jlink, copy resources)
+├── src/
+│   ├── main/java/com/odontologia/formatos/
+│   │   ├── config/                 # AppConfig, DatabaseConfig
+│   │   ├── controller/             # Javalin REST controllers + Main.java
+│   │   ├── db/                     # ConnectionManager, DemoDataLoader
+│   │   ├── export/                 # Excel generators (POI)
+│   │   ├── model/                  # 14 POJOs
+│   │   ├── repository/             # JDBC data access
+│   │   ├── service/                # Business logic
+│   │   └── util/                   # Logging, errors, transactions
+│   ├── main/resources/
+│   │   └── db/migration/           # Flyway migrations (V1-V5)
+│   └── test/                       # JUnit tests
+├── frontend/
+│   ├── electron/                   # main.ts, preload.ts
+│   ├── src/
+│   │   ├── api/                    # HTTP client + TypeScript types
+│   │   ├── components/             # UI components
+│   │   ├── hooks/                  # useApi, useToast, usePagination
+│   │   ├── lib/                    # format.ts, constants.ts
+│   │   └── pages/                  # Dashboard, Asistencia, Catalogos, etc.
+│   ├── electron-builder.yml        # NSIS installer config
+│   └── package.json
+├── .github/workflows/ci.yml        # CI pipeline
+└── planning/                       # Documentos de planificacion
+```
+
+## Funcionalidades
+
+- **Dashboard**: KPIs, graficos de ingresos, top materiales, asistencia del dia
+- **Asistencia Docente**: Registro con hora de entrada/salida, periodos de ausencia, acumulacion de materiales
+- **Tratamientos**: Grid de unidades, creacion con plantilla, cierre, pagos, reapertura, edicion retroactiva
+- **Catalogos**: Materiales, Docentes, Especialistas, Tratamientos Predefinidos, Conversiones de unidad
+- **Unidades**: Gestion de modulos de atencion con bloqueo visual
+- **Reportes**: Exportacion Excel — Materiales, Economico, Asistencia Docente, Anual
