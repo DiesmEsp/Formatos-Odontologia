@@ -19,6 +19,7 @@ frontend/release/
 frontend/coverage/
 frontend/test-results/
 frontend/build-resources/
+*.tsbuildinfo
 
 # Planificación (documentos de trabajo locales)
 planning/

@@ -15,14 +15,17 @@ function removeCrossoriginPlugin(): import('vite').Plugin {
 const plugins: import('vite').PluginOption[] = [react(), removeCrossoriginPlugin()];
 
 if (USE_ELECTRON) {
-  const electron = (await import('vite-plugin-electron')).default;
-  const renderer = (await import('vite-plugin-electron-renderer')).default;
+  const electron = require('vite-plugin-electron').default as typeof import('vite-plugin-electron').default;
+  const renderer = require('vite-plugin-electron-renderer').default as typeof import('vite-plugin-electron-renderer').default;
 
   plugins.push(
     electron([
       {
         entry: 'electron/main.ts',
         vite: {
+          define: {
+            __BUILD_TAG__: JSON.stringify(new Date().toISOString()),
+          },
           build: {
             outDir: 'dist-electron',
             rollupOptions: {

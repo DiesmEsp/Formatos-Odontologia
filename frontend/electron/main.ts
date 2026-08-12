@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, protocol, shell } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
@@ -6,6 +6,19 @@ import fs from 'fs';
 const PORT = 7070;
 const HEALTH_URL = `http://localhost:${PORT}/health`;
 const SPLASH_SIZE = { width: 400, height: 300 };
+const APP_SCHEME = 'app';
+const APP_HOST = 'bundle';
+
+declare const __BUILD_TAG__: string;
+
+app.disableHardwareAcceleration();
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: APP_SCHEME,
+    privileges: { standard: true, secure: true, supportFetchAPI: true },
+  },
+]);
 
 const SPLASH_HTML = `<!DOCTYPE html>
 <html lang="es">
@@ -15,13 +28,14 @@ const SPLASH_HTML = `<!DOCTYPE html>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:#0f172a;color:#f1f5f9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;user-select:none;-webkit-app-region:drag}
 .logo{font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-.5px}
-.subtitle{font-size:13px;color:#64748b;margin-bottom:32px}
+.subtitle{font-size:13px;color:#64748b;margin-bottom:4px}
+.version{font-size:11px;color:#475569;margin-bottom:32px}
 .status-row{display:flex;align-items:center;gap:10px;font-size:14px}
 .spinner{width:18px;height:18px;border:2px solid #334155;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
 .spinner.done{border-color:#22c55e;border-top-color:#22c55e;animation:none}
 .spinner.error{border-color:#ef4444;border-top-color:#ef4444;animation:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.log{margin-top:24px;font-size:12px;color:#475569;max-width:320px;text-align:center;line-height:1.5;display:none;white-space:pre-wrap}
+.log{margin-top:24px;font-size:11px;color:#475569;max-width:340px;text-align:left;line-height:1.4;display:none;white-space:pre-wrap;word-break:break-all}
 .log.visible{display:block}
 .error-msg{color:#ef4444;margin-top:16px;font-size:13px;text-align:center;max-width:300px;display:none}
 .error-msg.visible{display:block}
@@ -30,6 +44,7 @@ body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:#0f172
 <body>
 <div class="logo">Formatos Odontologicos</div>
 <div class="subtitle">Clinica Odontologica UNMSM</div>
+<div class="version" id="version"></div>
 <div class="status-row">
 <div class="spinner" id="spinner"></div>
 <span id="status">Iniciando...</span>
@@ -51,6 +66,65 @@ function resolveResource(...segments: string[]): string {
   return path.join(__dirname, '..', ...segments);
 }
 
+function getFrontendDir(): string {
+  return resolveResource('public');
+}
+
+function getBuildTag(): string {
+  try {
+    return typeof __BUILD_TAG__ !== 'undefined' ? __BUILD_TAG__ : 'dev';
+  } catch {
+    return 'dev';
+  }
+}
+
+function mimeTypeFor(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  const map: Record<string, string> = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.mjs': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.ico': 'image/x-icon',
+    '.webp': 'image/webp',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.map': 'application/json',
+  };
+  return map[ext] || 'application/octet-stream';
+}
+
+function registerAppProtocol(): void {
+  const distDir = path.normalize(getFrontendDir());
+  protocol.handle(APP_SCHEME, (request) => {
+    try {
+      const url = new URL(request.url);
+      let pathname = decodeURIComponent(url.pathname);
+      if (pathname === '/' || pathname === '') pathname = '/index.html';
+
+      const filePath = path.normalize(path.join(distDir, pathname));
+      const distRoot = distDir.endsWith(path.sep) ? distDir : distDir + path.sep;
+      if (filePath !== distDir && !filePath.startsWith(distRoot)) {
+        return new Response('Forbidden', { status: 403 });
+      }
+
+      const data = fs.readFileSync(filePath);
+      return new Response(data, {
+        headers: { 'Content-Type': mimeTypeFor(filePath) },
+      });
+    } catch {
+      return new Response('Not found', { status: 404 });
+    }
+  });
+}
+
 function createSplashWindow(): void {
   splashWindow = new BrowserWindow({
     width: SPLASH_SIZE.width,
@@ -69,6 +143,12 @@ function createSplashWindow(): void {
   });
 
   splashWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(SPLASH_HTML)}`);
+
+  splashWindow.webContents.on('did-finish-load', () => {
+    splashWindow?.webContents.executeJavaScript(`
+      document.getElementById('version').textContent = 'v${app.getVersion()} · build ${getBuildTag()}';
+    `).catch(() => {});
+  });
 }
 
 function updateSplash(status: string, error = false): void {
@@ -89,7 +169,7 @@ function appendSplashLog(line: string): void {
   if (!splashWindow || splashWindow.isDestroyed()) return;
   splashWindow.webContents.executeJavaScript(`
     var log = document.getElementById('log');
-    log.textContent += ${JSON.stringify(line + '\\n')};
+    log.textContent += ${JSON.stringify(line + '\n')};
     log.classList.add('visible');
   `).catch(() => {});
 }
@@ -216,6 +296,8 @@ function closeSplash(): void {
 }
 
 function createMainWindow(): void {
+  appendSplashLog('[main] Creando ventana principal...');
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
@@ -244,7 +326,7 @@ function createMainWindow(): void {
 
   const fallbackTimer = setTimeout(() => {
     if (!shown) {
-      console.warn('[Electron] ready-to-show no disparo; mostrando ventana por timeout');
+      appendSplashLog('[main][warn] ready-to-show no disparo; mostrando por timeout');
       revealWindow();
     }
   }, 5000);
@@ -255,15 +337,16 @@ function createMainWindow(): void {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
+    appendSplashLog('[main] Frontend cargado correctamente');
     console.log('[Electron] Frontend cargado correctamente');
   });
 
   mainWindow.webContents.on(
     'did-fail-load',
     (_event, errorCode, errorDescription, validatedURL) => {
-      console.error(
-        `[Electron] Error al cargar frontend: ${errorCode} ${errorDescription} (${validatedURL})`
-      );
+      const msg = `Error al cargar frontend: ${errorCode} ${errorDescription} (${validatedURL})`;
+      appendSplashLog(`[main][err] ${msg}`);
+      console.error(`[Electron] ${msg}`);
       if (errorCode !== -3) {
         dialog.showErrorBox(
           'Error al cargar la aplicacion',
@@ -274,6 +357,7 @@ function createMainWindow(): void {
   );
 
   mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    appendSplashLog(`[main][err] Renderizador termino: ${details.reason}`);
     console.error('[Electron] El proceso de renderizado termino:', details.reason);
     dialog.showErrorBox(
       'Error del renderizador',
@@ -284,7 +368,9 @@ function createMainWindow(): void {
   if (!app.isPackaged) {
     mainWindow.loadURL(`http://localhost:5173`);
   } else {
-    mainWindow.loadFile(resolveResource('public', 'index.html'));
+    const target = `${APP_SCHEME}://${APP_HOST}/index.html`;
+    appendSplashLog(`[main] Cargando ${target}`);
+    mainWindow.loadURL(target);
   }
 }
 
@@ -327,6 +413,7 @@ app.on('ready', async () => {
   });
 
   console.log('[Electron] Iniciando Formatos Odontologicos...');
+  registerAppProtocol();
   createSplashWindow();
 
   const resourceError = verifyResources();
