@@ -2,6 +2,7 @@
   "name": "formatos-odontologia",
   "version": "0.1.0",
   "description": "Clinica Odontologica UNMSM - Formatos Odontologicos",
+  "type": "module",
   "author": "Clinica Odontologica UNMSM",
   "license": "UNLICENSED",
   "private": true,
