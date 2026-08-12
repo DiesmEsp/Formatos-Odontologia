@@ -6,8 +6,8 @@ const USE_ELECTRON = process.env.VITE_ELECTRON === 'true';
 const plugins: import('vite').PluginOption[] = [react()];
 
 if (USE_ELECTRON) {
-  const electron = require('vite-plugin-electron').default as typeof import('vite-plugin-electron').default;
-  const renderer = require('vite-plugin-electron-renderer').default as typeof import('vite-plugin-electron-renderer').default;
+  const electron = (await import('vite-plugin-electron')).default;
+  const renderer = (await import('vite-plugin-electron-renderer')).default;
 
   plugins.push(
     electron([
