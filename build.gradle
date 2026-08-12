@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
+    id 'checkstyle'
     id 'com.gradleup.shadow' version '8.3.6'
 }
 
@@ -45,6 +47,35 @@ tasks.named('test') {
     testLogging {
         events 'passed', 'failed', 'skipped'
     }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            excludes = ['com.odontologia.formatos.controller.Main']
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'MISSEDRATIO'
+                maximum = 0.95
+            }
+        }
+    }
+}
+
+checkstyle {
+    toolVersion = '10.21.1'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 }
 
 task buildJre(type: Exec) {
