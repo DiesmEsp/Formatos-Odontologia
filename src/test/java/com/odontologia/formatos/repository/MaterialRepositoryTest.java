@@ -32,12 +32,12 @@ class MaterialRepositoryTest extends BaseRepositoryTest {
     @Test
     void findByNombreDuplicado() throws SQLException {
         Materiales m = new Materiales();
-        m.setNombre("Gasa");
+        m.setNombre("Gasa de prueba");
         m.setUnidad("paquete");
         m.setEstado(1);
         repository.insert(m);
 
-        assertNotNull(repository.findByNombre("Gasa"));
+        assertNotNull(repository.findByNombre("Gasa de prueba"));
     }
 
     @Test
@@ -61,7 +61,7 @@ class MaterialRepositoryTest extends BaseRepositoryTest {
 
         insertar("Guante nitrilo", "caja");
         insertar("Gasa estéril 5x5", "paquete");
-        insertar("Alginato", "cucharada");
+        insertar("Alginato de prueba", "cucharada");
 
         List<Materiales> todos = repository.findAll();
         assertEquals(base + 3, todos.size());
@@ -72,7 +72,7 @@ class MaterialRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void deleteEliminaRegistro() throws SQLException {
-        int id = insertar("Alginato", "cucharada");
+        int id = insertar("Alginato de prueba", "cucharada");
 
         repository.delete(id);
 

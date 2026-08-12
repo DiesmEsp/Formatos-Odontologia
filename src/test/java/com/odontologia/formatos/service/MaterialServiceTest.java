@@ -23,7 +23,7 @@ class MaterialServiceTest extends BaseRepositoryTest {
 
     @Test
     void rechazaDuplicado() throws SQLException {
-        service.crear("Gasa", "paquete");
-        assertThrows(EntidadDuplicadaException.class, () -> service.crear("Gasa", "paquete"));
+        service.crear("Gasa de prueba", "paquete");
+        assertThrows(EntidadDuplicadaException.class, () -> service.crear("Gasa de prueba", "paquete"));
     }
 }

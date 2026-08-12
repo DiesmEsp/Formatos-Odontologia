@@ -2,7 +2,6 @@ package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.config.AppConfig;
 import com.odontologia.formatos.db.ConnectionManager;
-import com.odontologia.formatos.db.DemoDataLoader;
 import com.odontologia.formatos.service.EntidadDuplicadaException;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.LogConfig;
@@ -22,7 +21,6 @@ public class Main {
     public static void main(String[] args) {
         LogConfig.configurar();
         ConnectionManager.getInstance();
-        DemoDataLoader.loadIfNeeded();
 
         Javalin app = Javalin.create(config -> {
             config.http.defaultContentType = ContentType.JSON;

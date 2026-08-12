@@ -87,7 +87,7 @@ Formatos-Odontologia/
 │   ├── main/java/com/odontologia/formatos/
 │   │   ├── config/                 # AppConfig, DatabaseConfig
 │   │   ├── controller/             # Javalin REST controllers + Main.java
-│   │   ├── db/                     # ConnectionManager, DemoDataLoader
+│   │   ├── db/                     # ConnectionManager
 │   │   ├── export/                 # Excel generators (POI)
 │   │   ├── model/                  # 14 POJOs
 │   │   ├── repository/             # JDBC data access
@@ -148,4 +148,3 @@ Formatos-Odontologia/
 - Detenga la aplicacion
 - Elimine `data/formatos.db`
 - Reinicie — Flyway ejecutara todas las migraciones desde cero
-- Para datos de prueba, configure `demo.enabled=true` en `application.properties`

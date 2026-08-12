@@ -67,12 +67,12 @@ class GenerarMuestraReportesTest extends BaseRepositoryTest {
 
     @BeforeEach
     void sembrarDatos() throws SQLException {
-        algodon = materialPorNombre("Algodón");
-        anestesia = materialPorNombre("Anestesia infiltrativa");
-        gasa = materialPorNombre("Gasa estéril");
-        guantes = materialPorNombre("Guantes descartables talla M");
+        algodon = materialPorNombre("Algodón 500 g");
+        anestesia = materialPorNombre("Anestesia con epinefrina");
+        gasa = materialPorNombre("Gasa");
+        guantes = materialPorNombre("Guantes descartables M");
         resina = materialPorNombre("Resina compuesta");
-        hilo = materialPorNombre("Hilo de sutura");
+        hilo = materialPorNombre("Hilo de sutura nylon 4/0");
 
         conversion(algodon, "gramo", "bolsa", 500);
         conversion(guantes, "guante", "caja", 100);
