@@ -1,16 +1,13 @@
 package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.model.Tratamiento;
-import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.service.TratamientoService;
 import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TratamientoController {

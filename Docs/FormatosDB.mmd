@@ -10,13 +10,15 @@
         ASISTENCIA ||--o{ MATERIALES_ASISTENCIA : "recibe"
         MATERIALES ||--o{ MATERIALES_ASISTENCIA : ""
         MATERIALES ||--o| UNIDAD_CONVERSION : "se convierte"
+        ASISTENCIA ||--o{ PERIODO_AUSENCIA : "registra"
 
         OPERADORES {
             int OperadorID PK
             text Nombres
             text Apellidos
+            text DNI
             text Grado "PRE|POS"
-            text Tipo "4|5|6 | R1|R2|R3"
+            text Tipo "3|4|5 | R1|R2|R3"
             int Periodo "año académico"
             int Estado "1=activo"
         }
@@ -25,12 +27,14 @@
             int PacienteID PK
             text Nombres
             text Apellidos
+            int Estado "1=activo"
         }
 
         DOCENTES {
             int DocenteID PK
             text Nombres
             text Apellidos
+            text Telefono
             int Estado "1=activo"
         }
 
@@ -85,7 +89,17 @@
             int AsistenciaID PK
             int DocenteID FK
             text Fecha
+            text HoraEntrada
+            text HoraSalida
             text Estado "ACTIVO|ANULADO"
+        }
+
+        PERIODO_AUSENCIA {
+            int AusenciaID PK
+            int AsistenciaID FK
+            text HoraInicio
+            text HoraFin "NULL si en curso"
+            text Motivo
         }
 
         MATERIALES_ASISTENCIA {

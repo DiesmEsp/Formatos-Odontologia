@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dts/checkstyle_configuration_1_3.dtd">
+<module name="Checker">
+    <module name="TreeWalker">
+        <module name="AvoidStarImport">
+            <property name="excludes" value="java.util,java.sql"/>
+        </module>
+        <module name="EmptyBlock"/>
+        <module name="UnusedImports"/>
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignore"/>
+        </module>
+    </module>
+    <module name="FileTabCharacter"/>
+</module>

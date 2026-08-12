@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odontologia.formatos.db.ConnectionManager;
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.PeriodoAusencia;
-import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
 import com.odontologia.formatos.service.AsistenciaService;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

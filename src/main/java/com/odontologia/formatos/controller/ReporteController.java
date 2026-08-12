@@ -1,14 +1,11 @@
 package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.export.ReporteEconomicoGenerator;
-import com.odontologia.formatos.export.ReporteGeneradorBase;
 import com.odontologia.formatos.export.ReporteMaterialesGenerator;
 import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
 import com.odontologia.formatos.export.ReporteConsolidadoGenerator;
 import com.odontologia.formatos.export.ReporteDocenteGenerator;
 import com.odontologia.formatos.export.ReporteEspecialistaGenerator;
-import com.odontologia.formatos.export.ReporteNomenclatura;
-import com.odontologia.formatos.export.ReporteException;
 import com.odontologia.formatos.service.NegocioException;
 import io.javalin.Javalin;
 
@@ -16,7 +13,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -7,7 +7,6 @@ import com.odontologia.formatos.service.UnidadService;
 import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 

@@ -16,8 +16,8 @@ Arquitectura: **Electron + React 19** (frontend) + **Java 21 + Javalin** (backen
 | Excel | Apache POI 5.5 |
 | Build Backend | Gradle 8.14 (Shadow JAR, jlink) |
 | Build Frontend | Vite + electron-builder (NSIS .exe) |
-| Tests Backend | JUnit 5 (125 tests) |
-| Tests Frontend | Vitest (128 tests) + Playwright (E2E) |
+| Tests Backend | JUnit 5 (119 tests) + JaCoCo |
+| Tests Frontend | Vitest (138 tests) + Playwright (E2E) |
 
 ## Arquitectura
 
@@ -27,6 +27,9 @@ El Electron main process spawn el JAR del backend Java (JRE minima via jlink), e
 
 - **JDK 21** (para compilar y ejecutar)
 - **Node.js 22+** (para frontend y empaquetado)
+- **Windows 10/11** (instalador .exe generado con electron-builder NSIS)
+- **~200 MB** de espacio libre para la aplicacion instalada
+- **4 GB RAM** recomendado (Electron + JRE + SQLite)
 
 ## Comandos
 
@@ -115,3 +118,34 @@ Formatos-Odontologia/
 - **Catalogos**: Materiales, Docentes, Especialistas, Tratamientos Predefinidos, Conversiones de unidad
 - **Unidades**: Gestion de modulos de atencion con bloqueo visual
 - **Reportes**: Exportacion Excel — Materiales, Economico, Asistencia Docente, Anual
+
+## Documentacion
+
+- [API REST](Docs/7.%20API%20REST.md) — 45 endpoints en 7 controladores
+- [Definicion tecnica](Docs/4.%20Definici%C3%B3n%20t%C3%A9cnica.md) — Stack, arquitectura y decisiones
+- [Historias de usuario](Docs/Requerimientos/2.%20Historias%20de%20usuario.md) — Requerimientos funcionales
+- [Especificacion de requerimientos](Docs/Requerimientos/3.%20Especificaci%C3%B3n%20de%20requerimientos.md) — RFs y RNFs
+- [Checklist de definicion](Docs/5.%20Checklist%20de%20definici%C3%B3n.md)
+- [Informe de auditoria](Docs/6.%20Informe%20de%20auditor%C3%ADa.md) — Hallazgos y plan de accion
+
+## Troubleshooting
+
+### El backend no inicia
+- Verifique que el puerto 7070 no este ocupado: `netstat -ano | findstr 7070`
+- Revise el archivo `data/formatos.db` — si esta corrupto, eliminelo y reinicie (se recrea con Flyway)
+- Ejecute el backend por separado: `java -jar build/libs/formatos-odontologia-2.0.0-all.jar`
+
+### Electron no carga el frontend
+- Verifique que el backend este corriendo en `localhost:7070`
+- Revise la consola de Electron (Ctrl+Shift+I) para errores de red
+- En modo dev, ejecute `npm run dev` para Vite y luego `npm run electron:dev`
+
+### Error "archivo en uso" al generar reportes
+- Cierre Excel antes de generar un nuevo reporte con el mismo nombre
+- Los archivos se generan en `Reportes/` dentro del directorio de la aplicacion
+
+### La base de datos se corrompio
+- Detenga la aplicacion
+- Elimine `data/formatos.db`
+- Reinicie — Flyway ejecutara todas las migraciones desde cero
+- Para datos de prueba, configure `demo.enabled=true` en `application.properties`
