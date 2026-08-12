@@ -9,7 +9,7 @@ files:
 extraResources:
   - from: build-resources/jre
     to: jre
-  - from: build-resources/FormatosOdontologia-2.0.0-all.jar
+  - from: build-resources/FormatosOdontologia-0.1.0-all.jar
     to: backend.jar
   - from: dist
     to: public
