@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
@@ -117,11 +117,11 @@ function getJarPath(): string {
 function verifyResources(): string | null {
   const jreBin = getJrePath();
   if (!fs.existsSync(jreBin)) {
-    return `No se encontro JRE en:\\n${jreBin}\\n\\nLa aplicacion no fue empaquetada correctamente.`;
+    return `No se encontro JRE en:\n${jreBin}\n\nLa aplicacion no fue empaquetada correctamente.`;
   }
   const jarFile = getJarPath();
   if (!fs.existsSync(jarFile)) {
-    return `No se encontro backend.jar en:\\n${jarFile}\\n\\nLa aplicacion no fue empaquetada correctamente.`;
+    return `No se encontro backend.jar en:\n${jarFile}\n\nLa aplicacion no fue empaquetada correctamente.`;
   }
   return null;
 }
@@ -208,6 +208,13 @@ async function waitForServer(timeoutMs = 60000): Promise<boolean> {
   return false;
 }
 
+function closeSplash(): void {
+  if (splashWindow && !splashWindow.isDestroyed()) {
+    splashWindow.close();
+    splashWindow = null;
+  }
+}
+
 function createMainWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -225,16 +232,53 @@ function createMainWindow(): void {
     },
   });
 
-  mainWindow.once('ready-to-show', () => {
-    if (splashWindow && !splashWindow.isDestroyed()) {
-      splashWindow.close();
-      splashWindow = null;
-    }
+  let shown = false;
+  const revealWindow = () => {
+    if (shown) return;
+    shown = true;
+    closeSplash();
     mainWindow?.show();
-  });
+  };
+
+  mainWindow.once('ready-to-show', revealWindow);
+
+  const fallbackTimer = setTimeout(() => {
+    if (!shown) {
+      console.warn('[Electron] ready-to-show no disparo; mostrando ventana por timeout');
+      revealWindow();
+    }
+  }, 5000);
 
   mainWindow.on('closed', () => {
+    clearTimeout(fallbackTimer);
     mainWindow = null;
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('[Electron] Frontend cargado correctamente');
+  });
+
+  mainWindow.webContents.on(
+    'did-fail-load',
+    (_event, errorCode, errorDescription, validatedURL) => {
+      console.error(
+        `[Electron] Error al cargar frontend: ${errorCode} ${errorDescription} (${validatedURL})`
+      );
+      if (errorCode !== -3) {
+        dialog.showErrorBox(
+          'Error al cargar la aplicacion',
+          `No se pudo cargar la interfaz.\n\n${errorDescription} (codigo ${errorCode})`
+        );
+      }
+    }
+  );
+
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[Electron] El proceso de renderizado termino:', details.reason);
+    dialog.showErrorBox(
+      'Error del renderizador',
+      `El proceso de renderizado termino inesperadamente.\n\nRazon: ${details.reason}`
+    );
   });
 
   if (!app.isPackaged) {

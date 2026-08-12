@@ -3,7 +3,16 @@ import react from '@vitejs/plugin-react';
 
 const USE_ELECTRON = process.env.VITE_ELECTRON === 'true';
 
-const plugins: import('vite').PluginOption[] = [react()];
+function removeCrossoriginPlugin(): import('vite').Plugin {
+  return {
+    name: 'remove-crossorigin',
+    transformIndexHtml(html) {
+      return html.replace(/\s+crossorigin/g, '');
+    },
+  };
+}
+
+const plugins: import('vite').PluginOption[] = [react(), removeCrossoriginPlugin()];
 
 if (USE_ELECTRON) {
   const electron = (await import('vite-plugin-electron')).default;
