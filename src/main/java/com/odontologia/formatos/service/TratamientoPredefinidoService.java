@@ -29,6 +29,11 @@ public class TratamientoPredefinidoService {
 
     public void actualizar(TratamientoPredefinido tp) throws SQLException {
         validarObligatorios(tp.getNombreTratamiento());
+        TratamientoPredefinido existente = repository.findByNombre(tp.getNombreTratamiento().trim());
+        if (existente != null && existente.getTratPredID() != tp.getTratPredID()) {
+            throw new EntidadDuplicadaException(
+                    "Ya existe un tratamiento predefinido con el nombre '" + tp.getNombreTratamiento().trim() + "'.");
+        }
         repository.update(tp);
     }
 

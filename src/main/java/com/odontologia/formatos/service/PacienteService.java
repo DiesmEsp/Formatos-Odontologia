@@ -26,6 +26,13 @@ public class PacienteService {
     public void actualizar(Paciente paciente) throws SQLException {
         if (paciente.getNombres() == null || paciente.getNombres().isBlank()) throw new NegocioException("Los nombres son obligatorios.");
         if (paciente.getApellidos() == null || paciente.getApellidos().isBlank()) throw new NegocioException("Los apellidos son obligatorios.");
+        for (Paciente p : repository.findAll()) {
+            if (p.getPacienteID() != paciente.getPacienteID()
+                    && p.getNombres().equalsIgnoreCase(paciente.getNombres().trim())
+                    && p.getApellidos().equalsIgnoreCase(paciente.getApellidos().trim())) {
+                throw new EntidadDuplicadaException("Ya existe un paciente con ese nombre.");
+            }
+        }
         repository.update(paciente);
     }
 

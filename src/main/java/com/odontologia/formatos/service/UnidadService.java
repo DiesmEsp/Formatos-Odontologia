@@ -1,7 +1,6 @@
 package com.odontologia.formatos.service;
 
 import com.odontologia.formatos.db.ConnectionManager;
-import com.odontologia.formatos.model.Unidad;
 import com.odontologia.formatos.repository.UnidadRepository;
 
 import java.sql.Connection;

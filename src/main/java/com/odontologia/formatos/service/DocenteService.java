@@ -27,6 +27,12 @@ public class DocenteService {
 
     public void actualizar(Docente docente) throws SQLException {
         validarObligatorios(docente.getNombres(), docente.getApellidos());
+        for (Docente d : repository.findAll()) {
+            if (d.getDocenteID() != docente.getDocenteID() && mismoNombre(d, docente.getNombres(), docente.getApellidos())) {
+                throw new EntidadDuplicadaException(
+                        "Ya existe un docente con el nombre '" + docente.getNombres().trim() + " " + docente.getApellidos().trim() + "'.");
+            }
+        }
         repository.update(docente);
     }
 

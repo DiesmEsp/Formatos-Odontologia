@@ -16,7 +16,6 @@ import com.odontologia.formatos.repository.TratamientoRepository;
 import com.odontologia.formatos.repository.UnidadRepository;
 import com.odontologia.formatos.util.TransaccionBD;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;

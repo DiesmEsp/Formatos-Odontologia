@@ -87,7 +87,7 @@ public class Main {
             try {
                 return Integer.parseInt(portProp);
             } catch (NumberFormatException e) {
-                System.err.println("Puerto invalido: " + portProp + ". Usando " + DEFAULT_PORT);
+                LOG.warning("Puerto invalido: " + portProp + ". Usando " + DEFAULT_PORT);
             }
         }
 
@@ -96,7 +96,7 @@ public class Main {
             try {
                 return Integer.parseInt(envPort);
             } catch (NumberFormatException e) {
-                System.err.println("Puerto invalido en env PORT. Usando " + DEFAULT_PORT);
+                LOG.warning("Puerto invalido en env PORT. Usando " + DEFAULT_PORT);
             }
         }
 

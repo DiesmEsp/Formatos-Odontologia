@@ -23,6 +23,10 @@ public class MaterialService {
 
     public void actualizar(Materiales material) throws SQLException {
         validarObligatorios(material.getNombre(), material.getUnidad());
+        Materiales existente = repository.findByNombre(material.getNombre().trim());
+        if (existente != null && existente.getMaterialID() != material.getMaterialID()) {
+            throw new EntidadDuplicadaException("Ya existe un material con el nombre '" + material.getNombre().trim() + "'.");
+        }
         repository.update(material);
     }
 
