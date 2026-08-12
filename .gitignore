@@ -24,3 +24,7 @@ frontend/build-resources/
 # Planificación (documentos de trabajo locales)
 planning/
 
+# Archivos fuente de datos clínicos (contienen datos personales de pacientes)
+Docs/Db_Create/
+Docs/materiales.csv
+
