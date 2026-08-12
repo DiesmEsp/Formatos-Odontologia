@@ -160,14 +160,14 @@ function CrearTratamientoModal({
   return (
     <>
       <div className="dialog-overlay" onClick={onClose}>
-        <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 560 }}>
+        <div className="dialog-pane mw-560" onClick={(e) => e.stopPropagation()}>
           <div className="dialog-header">
             <h3 className="dialog-title">Crear Tratamiento</h3>
             <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
           </div>
           <div className="dialog-body">
-            <div className="form-group"><label className="form-label">Unidad</label><input className="text-field" value={`Unidad ${unidad.unidadNro}`} readOnly style={{ width: '100%' }} /></div>
-            <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field" value={fecha} onChange={(e) => setFecha(e.target.value)} style={{ width: '100%' }} /></div>
+            <div className="form-group"><label className="form-label">Unidad</label><input className="text-field w-full" value={`Unidad ${unidad.unidadNro}`} readOnly /></div>
+            <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
 
             <div className="form-group">
               <label className="form-label">Paciente</label>
@@ -193,7 +193,7 @@ function CrearTratamientoModal({
 
             <div className="form-group">
               <label className="form-label">Tipo</label>
-              <select className="combo-box" value={tipo} onChange={(e) => handleTipoChange(e.target.value)} style={{ width: '100%' }}>
+              <select className="combo-box w-full" value={tipo} onChange={(e) => handleTipoChange(e.target.value)}>
                 <option value="NORMAL">Normal</option>
                 <option value="CONTINUO">Continuo</option>
               </select>
@@ -230,11 +230,11 @@ function CrearPacienteOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
 
   return (
     <div className="dialog-overlay" onClick={onClose} style={{ zIndex: 210 }}>
-      <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+      <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header"><h3 className="dialog-title">Nuevo Paciente</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
         <div className="dialog-body">
-          <div className="form-group"><label className="form-label">Nombres</label><input className="text-field" value={nombres} onChange={(e) => setNombres(e.target.value)} style={{ width: '100%' }} /></div>
-          <div className="form-group"><label className="form-label">Apellidos</label><input className="text-field" value={apellidos} onChange={(e) => setApellidos(e.target.value)} style={{ width: '100%' }} /></div>
+          <div className="form-group"><label className="form-label">Nombres</label><input className="text-field w-full" value={nombres} onChange={(e) => setNombres(e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Apellidos</label><input className="text-field w-full" value={apellidos} onChange={(e) => setApellidos(e.target.value)} /></div>
         </div>
         <div className="dialog-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
@@ -271,30 +271,30 @@ function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
 
   return (
     <div className="dialog-overlay" onClick={onClose} style={{ zIndex: 210 }}>
-      <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
+      <div className="dialog-pane mw-460" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header"><h3 className="dialog-title">Nuevo Operador</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
         <div className="dialog-body">
           <div className="form-row">
-            <div className="form-group"><label className="form-label">Nombres</label><input className="text-field" value={nombres} onChange={(e) => setNombres(e.target.value)} style={{ width: '100%' }} /></div>
-            <div className="form-group"><label className="form-label">Apellidos</label><input className="text-field" value={apellidos} onChange={(e) => setApellidos(e.target.value)} style={{ width: '100%' }} /></div>
+            <div className="form-group"><label className="form-label">Nombres</label><input className="text-field w-full" value={nombres} onChange={(e) => setNombres(e.target.value)} /></div>
+            <div className="form-group"><label className="form-label">Apellidos</label><input className="text-field w-full" value={apellidos} onChange={(e) => setApellidos(e.target.value)} /></div>
           </div>
-          <div className="form-group"><label className="form-label">DNI (opcional)</label><input className="text-field" value={dni} onChange={(e) => setDni(e.target.value)} style={{ width: '100%' }} placeholder="Opcional" /></div>
+          <div className="form-group"><label className="form-label">DNI (opcional)</label><input className="text-field w-full" value={dni} onChange={(e) => setDni(e.target.value)} placeholder="Opcional" /></div>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Grado</label>
-              <select className="combo-box" value={grado} onChange={(e) => handleGradoChange(e.target.value)} style={{ width: '100%' }}>
+              <select className="combo-box w-full" value={grado} onChange={(e) => handleGradoChange(e.target.value)}>
                 <option value="PRE">Pregrado (PRE)</option>
                 <option value="POS">Posgrado (POS)</option>
               </select>
             </div>
             <div className="form-group">
               <label className="form-label">Tipo</label>
-              <select className="combo-box" value={tipoOp} onChange={(e) => setTipoOp(e.target.value)} style={{ width: '100%' }}>
+              <select className="combo-box w-full" value={tipoOp} onChange={(e) => setTipoOp(e.target.value)}>
                 {tipos.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
           </div>
-          <div className="form-group"><label className="form-label">Periodo (ano)</label><input type="number" className="text-field" value={periodo} onChange={(e) => setPeriodo(Number(e.target.value))} style={{ width: '100%' }} /></div>
+          <div className="form-group"><label className="form-label">Periodo (ano)</label><input type="number" className="text-field w-full" value={periodo} onChange={(e) => setPeriodo(Number(e.target.value))} /></div>
         </div>
         <div className="dialog-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
@@ -496,7 +496,7 @@ function DetalleTratamientoSubventana({
         <div className="subventana">
           <div className="subventana-header">
             <div><h3 className="dialog-title">Detalle de Tratamiento #{tratamiento.tratamientoID}</h3></div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div className="flex flex-center gap-8">
               <Badge variant={getEstadoVariant(tratamiento.estado)}>{tratamiento.estado}</Badge>
               <button className="btn btn-ghost btn-sm" onClick={handleClose}><X size={18} /></button>
             </div>
@@ -512,7 +512,7 @@ function DetalleTratamientoSubventana({
               <div className="sv-row"><span className="sv-label">Pago</span><Badge variant={tratamiento.estadoPago === 'PAGADO' ? 'success' : tratamiento.estadoPago === 'PARCIAL' ? 'warning' : 'neutral'}>{tratamiento.estadoPago}</Badge></div>
             </div>
             {saldo > 0 && tratamiento.estado === 'ABIERTO' && (
-              <div className="alert-banner alert-warning" style={{ marginTop: 16 }}><AlertTriangle size={16} /><span>Saldo pendiente: {formatMonto(saldo)}</span></div>
+              <div className="alert-banner alert-warning mt-16"><AlertTriangle size={16} /><span>Saldo pendiente: {formatMonto(saldo)}</span></div>
             )}
             <h4 style={{ marginTop: 20, marginBottom: 12 }}>Materiales del tratamiento</h4>
             <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddRow} onRemove={handleRemoveRow} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
@@ -521,7 +521,7 @@ function DetalleTratamientoSubventana({
             <span className="text-muted text-sm">
               {totalMat} material(es){dirty && <span style={{ color: 'var(--color-warning-text)', marginLeft: 8 }}>(cambios sin guardar)</span>}
             </span>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="flex gap-8 flex-wrap">
               {dirty && (
                 <button className="btn btn-primary" onClick={handleSaveMaterials} disabled={savingMat}>
                   {savingMat ? 'Guardando...' : 'Guardar materiales'}
@@ -548,15 +548,15 @@ function DetalleTratamientoSubventana({
       </div>
       {showPago && (
         <div className="dialog-overlay" onClick={() => setShowPago(false)} style={{ zIndex: 210 }}>
-          <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+          <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
             <div className="dialog-header"><h3 className="dialog-title">Registrar Pago</h3><button className="btn btn-ghost btn-sm" onClick={() => setShowPago(false)}><X size={18} /></button></div>
             <div className="dialog-body">
-              <div className="sv-grid" style={{ marginBottom: 16 }}>
+              <div className="sv-grid mb-16">
                 <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
                 <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
                 <div className="sv-row"><span className="sv-label">Saldo</span><span className="num" style={{ color: saldo > 0 ? 'var(--color-danger-text)' : 'var(--color-success-text)' }}>{formatMonto(saldo)}</span></div>
               </div>
-              <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" style={{ width: '100%' }} /></div>
+              <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
             </div>
             <div className="dialog-footer"><button className="btn btn-secondary" onClick={() => setShowPago(false)}>Cancelar</button><button className="btn btn-primary" onClick={handleRegistrarPago} disabled={abono <= 0}>Registrar</button></div>
           </div>

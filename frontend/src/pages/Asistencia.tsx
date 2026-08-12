@@ -43,7 +43,8 @@ export default function Asistencia() {
   const loadDefaults = useCallback(async (): Promise<{ materialId: number; cantidad: number }[]> => {
     try {
       return await api.asistencia.materialesDefault.listar();
-    } catch {
+    } catch (err) {
+      console.error('Error al cargar materiales predeterminados:', err);
       return [];
     }
   }, []);
@@ -118,7 +119,7 @@ export default function Asistencia() {
 
           for (const dm of defaultMats) {
             if (dm.materialId) {
-              try { await api.asistencia.acumularMaterial(a.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
+              try { await api.asistencia.acumularMaterial(a.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch (err) { console.error('Error al acumular material predeterminado:', err); }
             }
           }
           setDirty(false);
@@ -320,7 +321,7 @@ export default function Asistencia() {
     materialRowsRef.current = defaultMats;
     for (const dm of defaultMats) {
       if (dm.materialId) {
-        try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch {}
+        try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch (err) { console.error('Error al acumular material:', err); }
       }
     }
     originalRowsRef.current = defaultMats.map((r) => ({ ...r }));
@@ -394,8 +395,8 @@ export default function Asistencia() {
               <tr>
                 <th>Nombre</th>
                 <th>Apellidos</th>
-                <th style={{ width: 200 }}>Estado</th>
-                <th style={{ width: 120 }} />
+                <th className="w-200">Estado</th>
+                <th className="w-120" />
               </tr>
             </thead>
             <tbody>
@@ -435,27 +436,27 @@ export default function Asistencia() {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: 20 }}>
+      <div className="card mb-20">
         <div className="card-header">
           <h3 className="card-title">Búsqueda manual</h3>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, maxWidth: 400 }}>
+        <div className="flex flex-center items-end flex-wrap gap-12">
+          <div className="flex-1 mw-400">
             <label className="form-label">Docente</label>
             <SearchableCombo options={docenteOptions} value={selectedDocente?.id ?? null} onChange={handleSelectDocente} onSearch={setQ} placeholder="Buscar docente por nombre..." />
           </div>
           <div>
             <label className="form-label">Fecha</label>
-            <input type="date" className="text-field" value={fecha} onChange={(e) => setFecha(e.target.value)} style={{ width: 160 }} />
+            <input type="date" className="text-field w-160" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           </div>
         </div>
       </div>
 
       {asistencia && selectedDocente && (
         <div className="card">
-          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="card-header flex flex-center flex-between">
             <h3 className="card-title">Registro del día — {selectedDocente.label} — {fecha}</h3>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div className="flex flex-center gap-8">
               {!esHoy && <Badge variant="warning">Registro manual</Badge>}
               {diaCerrado
                 ? <Badge variant="neutral">Día finalizado</Badge>
@@ -466,17 +467,16 @@ export default function Asistencia() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div className="grid-2col">
             <div>
               <label className="form-label">Hora de entrada</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="flex flex-center gap-8">
                 <input
                   type="time"
-                  className="text-field"
+                  className="text-field w-160"
                   step="1"
                   value={asistencia.horaEntrada?.substring(0, 8) ?? ''}
                   onChange={(e) => handleEditarEntrada(e.target.value + ':00')}
-                  style={{ width: 160 }}
                 />
                 {diaActivo && (
                   <span className="text-muted text-sm">en clínica desde las {formatearHora(asistencia.horaEntrada)}</span>
@@ -485,7 +485,7 @@ export default function Asistencia() {
             </div>
             <div>
               <label className="form-label">Hora de salida</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="flex flex-center gap-8">
                 {diaCerrado ? (
                   <>
                     <span className="text-sm">
@@ -508,19 +508,18 @@ export default function Asistencia() {
           </div>
 
           <div className="card" style={{ marginBottom: 16, background: 'var(--color-surface-hover)' }}>
-            <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 className="card-title" style={{ fontSize: 14 }}>
+            <div className="card-header flex flex-center flex-between">
+              <h3 className="card-title text-sm">
                 {ausencias.length > 0 ? `Periodos de ausencia (${ausencias.length})` : 'Sin periodos de ausencia'}
               </h3>
               {diaActivo && !tieneAusenciaAbierta && (
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="flex flex-center gap-8">
                   <input
                     type="text"
-                    className="text-field"
+                    className="text-field w-160"
                     placeholder="Motivo (opcional)"
                     value={motivoAusencia}
                     onChange={(e) => setMotivoAusencia(e.target.value)}
-                    style={{ width: 160 }}
                   />
                   <button className="btn btn-warning btn-sm" onClick={handleIniciarAusencia}>
                     Iniciar ausencia ({formatearHora(horaActual())})
@@ -537,7 +536,7 @@ export default function Asistencia() {
                     <th>Fin</th>
                     <th>Duración</th>
                     <th>Motivo</th>
-                    <th style={{ width: 160 }} />
+                    <th className="w-160" />
                   </tr>
                 </thead>
                 <tbody>
@@ -563,7 +562,7 @@ export default function Asistencia() {
                 </tbody>
               </table>
             ) : (
-              <div className="text-muted text-sm" style={{ padding: 12 }}>
+              <div className="text-muted text-sm p-12">
                 El docente no ha registrado salidas temporales. Use el botón "Iniciar ausencia" cuando el docente se retire de la clínica temporalmente.
               </div>
             )}
@@ -571,11 +570,11 @@ export default function Asistencia() {
 
           <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddMaterial} onRemove={handleRemoveMaterial} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--color-border)' }}>
+          <div className="flex flex-center flex-between" style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--color-border)' }}>
             <span className="text-muted text-sm">
               {totalMat} material(es){dirty && <span style={{ color: 'var(--color-warning-text)', marginLeft: 8 }}>(cambios sin guardar)</span>}
             </span>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="flex gap-8">
               {dirty && (
                 <button className="btn btn-primary btn-sm" onClick={guardarMaterialesEnBloque} disabled={savingMat}>
                   {savingMat ? 'Guardando...' : 'Guardar materiales'}
@@ -601,7 +600,7 @@ export default function Asistencia() {
 
       {showEditDefaults && (
         <div className="dialog-overlay" onClick={() => setShowEditDefaults(false)}>
-          <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 560 }}>
+          <div className="dialog-pane mw-560" onClick={(e) => e.stopPropagation()}>
             <div className="dialog-header">
               <h3 className="dialog-title">Editar lista predeterminada de materiales</h3>
               <button className="btn btn-ghost btn-sm" onClick={() => setShowEditDefaults(false)}><X size={18} /></button>
