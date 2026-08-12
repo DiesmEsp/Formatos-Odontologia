@@ -7,6 +7,23 @@ import { formatMonto, formatMes, formatearHora } from '../lib/format';
 import { DollarSign, Clock, Activity, Users, Archive, CalendarCheck, FileSpreadsheet, Stethoscope, Monitor } from 'lucide-react';
 import { COLORS_CHART } from '../lib/constants';
 
+function obtenerSaludo(): string {
+  const hora = new Date().getHours();
+  if (hora < 12) return 'Buenos días';
+  if (hora < 19) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+function fechaDeHoy(): string {
+  const fecha = new Date().toLocaleDateString('es-PE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  return fecha.charAt(0).toUpperCase() + fecha.slice(1);
+}
+
 export default function Dashboard() {
   const kpis = useApi(() => api.dashboard.kpis());
   const ingresos = useApi(() => api.dashboard.ingresosMensuales());
@@ -21,8 +38,10 @@ export default function Dashboard() {
   return (
     <div>
       <div className="view-header">
-        <h1 className="view-title">Dashboard</h1>
-        <p className="subtitle">Panel principal del sistema</p>
+        <div>
+          <h1 className="view-title">{obtenerSaludo()}</h1>
+          <p className="subtitle">{fechaDeHoy()} · Clínica Odontológica UNMSM</p>
+        </div>
       </div>
 
       {errors.length > 0 && (

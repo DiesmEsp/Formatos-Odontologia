@@ -83,11 +83,9 @@ body {
 }
 
 .nav-eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--font-3xs);
+  font-size: 0.72rem;
+  font-weight: 500;
   color: var(--color-text-sidebar);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   opacity: 0.72;
   padding: 16px 12px 5px 12px;
   display: block;
@@ -215,7 +213,6 @@ body {
 .kpi-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
   padding: 16px 18px;
   box-shadow: var(--shadow-sm);
   display: flex;
@@ -236,11 +233,9 @@ body {
 }
 
 .kpi-label {
-  font-size: var(--font-xs);
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--color-text-secondary);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
 }
 
 .kpi-value {
@@ -653,10 +648,8 @@ textarea.form-input,
 }
 
 .station-status {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
@@ -756,12 +749,9 @@ textarea.form-input,
 }
 
 .material-table-header-label {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
 }
 
 .material-row {
@@ -1006,7 +996,6 @@ textarea.form-input,
 .chart-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
   padding: 16px 18px;
   box-shadow: var(--shadow-md);
 }
@@ -1203,12 +1192,9 @@ textarea.form-input,
 }
 
 .data-table th {
-  font-family: var(--font-mono);
-  font-size: var(--font-2xs);
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   padding: 9px 12px;
   background-color: var(--color-surface-2);
   border-bottom: 1px solid var(--color-border-light);
@@ -1252,11 +1238,9 @@ textarea.form-input,
 }
 
 .row-detail-label {
-  font-size: var(--font-xs);
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
   margin-bottom: 8px;
 }
 
@@ -1397,11 +1381,17 @@ textarea.form-input,
 .report-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
   padding: 18px 20px;
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.report-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .report-icon {
@@ -1444,7 +1434,6 @@ textarea.form-input,
 .dash-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
   padding: 22px 20px;
   display: flex;
   flex-direction: column;
@@ -1452,11 +1441,10 @@ textarea.form-input,
   cursor: pointer;
   text-decoration: none;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s;
 }
 
 .dash-card:hover {
-  border-color: var(--color-primary-border);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
@@ -1598,6 +1586,13 @@ textarea.form-input,
 
 .content-area::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-border-light);
+}
+
+/* ===== FOCUS ===== */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ===== RESPONSIVE ===== */

@@ -7,21 +7,21 @@
   --color-primary-light: #e4f1ef;
   --color-primary-border: #bfd9d5;
 
-  --color-bg: #f3f6f6;
+  --color-bg: #f5f3ef;
   --color-surface: #ffffff;
-  --color-surface-hover: #f8fafa;
-  --color-surface-2: #f8fafa;
+  --color-surface-hover: #faf8f5;
+  --color-surface-2: #faf8f5;
 
   --color-sidebar: #0c2c31;
   --color-sidebar-hover: #123940;
   --color-sidebar-border: rgba(234, 243, 243, 0.09);
 
-  --color-border: #dce4e4;
-  --color-border-light: #c4d0d1;
+  --color-border: #e8e4dc;
+  --color-border-light: #d5cfc6;
 
-  --color-text: #142a33;
-  --color-text-secondary: #5c7178;
-  --color-text-muted: #93a6a9;
+  --color-text: #20292c;
+  --color-text-secondary: #5f6a68;
+  --color-text-muted: #99a29f;
   --color-text-sidebar: #9db8bc;
   --color-text-sidebar-active: #eaf3f3;
   --color-text-inverse: #ffffff;
@@ -52,9 +52,9 @@
   --radius-xl: 10px;
   --radius-pill: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(20, 42, 51, 0.06), 0 1px 3px rgba(20, 42, 51, 0.05);
-  --shadow-md: 0 4px 12px rgba(20, 42, 51, 0.09), 0 2px 4px rgba(20, 42, 51, 0.05);
-  --shadow-lg: 0 12px 32px rgba(20, 42, 51, 0.16), 0 4px 8px rgba(20, 42, 51, 0.06);
+  --shadow-sm: 0 1px 2px rgba(40, 32, 24, 0.05), 0 1px 3px rgba(40, 32, 24, 0.04);
+  --shadow-md: 0 4px 12px rgba(40, 32, 24, 0.07), 0 2px 4px rgba(40, 32, 24, 0.04);
+  --shadow-lg: 0 12px 32px rgba(40, 32, 24, 0.13), 0 4px 8px rgba(40, 32, 24, 0.05);
 
   --font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;

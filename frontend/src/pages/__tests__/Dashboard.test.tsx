@@ -37,10 +37,9 @@ describe('Dashboard', () => {
     vi.clearAllMocks();
   });
 
-  it('renderiza el titulo', () => {
+  it('renderiza el saludo de bienvenida', () => {
     renderDashboard();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Panel principal del sistema')).toBeInTheDocument();
+    expect(screen.getByText(/Buenos días|Buenas tardes|Buenas noches/)).toBeInTheDocument();
   });
 
   it('renderiza los 4 KPI cards con labels correctos', () => {

@@ -6,8 +6,8 @@ import {
   Archive,
   FileSpreadsheet,
   Monitor,
-  Activity,
 } from 'lucide-react';
+import { ToothMark } from './ToothMark';
 
 const ATENCION_ITEMS = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -27,7 +27,7 @@ export function Sidebar() {
       <div className="sidebar-brand">
         <div className="brand-row">
           <div className="brand-mark">
-            <Activity size={20} color="#eaf3f3" />
+            <ToothMark size={20} color="#eaf3f3" />
           </div>
           <div>
             <div className="brand-title">Formatos</div>
