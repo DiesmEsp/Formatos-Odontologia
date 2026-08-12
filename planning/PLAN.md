@@ -100,24 +100,26 @@ Convención: `[x]` = hecho, `[ ]` = pendiente, `[~]` = en curso.
 - [ ] 5.9 Indicador de reporte obsoleto (RNF-2.4.2) (→ Fase 6)
 - [x] Tests: anulaciones, reopen con unidad, edición retroactiva (99 tests)
 
-## Fase 6 — UI completa (JavaFX)
+## Fase 6 — UI completa (Electron + React + Vite)
 
-- [x] 6.0 ui/components: SearchableComboBox, MonthYearPicker, MaterialTable, ToastUtil, ConfirmDialog, FontLoader, SvgIcons
+> **Migración completada** (ver `migration-plan.md`). La UI pasó de JavaFX a Electron+React+Javalin.
+
+- [x] 6.0 Componentes: SearchableCombo, MonthYearPicker, MaterialTable, useToast, ConfirmDialog, ErrorBoundary, MonthYearRangePicker
 - [x] 6.0 Sistema visual: CSS Instrumental clinica, IBM Plex Sans/Mono, tokens mockup
-- [x] 6.1 MainView: sidebar mockup (marca, secciones Atencion/Gestion, footer)
-- [x] 6.2 Dashboard: KPIs, chart grid, accesos rapidos navegables, alert banner
-- [x] 6.3 Vista Catalogos (5 tabs: Materiales, Docentes, Especialistas, Trat. Predef., Trat. Realizados — filtros, badges, filas expandibles)
-- [x] 6.4 Vista Unidades: estados LED, bloqueo visual de ocupadas, modal creacion
-- [x] 6.5 Vista Asistencia Docente: flujo 2 pasos, busqueda predictiva, edicion de materiales, guardar/anular
-- [x] 6.6 Vista Tratamientos: grid de estaciones, detalle overlay, creacion on-the-fly, correccion de bugs
-- [x] 6.7 Vista Reportes: 4 tarjetas + anual + recientes + abrir archivo
-- [x] 6.8 0.5: ventana principal con menu (completado en MainView)
-- [ ] TestFX para flujos criticos (12.2)
+- [x] 6.1 Layout + Sidebar (marca, secciones Atencion/Gestion, footer, aria)
+- [x] 6.2 Dashboard: KPIs (Recharts), chart grid, accesos rapidos navegables, alert banner
+- [x] 6.3 Vista Catalogos (5 tabs: Materiales, Docentes, Especialistas, Trat. Predef., Trat. Realizados — filtros, badges, edicion)
+- [x] 6.4 Vista Unidades: estados LED, bloqueo visual de ocupadas, modal creacion, loading state
+- [x] 6.5 Vista Asistencia Docente: horarios entrada/salida, ausencias, timeline, materiales, guardar/anular
+- [x] 6.6 Vista Tratamientos: grid de estaciones (StationCard), detalle overlay, creacion on-the-fly
+- [x] 6.7 Vista Reportes: 4 tarjetas + consolidado por plazos + recientes + abrir archivo (showItemInFolder)
+- [x] 6.8 Ventana principal Electron + spawn JAR backend
+- [ ] TestFX → No aplica (reemplazado por vitest + Playwright, parcial)
 
 ## Fase 7 — Cierre
 
-- [ ] 7.1 Empaquetado jpackage (11.1/11.2) + build.gradle de distribución
-- [ ] 7.2 Prueba E2E final
+- [ ] 7.1 Empaquetado electron-builder (.exe para Windows) + build.gradle de distribución
+- [ ] 7.2 Prueba E2E final (Playwright)
 - [ ] 7.3 Actualizar README + checklist final
 
 ---
@@ -131,13 +133,17 @@ Convención: `[x]` = hecho, `[ ]` = pendiente, `[~]` = en curso.
 ## Estado general
 
 | Fase | Estado |
-|---|---|
+|---|--|
 | Fase 0 | ✅ (falta 0.5 → Fase 6) |
 | Fase 0.5 | ✅ Completada |
-| Fase 1 | Backend ✅ / UI pendiente |
-| Fase 2 | Backend ✅ (UI → Fase 6) |
-| Fase 3 | Backend ✅ (UI → Fase 6) |
-| Fase 4 | ✅ Rediseño 4.5 completo (UI → Fase 6) |
-| Fase 5 | ✅ Backend completado (UI → Fase 6) |
-| Fase 6 | ✅ UI completada (falta TestFX) |
-| Fase 7 | Pendiente |
+| Fase 1 | ✅ Backend + UI (Catálogos con tabs) |
+| Fase 2 | ✅ Backend + UI (Asistencia con horarios y ausencias) |
+| Fase 3 | ✅ Backend + UI (Tratamientos con grid de estaciones) |
+| Fase 4 | ✅ Rediseño 4.5 + reporte consolidado (UI tarjetas) |
+| Fase 5 | ✅ Backend + UI (anulación, edición retroactiva, ConfirmDialog) |
+| Fase 6 | ✅ UI Electron+React completada |
+| **Correcciones/Auditoría** | ✅ 3 fases completadas (issues usuario + seguridad + rendimiento) |
+| **Asistencia Horarios** | ✅ Fases A-E completadas |
+| Fase 7 | Pendiente (empaquetado + E2E + docs) |
+
+> **Última revisión:** 2026-08-11 — verificado contra código real (67 archivos backend, ~50 archivos frontend, 9 migraciones Flyway, 119 tests).
