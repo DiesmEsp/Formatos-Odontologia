@@ -92,7 +92,7 @@ task buildJre(type: Exec) {
 
     commandLine jlinkBin,
         '--output', outputDir,
-        '--add-modules', 'java.base,java.sql,java.naming,java.logging,java.management,jdk.unsupported,java.xml',
+        '--add-modules', 'java.base,java.sql,java.naming,java.logging,java.management,jdk.unsupported,java.xml,java.desktop',
         '--strip-debug',
         '--compress=zip-6',
         '--no-header-files',
