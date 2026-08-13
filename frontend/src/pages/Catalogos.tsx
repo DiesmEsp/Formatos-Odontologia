@@ -424,12 +424,8 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
           <Plus size={14} /> Nuevo Tratamiento
         </button>
       </div>
-      <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar tratamiento..." onSearch={setQ} />
-      {list.map((item) => expanded.has(item.tratPredID) && (
-        <div key={`det-${item.tratPredID}`} className="row-detail">
-          <MaterialesDetalle tratPredID={item.tratPredID} />
-        </div>
-      ))}
+      <CatalogoTabla columns={columns} data={list} loading={data.loading} searchPlaceholder="Buscar tratamiento..." onSearch={setQ}
+        rowKey={(r) => r.tratPredID} renderDetail={(r) => <MaterialesDetalle tratPredID={r.tratPredID} />} expanded={expanded} />
       <CatalogoModal key={modal?.edit?.tratPredID ?? 'new'} open={!!modal}
         title={modal?.edit ? "Editar Tratamiento Predefinido" : "Nuevo Tratamiento Predefinido"}
         fields={[
@@ -462,18 +458,18 @@ function MaterialesDetalle({ tratPredID }: { tratPredID: number }) {
   const detalle = useApi(() => api.catalogos.tratamientosPred.materiales(tratPredID), [tratPredID]);
   const mats = detalle.data ?? [];
   return (
-    <div style={{ padding: "8px 0" }}>
+    <div style={{ padding: "4px 0" }}>
       {mats.length === 0 ? (
         <span className="mat-empty">Sin materiales asignados</span>
       ) : (
-        <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
+        <ul className="material-list">
           {mats.map((m) => (
-            <span key={m.materialID} className="mat-chip">
-              {m.nombreMaterial}
-              <span className="chip-cant">{m.cantidad}</span>
-            </span>
+            <li key={m.materialID} className="material-list-item">
+              <span className="material-list-name">{m.nombreMaterial}</span>
+              <span className="material-list-cant">{m.cantidad}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
@@ -502,12 +498,8 @@ function TabTratamientosRealizados() {
 
   return (
     <>
-      <CatalogoTabla columns={columns} data={list} loading={data.loading} searchEnabled={false} emptyTitle="Sin tratamientos" emptyText="No hay tratamientos registrados." />
-      {list.map((item) => expanded.has(item.tratamientoID) && (
-        <div key={`det-${item.tratamientoID}`} className="row-detail">
-          <TratamientoMaterialesDetalle tratamientoID={item.tratamientoID} />
-        </div>
-      ))}
+      <CatalogoTabla columns={columns} data={list} loading={data.loading} searchEnabled={false} emptyTitle="Sin tratamientos" emptyText="No hay tratamientos registrados."
+        rowKey={(r) => r.tratamientoID} renderDetail={(r) => <TratamientoMaterialesDetalle tratamientoID={r.tratamientoID} />} expanded={expanded} />
     </>
   );
 }
@@ -516,18 +508,18 @@ function TratamientoMaterialesDetalle({ tratamientoID }: { tratamientoID: number
   const detalle = useApi(() => api.tratamientos.materialesConNombre(tratamientoID), [tratamientoID]);
   const mats = detalle.data ?? [];
   return (
-    <div style={{ padding: "8px 0" }}>
+    <div style={{ padding: "4px 0" }}>
       {mats.length === 0 ? (
         <span className="mat-empty">Sin materiales registrados</span>
       ) : (
-        <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
+        <ul className="material-list">
           {mats.map((m) => (
-            <span key={m.materialesListID} className="mat-chip">
-              {m.nombreMaterial}
-              <span className="chip-cant">{m.cantidad}</span>
-            </span>
+            <li key={m.materialesListID} className="material-list-item">
+              <span className="material-list-name">{m.nombreMaterial}</span>
+              <span className="material-list-cant">{m.cantidad}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

@@ -21,6 +21,9 @@ interface CatalogoTablaProps<T> {
   emptyText?: string;
   totalLabel?: string;
   filterBar?: ReactNode;
+  rowKey?: (row: T) => string | number;
+  renderDetail?: (row: T) => ReactNode;
+  expanded?: Set<string | number>;
 }
 
 export function CatalogoTabla<T>({
@@ -34,6 +37,9 @@ export function CatalogoTabla<T>({
   emptyText = 'No se encontraron registros.',
   totalLabel,
   filterBar,
+  rowKey,
+  renderDetail,
+  expanded,
 }: CatalogoTablaProps<T>) {
   const [query, setQuery] = useState('');
 
@@ -42,6 +48,11 @@ export function CatalogoTabla<T>({
     const t = setTimeout(() => onSearch?.(query), 300);
     return () => clearTimeout(t);
   }, [query, searchEnabled, onSearch]);
+
+  const keyOf = (row: T, idx: number): string | number => {
+    if (rowKey) return rowKey(row);
+    return (row as any).id ?? idx;
+  };
 
   return (
     <div>
@@ -84,19 +95,53 @@ export function CatalogoTabla<T>({
             </tr>
           </thead>
           <tbody>
-            {data.map((row, idx) => (
-              <tr key={(row as any).id ?? idx}>
-                {columns.map((col) => (
-                  <td key={col.key} className={col.className}>
-                    {col.render(row)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {data.map((row, idx) => {
+              const key = keyOf(row, idx);
+              return (
+                <CatalogoTablaRow
+                  key={key}
+                  row={row}
+                  columns={columns}
+                  expanded={!!(renderDetail && expanded?.has(key))}
+                  detail={renderDetail ? renderDetail(row) : null}
+                />
+              );
+            })}
           </tbody>
         </table>
         </div>
       )}
     </div>
+  );
+}
+
+function CatalogoTablaRow<T>({
+  row,
+  columns,
+  expanded,
+  detail,
+}: {
+  row: T;
+  columns: Column<T>[];
+  expanded: boolean;
+  detail: ReactNode | null;
+}) {
+  return (
+    <>
+      <tr>
+        {columns.map((col) => (
+          <td key={col.key} className={col.className}>
+            {col.render(row)}
+          </td>
+        ))}
+      </tr>
+      {expanded && detail != null && (
+        <tr className="row-detail-row">
+          <td colSpan={columns.length}>
+            <div className="row-detail">{detail}</div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
