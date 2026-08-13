@@ -274,7 +274,6 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
   const [modal, setModal] = useState<{ edit?: Operador } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Operador | null>(null);
   const [saving, setSaving] = useState(false);
-  const [gradoEdit, setGradoEdit] = useState("");
   const data = useApi(() => api.catalogos.operadores.listar(q || undefined), [q]);
   const list = data.data ?? [];
 
@@ -291,13 +290,11 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
     )},
     { key: "acciones", header: "", width: 80, className: "text-center", render: (r) => (
       <div className="flex gap-4 justify-center">
-        <button className="btn btn-ghost btn-sm" onClick={() => { setModal({ edit: r }); setGradoEdit(r.grado); }}><Pencil size={14} /></button>
+        <button className="btn btn-ghost btn-sm" onClick={() => setModal({ edit: r })}><Pencil size={14} /></button>
         <button className="btn btn-ghost btn-sm" onClick={() => setDeleteTarget(r)}><Trash2 size={14} /></button>
       </div>
     )},
   ];
-
-  const tipoOptions = gradoEdit === "PRE" ? TIPOS_PRE : gradoEdit === "POS" ? TIPOS_POS : [];
 
   const handleSave = async (values: Record<string, any>) => {
     setSaving(true);
@@ -315,7 +312,7 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
     finally { setSaving(false); }
   };
 
-  const openNew = () => { setModal({}); setGradoEdit(""); };
+  const openNew = () => { setModal({}); };
 
   return (
     <>
@@ -328,16 +325,16 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
           { key: "nombres", label: "Nombres", type: "text" },
           { key: "apellidos", label: "Apellidos", type: "text" },
           { key: "dni", label: "DNI (opcional)", type: "text", placeholder: "Opcional" },
-          { key: "grado", label: "Grado", type: "select", options: [{ label: "Pregrado (PRE)", value: "PRE" }, { label: "Posgrado (POS)", value: "POS" }] },
-          { key: "tipo", label: "Tipo", type: "select", options: tipoOptions.map((v) => ({ label: v, value: v })) },
-          { key: "periodo", label: "Periodo (ano)", type: "number" },
+          { key: "grado", label: "Grado", type: "select", options: [{ label: "Pregrado (PRE)", value: "PRE" }, { label: "Posgrado (POS)", value: "POS" }], onFieldChange: (v, setField) => setField("tipo", v === "PRE" ? "3" : "R1") },
+          { key: "tipo", label: "Tipo", type: "select", options: (values) => (values.grado === "PRE" ? TIPOS_PRE : values.grado === "POS" ? TIPOS_POS : []).map((v) => ({ label: v, value: v })) },
+          { key: "periodo", label: "Periodo (ano)", type: "number", integer: true },
           ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
         initialValues={modal?.edit ? {
           nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, dni: modal.edit.dni || "",
           grado: modal.edit.grado, tipo: modal.edit.tipo, periodo: String(modal.edit.periodo), estado: String(modal.edit.estado),
         } : { nombres: "", apellidos: "", dni: "", grado: "", tipo: "", periodo: String(new Date().getFullYear()) }}
-        onSave={handleSave} onCancel={() => { setModal(null); setGradoEdit(""); }} saving={saving} />
+        onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar operador"
         message={`Confirme que desea eliminar a "${deleteTarget?.nombres} ${deleteTarget?.apellidos}".`}
         confirmLabel="Eliminar" variant="danger" onConfirm={async () => {

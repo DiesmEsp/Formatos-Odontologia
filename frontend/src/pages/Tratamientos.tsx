@@ -294,7 +294,7 @@ function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
               </select>
             </div>
           </div>
-          <div className="form-group"><label className="form-label">Periodo (ano)</label><input type="number" className="text-field w-full" value={periodo} onChange={(e) => setPeriodo(Number(e.target.value))} /></div>
+          <div className="form-group"><label className="form-label">Periodo (ano)</label><input type="number" className="text-field w-full" value={periodo} onChange={(e) => setPeriodo(Math.trunc(Number(e.target.value)))} step={1} inputMode="numeric" min={2000} /></div>
         </div>
         <div className="dialog-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>

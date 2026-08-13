@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 
+type FieldOption = { label: string; value: string };
+
 interface Field {
   key: string;
   label: string;
   type: 'text' | 'number' | 'select' | 'readonly';
-  options?: { label: string; value: string }[];
+  options?: FieldOption[] | ((values: Record<string, any>) => FieldOption[]);
   placeholder?: string;
+  integer?: boolean;
+  step?: string | number;
+  onFieldChange?: (value: string, setField: (key: string, value: any) => void) => void;
 }
 
 import type { ReactNode } from 'react';
@@ -52,6 +57,11 @@ export function CatalogoModal({
     onCancel();
   };
 
+  const resolveOptions = (f: Field): FieldOption[] => {
+    if (typeof f.options === 'function') return f.options(values);
+    return f.options ?? [];
+  };
+
   return (
     <div className="dialog-overlay" onClick={handleCancel}>
       <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: width ?? 480 }}>
@@ -71,11 +81,14 @@ export function CatalogoModal({
                     <select
                       className="combo-box"
                       value={values[f.key] ?? ''}
-                      onChange={(e) => setField(f.key, e.target.value)}
+                      onChange={(e) => {
+                        setField(f.key, e.target.value);
+                        f.onFieldChange?.(e.target.value, setField);
+                      }}
                       style={{ width: '100%' }}
                     >
                       <option value="">Seleccionar...</option>
-                      {f.options?.map((opt) => (
+                      {resolveOptions(f).map((opt) => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
@@ -84,10 +97,18 @@ export function CatalogoModal({
                       type={f.type === 'number' ? 'number' : 'text'}
                       className="text-field"
                       value={values[f.key] ?? ''}
-                      onChange={(e) => setField(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)}
+                      onChange={(e) => {
+                        if (f.type === 'number') {
+                          const num = e.target.value === '' ? 0 : Number(e.target.value);
+                          setField(f.key, f.integer ? Math.trunc(num) : num);
+                        } else {
+                          setField(f.key, e.target.value);
+                        }
+                      }}
                       placeholder={f.placeholder}
                       readOnly={f.type === 'readonly'}
-                      step={f.type === 'number' ? '0.01' : undefined}
+                      step={f.step ?? (f.type === 'number' ? (f.integer ? 1 : '0.01') : undefined)}
+                      inputMode={f.integer ? 'numeric' : undefined}
                       style={{ width: '100%' }}
                     />
                   )}

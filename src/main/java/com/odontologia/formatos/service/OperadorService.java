@@ -9,7 +9,7 @@ import java.util.List;
 
 public class OperadorService {
 
-    private static final List<String> TIPOS_PRE = Arrays.asList("4", "5", "6");
+    private static final List<String> TIPOS_PRE = Arrays.asList("3", "4", "5");
     private static final List<String> TIPOS_POS = Arrays.asList("R1", "R2", "R3");
 
     private final OperadorRepository repository = new OperadorRepository();
@@ -46,7 +46,7 @@ public class OperadorService {
         String t = tipo.trim().toUpperCase();
         if ("PRE".equals(g)) {
             if (!TIPOS_PRE.contains(t)) {
-                throw new NegocioException("Un operador de grado PRE solo puede tener tipo 4, 5 o 6.");
+                throw new NegocioException("Un operador de grado PRE solo puede tener tipo 3, 4 o 5.");
             }
         } else if ("POS".equals(g)) {
             if (!TIPOS_POS.contains(t)) {
