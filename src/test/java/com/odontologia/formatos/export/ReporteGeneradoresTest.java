@@ -108,9 +108,11 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
             Sheet general = libro.getSheet("General");
             assertNotNull(general);
             assertEquals("Material", general.getRow(0).getCell(0).getStringCellValue());
-            assertEquals("Algodón prueba", general.getRow(1).getCell(0).getStringCellValue());
-            assertEquals("gramo", general.getRow(1).getCell(1).getStringCellValue());
-            assertEquals(1500.0, general.getRow(1).getCell(2).getNumericCellValue(), 0.001);
+
+            int filaAlgodon = buscarFila(general, "Algodón prueba");
+            assertTrue(filaAlgodon > 0, "Debe existir la fila del material de prueba");
+            assertEquals("gramo", general.getRow(filaAlgodon).getCell(1).getStringCellValue());
+            assertEquals(1500.0, general.getRow(filaAlgodon).getCell(2).getNumericCellValue(), 0.001);
 
             Sheet detalleDocente = libro.getSheet("Detalle Docente");
             assertNotNull(detalleDocente);
@@ -195,6 +197,17 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
         Path archivo = new ReporteMaterialesGenerator().generar(2024, 10, carpeta);
 
         assertTrue(Files.exists(archivo));
+    }
+
+    private int buscarFila(Sheet hoja, String valor) {
+        for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+            var fila = hoja.getRow(i);
+            if (fila != null && fila.getCell(0) != null
+                    && valor.equals(fila.getCell(0).getStringCellValue())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private int insertarMaterial(String nombre, String unidad) throws SQLException {
