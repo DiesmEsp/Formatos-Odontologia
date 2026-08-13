@@ -113,12 +113,21 @@ public class DashboardController {
 
         try (Connection con = ConnectionManager.getInstance().getConnection()) {
             String sql = """
-                    SELECT m.Nombre, COALESCE(SUM(ml.Cantidad), 0) as total
+                    SELECT m.Nombre, COALESCE(SUM(consumo.cant), 0) AS total
                     FROM Materiales m
-                    LEFT JOIN Materiales_List ml ON m.MaterialID = ml.MaterialID
-                    LEFT JOIN Tratamiento t ON ml.TratamientoID = t.TratamientoID AND t.Estado = 'CERRADO'
+                    LEFT JOIN (
+                      SELECT ml.MaterialID AS MaterialID, ml.Cantidad AS cant
+                      FROM Materiales_List ml
+                      JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID
+                      WHERE t.Estado = 'CERRADO'
+                      UNION ALL
+                      SELECT ma.MaterialesID AS MaterialID, ma.Cantidad AS cant
+                      FROM Materiales_Asistencia ma
+                      JOIN Asistencia a ON a.AsistenciaID = ma.AsistenciaID
+                      WHERE a.Estado = 'ACTIVO'
+                    ) consumo ON consumo.MaterialID = m.MaterialID
                     WHERE m.Estado = 1
-                    GROUP BY m.MaterialID
+                    GROUP BY m.MaterialID, m.Nombre
                     ORDER BY total DESC
                     LIMIT 5""";
 
