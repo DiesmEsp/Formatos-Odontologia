@@ -28,7 +28,7 @@ public class DashboardController {
 
         try (Connection con = ConnectionManager.getInstance().getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT COALESCE(SUM(MontoPagado), 0) FROM Tratamiento WHERE Fecha LIKE ? AND Estado = 'CERRADO'")) {
+                    "SELECT COALESCE(SUM(Monto), 0) FROM Tratamiento WHERE Fecha LIKE ? AND Estado = 'CERRADO'")) {
                 ps.setString(1, mesActual + "%");
                 try (ResultSet rs = ps.executeQuery()) {
                     kpis.put("ingresosMes", rs.next() ? rs.getDouble(1) : 0);
@@ -36,7 +36,7 @@ public class DashboardController {
             }
 
             try (PreparedStatement ps = con.prepareStatement(
-                    "SELECT COALESCE(SUM(MontoPagado), 0) FROM Tratamiento WHERE Fecha >= ? AND Estado = 'CERRADO'")) {
+                    "SELECT COALESCE(SUM(Monto), 0) FROM Tratamiento WHERE Fecha >= ? AND Estado = 'CERRADO'")) {
                 ps.setString(1, hace7Dias);
                 try (ResultSet rs = ps.executeQuery()) {
                     kpis.put("ingresosSemana", rs.next() ? rs.getDouble(1) : 0);
@@ -70,7 +70,7 @@ public class DashboardController {
             for (int m = 1; m <= 12; m++) {
                 String prefijo = base + String.format("%02d", m);
                 try (PreparedStatement ps = con.prepareStatement(
-                        "SELECT COALESCE(SUM(MontoPagado), 0) FROM Tratamiento WHERE Fecha LIKE ? AND Estado = 'CERRADO'")) {
+                        "SELECT COALESCE(SUM(Monto), 0) FROM Tratamiento WHERE Fecha LIKE ? AND Estado = 'CERRADO'")) {
                     ps.setString(1, prefijo + "%");
                     try (ResultSet rs = ps.executeQuery()) {
                         Map<String, Object> entry = new LinkedHashMap<>();
