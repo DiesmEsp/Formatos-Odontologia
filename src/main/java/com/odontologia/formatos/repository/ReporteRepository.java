@@ -26,8 +26,9 @@ public class ReporteRepository {
     public List<FilaMaterial> materiales(int anio, int mes) throws SQLException {
         String patron = patronMes(anio, mes);
         String sql = "SELECT m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) AS UnidadBase, "
-                + "SUM(consumo.cant * COALESCE(uc.Factor, 1)) AS CantidadTotal "
-                + "FROM ( "
+                + "COALESCE(SUM(consumo.cant * COALESCE(uc.Factor, 1)), 0) AS CantidadTotal "
+                + "FROM Materiales m "
+                + "LEFT JOIN ( "
                 + "  SELECT ml.MaterialID AS MaterialID, ml.Cantidad AS cant "
                 + "  FROM Materiales_List ml "
                 + "  JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
@@ -37,10 +38,10 @@ public class ReporteRepository {
                 + "  FROM Materiales_Asistencia ma "
                 + "  JOIN Asistencia a ON a.AsistenciaID = ma.AsistenciaID "
                 + "  WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? "
-                + ") consumo "
-                + "JOIN Materiales m ON m.MaterialID = consumo.MaterialID "
+                + ") consumo ON consumo.MaterialID = m.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
                 + "  AND uc.UnidadEmpaque = m.Unidad "
+                + "WHERE m.Estado = 1 "
                 + "GROUP BY m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
                 + "ORDER BY m.Nombre";
         List<FilaMaterial> lista = new ArrayList<>();
