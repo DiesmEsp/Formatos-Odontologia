@@ -192,11 +192,6 @@ export interface ReporteGenerado {
   path: string;
 }
 
-export interface ReporteAnualGenerado {
-  reporteMateriales: string;
-  reporteEconomico: string;
-}
-
 export interface ReporteReciente {
   nombre: string;
   path: string;

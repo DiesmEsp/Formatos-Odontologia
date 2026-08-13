@@ -20,7 +20,6 @@ import type {
   Operador,
   Paciente,
   PeriodoAusencia,
-  ReporteAnualGenerado,
   ReporteGenerado,
   ReporteReciente,
   TopMaterial,
@@ -263,7 +262,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ anio, mes }),
     }),
-    generarAnual: (anio: number) => request<ReporteAnualGenerado>('/api/reportes/anual/generar', {
+    generarAnual: (anio: number) => request<ReporteGenerado>('/api/reportes/anual/generar', {
       method: 'POST',
       body: JSON.stringify({ anio }),
     }),

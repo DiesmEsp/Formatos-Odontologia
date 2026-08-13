@@ -105,11 +105,8 @@ public class ReporteController {
             var body = ctx.bodyAsClass(Map.class);
             int anio = ((Number) body.get("anio")).intValue();
             try {
-                Path pathMat = materialesGen.generar(anio, 1, 12, carpetaReportes());
-                Path pathEco = economicoGen.generar(anio, 1, 12, carpetaReportes());
-                ctx.json(Map.of(
-                        "reporteMateriales", pathMat.toAbsolutePath().toString(),
-                        "reporteEconomico", pathEco.toAbsolutePath().toString()));
+                Path path = consolidadoGen.generar(anio, 1, 12, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
