@@ -293,6 +293,40 @@ public class ReporteRepository {
         return lista;
     }
 
+    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes) throws SQLException {
+        String sql = "SELECT t.TratamientoID, t.NombreTratamiento, t.Fecha, "
+                + "o.Nombres || ' ' || o.Apellidos AS Operador, o.Grado, o.Tipo, "
+                + "m.Nombre AS Material, COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
+                + "ml.Cantidad * COALESCE(uc.Factor, 1) AS Cantidad "
+                + "FROM Materiales_List ml "
+                + "JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
+                + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
+                + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
+                + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID AND uc.UnidadEmpaque = m.Unidad "
+                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
+                + "ORDER BY o.Apellidos, o.Nombres, t.Fecha, t.TratamientoID, m.Nombre";
+        List<FilaTratamiento> lista = new ArrayList<>();
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, patronMes(anio, mes));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new FilaTratamiento(
+                            rs.getInt("TratamientoID"),
+                            rs.getString("NombreTratamiento"),
+                            rs.getString("Fecha"),
+                            rs.getString("Operador"),
+                            rs.getString("Grado"),
+                            rs.getString("Tipo"),
+                            rs.getString("Material"),
+                            rs.getString("Unidad"),
+                            rs.getDouble("Cantidad")));
+                }
+            }
+        }
+        return lista;
+    }
+
     public static class FilaMaterial {
         private final int materialID;
         private final String nombre;
@@ -609,5 +643,41 @@ public class ReporteRepository {
         public String getHoraInicio() { return horaInicio; }
         public String getHoraFin() { return horaFin; }
         public String getMotivo() { return motivo; }
+    }
+
+    public static class FilaTratamiento {
+        private final int tratamientoID;
+        private final String nombreTratamiento;
+        private final String fecha;
+        private final String operador;
+        private final String grado;
+        private final String tipo;
+        private final String material;
+        private final String unidad;
+        private final double cantidad;
+
+        public FilaTratamiento(int tratamientoID, String nombreTratamiento, String fecha,
+                               String operador, String grado, String tipo,
+                               String material, String unidad, double cantidad) {
+            this.tratamientoID = tratamientoID;
+            this.nombreTratamiento = nombreTratamiento;
+            this.fecha = fecha;
+            this.operador = operador;
+            this.grado = grado;
+            this.tipo = tipo;
+            this.material = material;
+            this.unidad = unidad;
+            this.cantidad = cantidad;
+        }
+
+        public int getTratamientoID() { return tratamientoID; }
+        public String getNombreTratamiento() { return nombreTratamiento; }
+        public String getFecha() { return fecha; }
+        public String getOperador() { return operador; }
+        public String getGrado() { return grado; }
+        public String getTipo() { return tipo; }
+        public String getMaterial() { return material; }
+        public String getUnidad() { return unidad; }
+        public double getCantidad() { return cantidad; }
     }
 }

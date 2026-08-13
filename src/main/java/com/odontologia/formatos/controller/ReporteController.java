@@ -6,6 +6,7 @@ import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
 import com.odontologia.formatos.export.ReporteConsolidadoGenerator;
 import com.odontologia.formatos.export.ReporteDocenteGenerator;
 import com.odontologia.formatos.export.ReporteEspecialistaGenerator;
+import com.odontologia.formatos.export.ReporteTratamientoGenerator;
 import com.odontologia.formatos.service.NegocioException;
 import io.javalin.Javalin;
 
@@ -26,6 +27,7 @@ public class ReporteController {
     private final ReporteAsistenciaGenerator asistenciaGen = new ReporteAsistenciaGenerator();
     private final ReporteDocenteGenerator docenteGen = new ReporteDocenteGenerator();
     private final ReporteEspecialistaGenerator especialistaGen = new ReporteEspecialistaGenerator();
+    private final ReporteTratamientoGenerator tratamientoGen = new ReporteTratamientoGenerator();
     private final ReporteConsolidadoGenerator consolidadoGen = new ReporteConsolidadoGenerator();
 
     public void register(Javalin app) {
@@ -77,6 +79,20 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 Path path = especialistaGen.generar(anio, mes, carpetaReportes());
+                ctx.json(Map.of("path", path.toAbsolutePath().toString()));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            } catch (Exception e) {
+                ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            }
+        });
+
+        app.post("/api/reportes/tratamiento/generar", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int anio = ((Number) body.get("anio")).intValue();
+            int mes = ((Number) body.get("mes")).intValue();
+            try {
+                Path path = tratamientoGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));

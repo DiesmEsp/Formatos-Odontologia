@@ -14,6 +14,7 @@ public final class ReporteNomenclatura {
     public static final String TIPO_ASISTENCIA = "Asistencia";
     public static final String TIPO_DOCENTE = "Consumo_Docente";
     public static final String TIPO_ESPECIALISTA = "Consumo_Especialista";
+    public static final String TIPO_TRATAMIENTO = "Consumo_Tratamiento";
 
     private static final String[] MESES = {
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -62,6 +63,10 @@ public final class ReporteNomenclatura {
 
     public static String nombreEspecialista(int anio, int mesInicio, int mesFin) {
         return nombreRango(TIPO_ESPECIALISTA, anio, mesInicio, mesFin);
+    }
+
+    public static String nombreTratamiento(int anio, int mes) {
+        return nombreMensual(TIPO_TRATAMIENTO, anio, mes);
     }
 
     private static String nombreMensual(String tipo, int anio, int mes) {
