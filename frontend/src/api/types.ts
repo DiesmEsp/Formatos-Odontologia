@@ -147,7 +147,7 @@ export interface EditarTratamientoDTO {
   tipo: string;
   monto: number | null;
   montoPagado: number | null;
-  estadoPago: string;
+  estadoPago: string | null;
   fecha: string;
   nombreTratamiento: string;
   operadorID: number | null;

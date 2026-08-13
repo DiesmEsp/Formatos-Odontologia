@@ -93,6 +93,18 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    registrarCerrado: (data: {
+      operadorID: number;
+      pacienteID: number;
+      fecha: string;
+      tratPredID: number | null;
+      monto: number | null;
+      tipo: string;
+      materiales: Record<string, number>;
+    }) => request<{ id: number }>('/api/tratamientos/cerrado', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
     cerrar: (id: number) => request<{ ok: boolean }>(`/api/tratamientos/${id}/cerrar`, { method: 'POST' }),
     anular: (id: number, motivo: string) => request<{ ok: boolean }>(`/api/tratamientos/${id}/anular`, {
       method: 'POST',

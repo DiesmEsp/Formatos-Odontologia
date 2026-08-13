@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useToast } from "../hooks/useToast";
 import { api } from "../api";
@@ -6,7 +6,7 @@ import { CatalogoTabla, type Column } from "../components/CatalogoTabla";
 import { CatalogoModal } from "../components/CatalogoModal";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Badge } from "../components/Badge";
-import { Plus, ChevronDown, Trash2, Pencil } from "lucide-react";
+import { Plus, ChevronDown, Trash2, Pencil, X, DollarSign } from "lucide-react";
 import type {
   Materiales,
   Docente,
@@ -16,6 +16,8 @@ import type {
   Tratamiento,
 } from "../api/types";
 import { MaterialTable, type MaterialRow } from "../components/MaterialTable";
+import { SearchableCombo, type SearchableOption } from "../components/SearchableCombo";
+import { hoyISO, nombreCompleto, formatMonto } from "../lib/format";
 
 type TabId = "materiales" | "docentes" | "pacientes" | "operadores" | "tratamientos-pred" | "tratamientos-realizados";
 
@@ -478,6 +480,11 @@ function MaterialesDetalle({ tratPredID }: { tratPredID: number }) {
 function TabTratamientosRealizados() {
   const data = useApi(() => api.tratamientos.cerrados());
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const [registrarOpen, setRegistrarOpen] = useState(false);
+  const [editarTarget, setEditarTarget] = useState<Tratamiento | null>(null);
+  const [pagoTarget, setPagoTarget] = useState<Tratamiento | null>(null);
+  const [anularTarget, setAnularTarget] = useState<Tratamiento | null>(null);
+  const { addToast } = useToast();
   const list = data.data ?? [];
 
   const columns: Column<Tratamiento>[] = [
@@ -494,12 +501,33 @@ function TabTratamientosRealizados() {
       const v = r.estado === "CERRADO" ? "success" : r.estado === "ANULADO" ? "danger" : "info";
       return <Badge variant={v}>{r.estado}</Badge>;
     }},
+    { key: "acciones", header: "", width: 120, className: "text-center", render: (r) => (
+      <div className="flex gap-4 justify-center">
+        <button type="button" className="btn btn-ghost btn-sm" title="Editar" onClick={() => setEditarTarget(r)}><Pencil size={14} /></button>
+        <button type="button" className="btn btn-ghost btn-sm" title="Registrar pago" onClick={() => setPagoTarget(r)}><DollarSign size={14} /></button>
+        <button type="button" className="btn btn-ghost btn-sm" title="Anular" onClick={() => setAnularTarget(r)}><Trash2 size={14} /></button>
+      </div>
+    )},
   ];
 
   return (
     <>
+      <div style={{ marginBottom: 12, display: "flex", justifyContent: "flex-end" }}>
+        <button className="btn btn-primary btn-sm" onClick={() => setRegistrarOpen(true)}><Plus size={14} /> Registrar tratamiento realizado</button>
+      </div>
       <CatalogoTabla columns={columns} data={list} loading={data.loading} searchEnabled={false} emptyTitle="Sin tratamientos" emptyText="No hay tratamientos registrados."
         rowKey={(r) => r.tratamientoID} renderDetail={(r) => <TratamientoMaterialesDetalle tratamientoID={r.tratamientoID} />} expanded={expanded} />
+      {registrarOpen && <RegistrarRealizadoModal onClose={() => setRegistrarOpen(false)} onSuccess={() => { setRegistrarOpen(false); data.refetch(); }} addToast={addToast} />}
+      {editarTarget && <EditarRealizadoModal tratamiento={editarTarget} onClose={() => setEditarTarget(null)} onSuccess={() => { setEditarTarget(null); data.refetch(); }} addToast={addToast} />}
+      {pagoTarget && <RegistrarPagoModal tratamiento={pagoTarget} onClose={() => setPagoTarget(null)} onSuccess={() => { setPagoTarget(null); data.refetch(); }} addToast={addToast} />}
+      <ConfirmDialog open={!!anularTarget} title="Anular tratamiento" message={`Confirme que desea anular el tratamiento #${anularTarget?.tratamientoID}.`} confirmLabel="Sí, anular" variant="danger" requireMotivo
+        onConfirm={async (motivo) => {
+          if (!anularTarget || !motivo) return;
+          try { await api.tratamientos.anular(anularTarget.tratamientoID, motivo); addToast("success", "Tratamiento anulado"); data.refetch(); }
+          catch (err) { addToast("error", err instanceof Error ? err.message : "Error al anular"); }
+          setAnularTarget(null);
+        }}
+        onCancel={() => setAnularTarget(null)} />
     </>
   );
 }
@@ -521,6 +549,248 @@ function TratamientoMaterialesDetalle({ tratamientoID }: { tratamientoID: number
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function RegistrarRealizadoModal({ onClose, onSuccess, addToast }: { onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>["addToast"] }) {
+  const [fecha, setFecha] = useState(hoyISO());
+  const [pacienteId, setPacienteId] = useState<number | null>(null);
+  const [operadorId, setOperadorId] = useState<number | null>(null);
+  const [tratPredId, setTratPredId] = useState<number | null>(null);
+  const [montoStr, setMontoStr] = useState("");
+  const [tipo, setTipo] = useState("NORMAL");
+  const [matRows, setMatRows] = useState<MaterialRow[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [qPac, setQPac] = useState("");
+  const [qOpe, setQOpe] = useState("");
+  const [qTrat, setQTrat] = useState("");
+
+  const pacientes = useApi(() => api.catalogos.pacientes.listar(qPac || undefined), [qPac]);
+  const operadores = useApi(() => api.catalogos.operadores.listar(qOpe || undefined), [qOpe]);
+  const tratsPred = useApi(() => api.catalogos.tratamientosPred.listar(qTrat || undefined), [qTrat]);
+  const materiales = useApi(() => api.catalogos.materiales.listar());
+
+  const pOptions: SearchableOption[] = (pacientes.data ?? []).map((p) => ({ id: p.pacienteID, label: nombreCompleto(p.nombres, p.apellidos) }));
+  const oOptions: SearchableOption[] = (operadores.data ?? []).map((o) => ({ id: o.operadorID, label: nombreCompleto(o.nombres, o.apellidos), badge: o.grado }));
+  const tOptions: SearchableOption[] = (tratsPred.data ?? []).map((t) => ({ id: t.tratPredID, label: t.nombreTratamiento, extra: t.montoSugerido != null ? `S/ ${t.montoSugerido.toFixed(2)}` : undefined }));
+
+  const handleTratChange = async (id: number | null) => {
+    setTratPredId(id);
+    if (id) {
+      const tp = tratsPred.data?.find((t) => t.tratPredID === id);
+      if (tp?.montoSugerido != null && tipo !== "CONTINUO") setMontoStr(String(tp.montoSugerido));
+      try {
+        const mats = await api.catalogos.tratamientosPred.materiales(id);
+        setMatRows(mats.map((m, i) => ({ key: `pred-${i}-${m.materialID}`, materialId: m.materialID, nombreMaterial: m.nombreMaterial, cantidad: m.cantidad })));
+      } catch { setMatRows([]); }
+    }
+  };
+
+  const handleGuardar = async () => {
+    if (!operadorId || !pacienteId) { addToast("error", "Seleccione paciente y operador"); return; }
+    setSaving(true);
+    try {
+      const materialesMap: Record<string, number> = {};
+      for (const r of matRows) {
+        if (r.materialId == null) continue;
+        materialesMap[String(r.materialId)] = r.cantidad > 0 ? r.cantidad : 1;
+      }
+      await api.tratamientos.registrarCerrado({
+        operadorID: operadorId,
+        pacienteID: pacienteId,
+        fecha,
+        tratPredID: tratPredId,
+        monto: tipo === "CONTINUO" ? null : (montoStr === "" ? null : Number(montoStr)),
+        tipo,
+        materiales: materialesMap,
+      });
+      addToast("success", "Tratamiento registrado correctamente");
+      onSuccess();
+    } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al registrar"); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="dialog-overlay" onClick={onClose}>
+      <div className="dialog-pane mw-560" onClick={(e) => e.stopPropagation()}>
+        <div className="dialog-header">
+          <h3 className="dialog-title">Registrar tratamiento realizado</h3>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div className="dialog-body">
+          <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
+          <div className="form-group"><label className="form-label">Paciente</label><SearchableCombo options={pOptions} value={pacienteId} onChange={setPacienteId} onSearch={setQPac} placeholder="Buscar paciente..." /></div>
+          <div className="form-group"><label className="form-label">Operador</label><SearchableCombo options={oOptions} value={operadorId} onChange={setOperadorId} onSearch={setQOpe} placeholder="Buscar operador..." /></div>
+          <div className="form-group"><label className="form-label">Tipo de tratamiento</label><SearchableCombo options={tOptions} value={tratPredId} onChange={handleTratChange} onSearch={setQTrat} placeholder="Buscar tratamiento..." /></div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Tipo</label>
+              <select className="combo-box w-full" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+                <option value="NORMAL">Normal</option>
+                <option value="CONTINUO">Continuo</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Monto total</label>
+              <input type="text" inputMode="decimal" className="text-field w-full" value={montoStr} onChange={(e) => setMontoStr(e.target.value.replace(/[^0-9.]/g, ""))} disabled={tipo === "CONTINUO"} placeholder="0.00" />
+            </div>
+          </div>
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 14, marginTop: 4 }}>
+            <h4 style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginBottom: 10, color: 'var(--color-text)' }}>Materiales</h4>
+            <MaterialTable
+              rows={matRows}
+              materials={materiales.data ?? []}
+              onAdd={() => setMatRows((prev) => [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: "", cantidad: 0 }])}
+              onRemove={(key) => setMatRows((prev) => prev.filter((r) => r.key !== key))}
+              onMaterialChange={(key, materialId) => setMatRows((prev) => prev.map((r) => r.key === key ? { ...r, materialId } : r))}
+              onCantidadChange={(key, cantidad) => setMatRows((prev) => prev.map((r) => r.key === key ? { ...r, cantidad } : r))}
+            />
+          </div>
+        </div>
+        <div className="dialog-footer">
+          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleGuardar} disabled={saving}>{saving ? "Guardando..." : "Registrar"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditarRealizadoModal({ tratamiento, onClose, onSuccess, addToast }: { tratamiento: Tratamiento; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>["addToast"] }) {
+  const [fecha, setFecha] = useState(tratamiento.fecha);
+  const [nombre, setNombre] = useState(tratamiento.nombreTratamiento);
+  const [montoStr, setMontoStr] = useState(String(tratamiento.monto));
+  const [tipo, setTipo] = useState(tratamiento.tipo);
+  const [pacienteId, setPacienteId] = useState<number | null>(tratamiento.pacienteID);
+  const [operadorId, setOperadorId] = useState<number | null>(tratamiento.operadorID);
+  const [matRows, setMatRows] = useState<MaterialRow[]>([]);
+  const [originalMat, setOriginalMat] = useState<MaterialRow[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const pacientes = useApi(() => api.catalogos.pacientes.listar());
+  const operadores = useApi(() => api.catalogos.operadores.listar());
+  const materiales = useApi(() => api.catalogos.materiales.listar());
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const mats = await api.tratamientos.materialesConNombre(tratamiento.tratamientoID);
+        const rows = mats.map((m) => ({ key: `mat-${m.materialesListID}`, materialId: m.materialID, nombreMaterial: m.nombreMaterial, cantidad: m.cantidad }));
+        setMatRows(rows);
+        setOriginalMat(rows);
+      } catch {
+        setMatRows([]);
+        setOriginalMat([]);
+      }
+    })();
+  }, [tratamiento.tratamientoID]);
+
+  const pOptions: SearchableOption[] = (pacientes.data ?? []).map((p) => ({ id: p.pacienteID, label: nombreCompleto(p.nombres, p.apellidos) }));
+  const oOptions: SearchableOption[] = (operadores.data ?? []).map((o) => ({ id: o.operadorID, label: nombreCompleto(o.nombres, o.apellidos), badge: o.grado }));
+
+  const handleGuardar = async () => {
+    if (!operadorId || !pacienteId) { addToast("error", "Seleccione paciente y operador"); return; }
+    setSaving(true);
+    try {
+      const cantidades: Record<string, number> = {};
+      const currentIds = new Set(matRows.filter((r) => r.materialId != null).map((r) => r.materialId));
+      for (const orig of originalMat) {
+        if (orig.materialId != null && !currentIds.has(orig.materialId)) {
+          cantidades[String(orig.materialId)] = 0;
+        }
+      }
+      for (const r of matRows) {
+        if (r.materialId == null) continue;
+        cantidades[String(r.materialId)] = r.cantidad > 0 ? r.cantidad : 1;
+      }
+      await api.tratamientos.editarRetroactivo(tratamiento.tratamientoID, {
+        tipo,
+        monto: tipo === "CONTINUO" ? null : (montoStr === "" ? null : Number(montoStr)),
+        montoPagado: null,
+        estadoPago: null,
+        fecha,
+        nombreTratamiento: nombre,
+        operadorID: operadorId,
+        pacienteID: pacienteId,
+        cantidadesMateriales: cantidades,
+      });
+      addToast("success", "Tratamiento actualizado");
+      onSuccess();
+    } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al guardar"); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="dialog-overlay" onClick={onClose}>
+      <div className="dialog-pane mw-560" onClick={(e) => e.stopPropagation()}>
+        <div className="dialog-header">
+          <h3 className="dialog-title">Editar Tratamiento #{tratamiento.tratamientoID}</h3>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div className="dialog-body">
+          <div className="form-group"><label className="form-label">Nombre del tratamiento</label><input className="text-field w-full" value={nombre} onChange={(e) => setNombre(e.target.value)} /></div>
+          <div className="form-row">
+            <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
+            <div className="form-group">
+              <label className="form-label">Tipo</label>
+              <select className="combo-box w-full" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+                <option value="NORMAL">Normal</option>
+                <option value="CONTINUO">Continuo</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group"><label className="form-label">Monto total</label><input type="text" inputMode="decimal" className="text-field w-full" value={montoStr} onChange={(e) => setMontoStr(e.target.value.replace(/[^0-9.]/g, ""))} disabled={tipo === "CONTINUO"} placeholder="0.00" /></div>
+          <div className="form-group"><label className="form-label">Paciente</label><SearchableCombo options={pOptions} value={pacienteId} onChange={setPacienteId} placeholder="Buscar paciente..." /></div>
+          <div className="form-group"><label className="form-label">Operador</label><SearchableCombo options={oOptions} value={operadorId} onChange={setOperadorId} placeholder="Buscar operador..." /></div>
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 14, marginTop: 4 }}>
+            <h4 style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginBottom: 10, color: 'var(--color-text)' }}>Materiales</h4>
+            <MaterialTable
+              rows={matRows}
+              materials={materiales.data ?? []}
+              onAdd={() => setMatRows((prev) => [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: "", cantidad: 0 }])}
+              onRemove={(key) => setMatRows((prev) => prev.filter((r) => r.key !== key))}
+              onMaterialChange={(key, materialId) => setMatRows((prev) => prev.map((r) => r.key === key ? { ...r, materialId } : r))}
+              onCantidadChange={(key, cantidad) => setMatRows((prev) => prev.map((r) => r.key === key ? { ...r, cantidad } : r))}
+            />
+          </div>
+        </div>
+        <div className="dialog-footer">
+          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleGuardar} disabled={saving}>{saving ? "Guardando..." : "Guardar"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegistrarPagoModal({ tratamiento, onClose, onSuccess, addToast }: { tratamiento: Tratamiento; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>["addToast"] }) {
+  const [abono, setAbono] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const saldo = tratamiento.monto - tratamiento.montoPagado;
+
+  const handleGuardar = async () => {
+    if (abono <= 0) return;
+    setSaving(true);
+    try { await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono); addToast("success", "Pago registrado"); onSuccess(); }
+    catch (err) { addToast("error", err instanceof Error ? err.message : "Error al registrar pago"); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="dialog-overlay" onClick={onClose}>
+      <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
+        <div className="dialog-header"><h3 className="dialog-title">Registrar Pago</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
+        <div className="dialog-body">
+          <div className="sv-grid mb-16">
+            <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
+            <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
+            <div className="sv-row"><span className="sv-label">Saldo</span><span className="num" style={{ color: saldo > 0 ? 'var(--color-danger-text)' : 'var(--color-success-text)' }}>{formatMonto(saldo)}</span></div>
+          </div>
+          <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
+        </div>
+        <div className="dialog-footer"><button className="btn btn-secondary" onClick={onClose}>Cancelar</button><button className="btn btn-primary" onClick={handleGuardar} disabled={saving || abono <= 0}>{saving ? "Guardando..." : "Registrar"}</button></div>
+      </div>
     </div>
   );
 }
