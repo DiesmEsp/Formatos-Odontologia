@@ -44,8 +44,8 @@ public class TratamientoPredefinidoService {
         });
     }
 
-    public List<TratamientoPredefinidoMaterial> materiales(int tratPredID) throws SQLException {
-        return materialRepository.findByTratPredID(tratPredID);
+    public List<TratamientoPredefinidoMaterialRepository.MaterialConNombre> materiales(int tratPredID) throws SQLException {
+        return materialRepository.findConNombre(tratPredID);
     }
 
     public void guardarMateriales(int tratPredID, List<TratamientoPredefinidoMaterial> materiales) throws SQLException {

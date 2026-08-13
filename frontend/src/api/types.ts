@@ -50,6 +50,12 @@ export interface TratamientoPredefinidoMaterial {
   cantidad: number;
 }
 
+export interface TratamientoPredefinidoMaterialConNombre {
+  materialID: number;
+  nombreMaterial: string;
+  cantidad: number;
+}
+
 export interface Tratamiento {
   tratamientoID: number;
   operadorID: number;

@@ -66,6 +66,27 @@ public class TratamientoPredefinidoMaterialRepository {
         return lista;
     }
 
+    public List<MaterialConNombre> findConNombre(int tratPredID) throws SQLException {
+        List<MaterialConNombre> lista = new ArrayList<>();
+        String sql = "SELECT mlp.MaterialID, m.Nombre, mlp.Cantidad "
+                + "FROM Materiales_List_PRED mlp "
+                + "JOIN Materiales m ON m.MaterialID = mlp.MaterialID "
+                + "WHERE mlp.TratPredID = ? ORDER BY m.Nombre";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, tratPredID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new MaterialConNombre(
+                            rs.getInt("MaterialID"),
+                            rs.getString("Nombre"),
+                            rs.getDouble("Cantidad")));
+                }
+            }
+        }
+        return lista;
+    }
+
     public void deleteByTratPredID(int tratPredID) throws SQLException {
         try (Connection con = ConnectionManager.getInstance().getConnection()) {
             deleteByTratPredID(con, tratPredID);
@@ -86,5 +107,29 @@ public class TratamientoPredefinidoMaterialRepository {
                 rs.getInt("TratPredID"),
                 rs.getInt("MaterialID"),
                 rs.getDouble("Cantidad"));
+    }
+
+    public static class MaterialConNombre {
+        private final int materialID;
+        private final String nombreMaterial;
+        private final double cantidad;
+
+        public MaterialConNombre(int materialID, String nombreMaterial, double cantidad) {
+            this.materialID = materialID;
+            this.nombreMaterial = nombreMaterial;
+            this.cantidad = cantidad;
+        }
+
+        public int getMaterialID() {
+            return materialID;
+        }
+
+        public String getNombreMaterial() {
+            return nombreMaterial;
+        }
+
+        public double getCantidad() {
+            return cantidad;
+        }
     }
 }

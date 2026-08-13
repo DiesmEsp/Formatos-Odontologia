@@ -132,7 +132,7 @@ public class AsistenciaMaterialRepository {
 
     public List<MaterialConCantidad> findMaterialesConNombre(int asistenciaID) throws SQLException {
         List<MaterialConCantidad> lista = new ArrayList<>();
-        String sql = "SELECT ma.MaterialesID, m.Nombre, m.Unidad, ma.Cantidad "
+        String sql = "SELECT ma.MatAsistenciaID, ma.MaterialesID, m.Nombre, m.Unidad, ma.Cantidad "
                 + "FROM Materiales_Asistencia ma "
                 + "JOIN Materiales m ON m.MaterialID = ma.MaterialesID "
                 + "WHERE ma.AsistenciaID = ? ORDER BY m.Nombre";
@@ -142,6 +142,7 @@ public class AsistenciaMaterialRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new MaterialConCantidad(
+                            rs.getInt("MatAsistenciaID"),
                             rs.getInt("MaterialesID"),
                             rs.getString("Nombre"),
                             rs.getString("Unidad"),
@@ -161,24 +162,31 @@ public class AsistenciaMaterialRepository {
     }
 
     public static class MaterialConCantidad {
+        private final int materialesListID;
         private final int materialID;
-        private final String nombre;
+        private final String nombreMaterial;
         private final String unidad;
         private final double cantidad;
 
-        public MaterialConCantidad(int materialID, String nombre, String unidad, double cantidad) {
+        public MaterialConCantidad(int materialesListID, int materialID, String nombreMaterial,
+                                   String unidad, double cantidad) {
+            this.materialesListID = materialesListID;
             this.materialID = materialID;
-            this.nombre = nombre;
+            this.nombreMaterial = nombreMaterial;
             this.unidad = unidad;
             this.cantidad = cantidad;
+        }
+
+        public int getMaterialesListID() {
+            return materialesListID;
         }
 
         public int getMaterialID() {
             return materialID;
         }
 
-        public String getNombre() {
-            return nombre;
+        public String getNombreMaterial() {
+            return nombreMaterial;
         }
 
         public String getUnidad() {

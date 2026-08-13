@@ -28,7 +28,7 @@ import type {
   TratamientoEstado,
   TratamientoMaterialConNombre,
   TratamientoPredefinido,
-  TratamientoPredefinidoMaterial,
+  TratamientoPredefinidoMaterialConNombre,
   Unidad,
   UnidadConversion,
 } from './types';
@@ -207,7 +207,7 @@ export const api = {
       crear: (data: CrearTratamientoPredDTO) => request<{ id: number }>('/api/catalogos/tratamientos-pred', { method: 'POST', body: JSON.stringify(data) }),
       actualizar: (data: TratamientoPredefinido) => request<{ ok: boolean }>(`/api/catalogos/tratamientos-pred/${data.tratPredID}`, { method: 'PUT', body: JSON.stringify(data) }),
       eliminar: (id: number) => request<void>(`/api/catalogos/tratamientos-pred/${id}`, { method: 'DELETE' }),
-      materiales: (id: number) => request<TratamientoPredefinidoMaterial[]>(`/api/catalogos/tratamientos-pred/${id}/materiales`),
+      materiales: (id: number) => request<TratamientoPredefinidoMaterialConNombre[]>(`/api/catalogos/tratamientos-pred/${id}/materiales`),
       guardarMateriales: (id: number, materiales: { materialID: number; cantidad: number }[]) => request<{ ok: boolean }>(`/api/catalogos/tratamientos-pred/${id}/materiales`, {
         method: 'PUT',
         body: JSON.stringify({ materiales }),

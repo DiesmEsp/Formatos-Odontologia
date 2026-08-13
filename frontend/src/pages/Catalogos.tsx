@@ -375,7 +375,7 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
         <button className="btn btn-ghost btn-sm" onClick={async () => {
           try {
             const matsData = await api.catalogos.tratamientosPred.materiales(r.tratPredID);
-            setMatRows(matsData.map((m) => ({ key: `mat-${m.materialListPredID}`, materialId: m.materialID, nombreMaterial: "", cantidad: m.cantidad })));
+            setMatRows(matsData.map((m) => ({ key: `mat-${m.materialID}`, materialId: m.materialID, nombreMaterial: m.nombreMaterial, cantidad: m.cantidad })));
           } catch { setMatRows([]); }
           setModal({ edit: r });
         }}><Pencil size={14} /></button>
@@ -468,8 +468,8 @@ function MaterialesDetalle({ tratPredID }: { tratPredID: number }) {
       ) : (
         <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
           {mats.map((m) => (
-            <span key={m.materialListPredID} className="mat-chip">
-              Material #{m.materialID}
+            <span key={m.materialID} className="mat-chip">
+              {m.nombreMaterial}
               <span className="chip-cant">{m.cantidad}</span>
             </span>
           ))}
