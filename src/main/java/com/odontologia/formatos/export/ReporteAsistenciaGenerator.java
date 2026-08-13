@@ -41,7 +41,11 @@ public class ReporteAsistenciaGenerator extends ReporteGeneradorBase {
             double horasTotales = calcularHoras(a.getHoraEntrada(), a.getHoraSalida());
             double horasAusencia = 0;
             for (FilaAusencia aus : a.getAusencias()) {
-                horasAusencia += calcularHoras(aus.getHoraInicio(), aus.getHoraFin());
+                if (aus.getHoraFin() != null) {
+                    horasAusencia += calcularHoras(aus.getHoraInicio(), aus.getHoraFin());
+                } else if (a.getHoraSalida() != null) {
+                    horasAusencia += calcularHoras(aus.getHoraInicio(), a.getHoraSalida());
+                }
             }
             double horasPresencia = Math.max(0, horasTotales - horasAusencia);
 
@@ -74,12 +78,14 @@ public class ReporteAsistenciaGenerator extends ReporteGeneradorBase {
         for (FilaAsistencia a : datos) {
             for (FilaAusencia aus : a.getAusencias()) {
                 List<Object> valores = new ArrayList<>();
-                double duracion = calcularHoras(aus.getHoraInicio(), aus.getHoraFin());
+                double duracion = aus.getHoraFin() != null
+                        ? calcularHoras(aus.getHoraInicio(), aus.getHoraFin())
+                        : (a.getHoraSalida() != null ? calcularHoras(aus.getHoraInicio(), a.getHoraSalida()) : 0);
 
                 valores.add(a.getDocente());
                 valores.add(a.getFecha());
                 valores.add(aus.getHoraInicio() != null ? aus.getHoraInicio().substring(0, 5) : "");
-                valores.add(aus.getHoraFin() != null ? aus.getHoraFin().substring(0, 5) : "");
+                valores.add(aus.getHoraFin() != null ? aus.getHoraFin().substring(0, 5) : "En curso");
                 valores.add(redondear2(duracion));
                 valores.add(aus.getMotivo() != null ? aus.getMotivo() : "");
 
