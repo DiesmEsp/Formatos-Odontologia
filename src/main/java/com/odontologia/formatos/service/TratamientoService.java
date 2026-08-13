@@ -111,6 +111,69 @@ public class TratamientoService {
         return repository.findByEstado("CERRADO");
     }
 
+    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
+                            Double monto, String tipo, Map<Integer, Double> materiales) throws SQLException {
+        validarEspecialista(operadorID);
+        validarPaciente(pacienteID);
+        validarFecha(fecha);
+        String tipoNormalizado = normalizarTipo(tipo);
+
+        return TransaccionBD.ejecutarConResultado(con -> {
+            Tratamiento tratamiento = new Tratamiento();
+            tratamiento.setOperadorID(operadorID);
+            tratamiento.setPacienteID(pacienteID);
+            tratamiento.setUnidadID(null);
+            tratamiento.setFecha(fecha);
+            tratamiento.setTipo(tipoNormalizado);
+            tratamiento.setEstado("CERRADO");
+            tratamiento.setCerradoEn(timestampLocal());
+
+            if (tratPredID != null) {
+                TratamientoPredefinido predefinido = predefinidoRepository.findById(tratPredID);
+                if (predefinido == null) {
+                    throw new NegocioException("El tipo de tratamiento seleccionado no existe.");
+                }
+                tratamiento.setNombreTratamiento(predefinido.getNombreTratamiento());
+                if (monto == null && predefinido.getMontoSugerido() != null) {
+                    tratamiento.setMonto(predefinido.getMontoSugerido());
+                }
+            } else {
+                tratamiento.setNombreTratamiento("Tratamiento general");
+            }
+
+            if ("CONTINUO".equals(tipoNormalizado)) {
+                tratamiento.setMonto(0);
+                tratamiento.setEstadoPago("PAGADO");
+                tratamiento.setMontoPagado(0);
+            } else {
+                double montoReal = monto != null ? monto : tratamiento.getMonto();
+                if (montoReal < 0) {
+                    throw new NegocioException("El monto del tratamiento no puede ser negativo.");
+                }
+                tratamiento.setMonto(montoReal);
+                tratamiento.setEstadoPago("PAGADO");
+                tratamiento.setMontoPagado(montoReal);
+            }
+
+            int tratamientoID = repository.insert(con, tratamiento);
+            tratamiento.setTratamientoID(tratamientoID);
+
+            if (materiales != null) {
+                for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
+                    if (entrada.getValue() == null || entrada.getValue() <= 0) {
+                        continue;
+                    }
+                    TratamientoMaterial item = new TratamientoMaterial();
+                    item.setTratamientoID(tratamientoID);
+                    item.setMaterialID(entrada.getKey());
+                    item.setCantidad(entrada.getValue());
+                    materialRepository.insert(con, item);
+                }
+            }
+            return tratamientoID;
+        });
+    }
+
     public List<Tratamiento> porUnidad(int unidadID) throws SQLException {
         return repository.findByUnidad(unidadID);
     }

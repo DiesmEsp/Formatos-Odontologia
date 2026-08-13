@@ -80,6 +80,48 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void crearCerradoConMateriales() throws SQLException {
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(1, 2.0);
+        materiales.put(2, 3.0);
+
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 120.0, "NORMAL", materiales);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("CERRADO", t.getEstado());
+        assertEquals(120.0, t.getMonto(), 0.001);
+        assertEquals("PAGADO", t.getEstadoPago());
+        assertEquals(120.0, t.getMontoPagado(), 0.001);
+
+        List<TratamientoMaterialRepository.MaterialConCantidad> mats = service.materialesConNombre(id);
+        assertEquals(2, mats.size());
+    }
+
+    @Test
+    void crearCerradoConPlantillaUsaNombreYMonto() throws SQLException {
+        int predID = crearPlantillaConMateriales();
+
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", predID, null, "NORMAL", Map.of());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Tratamiento de prueba unico", t.getNombreTratamiento());
+        assertEquals(150.0, t.getMonto(), 0.001);
+        assertEquals("CERRADO", t.getEstado());
+    }
+
+    @Test
+    void crearCerradoRechazaMontoNegativo() {
+        assertThrows(NegocioException.class, () ->
+                service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, -5.0, "NORMAL", Map.of()));
+    }
+
+    @Test
+    void crearCerradoRechazaFechaInvalida() {
+        assertThrows(NegocioException.class, () ->
+                service.crearCerrado(operadorID, pacienteID, "2026/08/01", null, 120.0, "NORMAL", Map.of()));
+    }
+
+    @Test
     void crearConPlantillaCargaMateriales() throws SQLException {
         int predID = crearPlantillaConMateriales();
 

@@ -60,6 +60,34 @@ public class TratamientoController {
             }
         });
 
+        app.post("/api/tratamientos/cerrado", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int operadorID = ((Number) body.get("operadorID")).intValue();
+            int pacienteID = ((Number) body.get("pacienteID")).intValue();
+            String fecha = (String) body.get("fecha");
+            Integer tratPredID = body.get("tratPredID") != null
+                    ? ((Number) body.get("tratPredID")).intValue() : null;
+            Double monto = body.get("monto") != null
+                    ? ((Number) body.get("monto")).doubleValue() : null;
+            String tipo = (String) body.get("tipo");
+
+            Map<Integer, Double> materiales = new HashMap<>();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> rawMateriales = (Map<String, Object>) body.get("materiales");
+            if (rawMateriales != null) {
+                for (Map.Entry<String, Object> e : rawMateriales.entrySet()) {
+                    materiales.put(Integer.parseInt(e.getKey()), ((Number) e.getValue()).doubleValue());
+                }
+            }
+
+            try {
+                int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, materiales);
+                ctx.status(201).json(Map.of("id", id));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.post("/api/tratamientos/{id}/cerrar", ctx -> {
             int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
