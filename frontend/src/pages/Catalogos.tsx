@@ -78,9 +78,9 @@ function TabMateriales({ addToast }: { addToast: ReturnType<typeof useToast>["ad
   const list = data.data ?? [];
 
   const columns: Column<Materiales>[] = [
-    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.materialID}</span> },
-    { key: "nombre", header: "Nombre", render: (r) => r.nombre },
-    { key: "unidad", header: "Unidad", width: 120, render: (r) => r.unidad },
+    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.materialID}</span>, sortValue: (r) => r.materialID },
+    { key: "nombre", header: "Nombre", render: (r) => r.nombre, sortValue: (r) => r.nombre },
+    { key: "unidad", header: "Unidad", width: 120, render: (r) => r.unidad, sortValue: (r) => r.unidad },
     { key: "estado", header: "Estado", width: 100, render: (r) => (
       <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
     )},
@@ -144,10 +144,10 @@ function TabDocentes({ addToast }: { addToast: ReturnType<typeof useToast>["addT
   const list = data.data ?? [];
 
   const columns: Column<Docente>[] = [
-    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.docenteID}</span> },
-    { key: "nombres", header: "Nombres", render: (r) => r.nombres },
-    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos },
-    { key: "telefono", header: "Telefono", width: 130, render: (r) => r.telefono },
+    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.docenteID}</span>, sortValue: (r) => r.docenteID },
+    { key: "nombres", header: "Nombres", render: (r) => r.nombres, sortValue: (r) => r.nombres },
+    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos, sortValue: (r) => r.apellidos },
+    { key: "telefono", header: "Telefono", width: 130, render: (r) => r.telefono, sortValue: (r) => r.telefono },
     { key: "estado", header: "Estado", width: 100, render: (r) => (
       <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
     )},
@@ -213,9 +213,9 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
   const list = data.data ?? [];
 
   const columns: Column<Paciente>[] = [
-    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.pacienteID}</span> },
-    { key: "nombres", header: "Nombres", render: (r) => r.nombres },
-    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos },
+    { key: "id", header: "ID", width: 60, render: (r) => <span className="num">{r.pacienteID}</span>, sortValue: (r) => r.pacienteID },
+    { key: "nombres", header: "Nombres", render: (r) => r.nombres, sortValue: (r) => r.nombres },
+    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos, sortValue: (r) => r.apellidos },
     { key: "estado", header: "Estado", width: 100, render: (r) => (
       <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
     )},
@@ -280,13 +280,13 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
   const list = data.data ?? [];
 
   const columns: Column<Operador>[] = [
-    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.operadorID}</span> },
-    { key: "nombres", header: "Nombres", render: (r) => r.nombres },
-    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos },
-    { key: "dni", header: "DNI", width: 100, render: (r) => r.dni || "-" },
-    { key: "grado", header: "Grado", width: 70, render: (r) => r.grado },
-    { key: "tipo", header: "Tipo", width: 70, render: (r) => r.tipo },
-    { key: "periodo", header: "Periodo", width: 80, render: (r) => <span className="num">{r.periodo}</span> },
+    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.operadorID}</span>, sortValue: (r) => r.operadorID },
+    { key: "nombres", header: "Nombres", render: (r) => r.nombres, sortValue: (r) => r.nombres },
+    { key: "apellidos", header: "Apellidos", render: (r) => r.apellidos, sortValue: (r) => r.apellidos },
+    { key: "dni", header: "DNI", width: 100, render: (r) => r.dni || "-", sortValue: (r) => r.dni ?? "" },
+    { key: "grado", header: "Grado", width: 70, render: (r) => r.grado, sortValue: (r) => r.grado },
+    { key: "tipo", header: "Tipo", width: 70, render: (r) => r.tipo, sortValue: (r) => r.tipo },
+    { key: "periodo", header: "Periodo", width: 80, render: (r) => <span className="num">{r.periodo}</span>, sortValue: (r) => r.periodo },
     { key: "estado", header: "Estado", width: 90, render: (r) => (
       <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
     )},
@@ -366,9 +366,9 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
         <ChevronDown size={14} style={{ transform: expanded.has(r.tratPredID) ? "rotate(180deg)" : "", transition: "transform 0.18s" }} />
       </button>
     )},
-    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratPredID}</span> },
-    { key: "nombre", header: "Nombre", render: (r) => r.nombreTratamiento },
-    { key: "costo", header: "Costo", width: 100, render: (r) => r.montoSugerido != null ? `S/ ${r.montoSugerido.toFixed(2)}` : "-" },
+    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratPredID}</span>, sortValue: (r) => r.tratPredID },
+    { key: "nombre", header: "Nombre", render: (r) => r.nombreTratamiento, sortValue: (r) => r.nombreTratamiento },
+    { key: "costo", header: "Costo", width: 100, render: (r) => r.montoSugerido != null ? `S/ ${r.montoSugerido.toFixed(2)}` : "-", sortValue: (r) => r.montoSugerido ?? 0 },
     { key: "estado", header: "Estado", width: 100, render: (r) => (
       <Badge variant={r.estado === 1 ? "success" : "neutral"}>{r.estado === 1 ? "Activo" : "Inactivo"}</Badge>
     )},
@@ -493,10 +493,10 @@ function TabTratamientosRealizados() {
         <ChevronDown size={14} style={{ transform: expanded.has(r.tratamientoID) ? "rotate(180deg)" : "", transition: "transform 0.18s" }} />
       </button>
     )},
-    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratamientoID}</span> },
-    { key: "nombre", header: "Tratamiento", render: (r) => r.nombreTratamiento },
-    { key: "fecha", header: "Fecha", width: 100, render: (r) => r.fecha },
-    { key: "monto", header: "Monto", width: 100, render: (r) => `S/ ${r.monto.toFixed(2)}` },
+    { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratamientoID}</span>, sortValue: (r) => r.tratamientoID },
+    { key: "nombre", header: "Tratamiento", render: (r) => r.nombreTratamiento, sortValue: (r) => r.nombreTratamiento },
+    { key: "fecha", header: "Fecha", width: 100, render: (r) => r.fecha, sortValue: (r) => r.fecha },
+    { key: "monto", header: "Monto", width: 100, render: (r) => `S/ ${r.monto.toFixed(2)}`, sortValue: (r) => r.monto },
     { key: "estado", header: "Estado", width: 90, render: (r) => {
       const v = r.estado === "CERRADO" ? "success" : r.estado === "ANULADO" ? "danger" : "info";
       return <Badge variant={v}>{r.estado}</Badge>;
