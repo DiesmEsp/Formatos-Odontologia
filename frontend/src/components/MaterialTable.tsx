@@ -129,14 +129,14 @@ export function MaterialTable({
             readOnly={readOnly}
           />
           {!readOnly && (
-            <button className="btn btn-ghost btn-sm material-row-remove" onClick={() => onRemove(row.key)}>
+            <button type="button" className="btn btn-ghost btn-sm material-row-remove" onClick={() => onRemove(row.key)}>
               <Trash2 size={14} />
             </button>
           )}
         </div>
       ))}
       {!readOnly && (
-        <button className="material-table-add" onClick={onAdd}>
+        <button type="button" className="material-table-add" onClick={onAdd}>
           <Plus size={14} />
           <span>Agregar material</span>
         </button>

@@ -95,6 +95,7 @@ export function SearchableCombo({
           )}
           {!loading && filteredOptions.map((opt) => (
             <button
+              type="button"
               key={opt.id}
               className={`combo-option ${opt.id === value ? 'selected' : ''}`}
               onClick={() => handleSelect(opt.id)}
@@ -108,13 +109,13 @@ export function SearchableCombo({
           {!loading && filteredOptions.length === 0 && allowCreate && onCreateNew && query.trim() && (
             <div style={{ padding: '12px', textAlign: 'center' }}>
               <span className="text-muted text-sm" style={{ display: 'block', marginBottom: 8 }}>Sin resultados</span>
-              <button className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
                 <Plus size={14} /> Crear &quot;{query}&quot;
               </button>
             </div>
           )}
           {!loading && allowCreate && onCreateNew && filteredOptions.length > 0 && (
-            <button className="combo-option combo-option-create" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
+            <button type="button" className="combo-option combo-option-create" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
               <Plus size={14} />
               <span>Crear nuevo</span>
             </button>
