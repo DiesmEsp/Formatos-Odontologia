@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 type FieldOption = { label: string; value: string };
@@ -40,6 +40,17 @@ export function CatalogoModal({
   width,
 }: CatalogoModalProps) {
   const [values, setValues] = useState<Record<string, any>>(initialValues);
+  const initialValuesRef = useRef(initialValues);
+
+  useEffect(() => {
+    initialValuesRef.current = initialValues;
+  }, [initialValues]);
+
+  useEffect(() => {
+    if (open) {
+      setValues(initialValuesRef.current);
+    }
+  }, [open]);
 
   if (!open) return null;
 
