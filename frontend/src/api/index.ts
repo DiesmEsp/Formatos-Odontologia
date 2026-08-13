@@ -86,6 +86,7 @@ export const api = {
 
   tratamientos: {
     activos: () => request<Tratamiento[]>('/api/tratamientos'),
+    cerrados: () => request<Tratamiento[]>('/api/tratamientos/cerrados'),
     porUnidad: (unidadId: number) => request<Tratamiento[]>(`/api/tratamientos/unidad/${unidadId}`),
     buscarPorId: (id: number) => request<Tratamiento>(`/api/tratamientos/${id}`),
     crear: (data: CrearTratamientoDTO) => request<{ id: number }>('/api/tratamientos', {

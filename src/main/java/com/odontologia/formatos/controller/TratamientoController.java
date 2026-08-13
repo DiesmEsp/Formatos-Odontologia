@@ -20,6 +20,10 @@ public class TratamientoController {
             ctx.json(service.activos());
         });
 
+        app.get("/api/tratamientos/cerrados", ctx -> {
+            ctx.json(service.cerrados());
+        });
+
         app.get("/api/tratamientos/unidad/{id}", ctx -> {
             int unidadId = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.porUnidad(unidadId));

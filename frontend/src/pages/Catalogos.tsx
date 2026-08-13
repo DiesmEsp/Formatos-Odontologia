@@ -480,7 +480,7 @@ function MaterialesDetalle({ tratPredID }: { tratPredID: number }) {
 }
 
 function TabTratamientosRealizados() {
-  const data = useApi(() => api.tratamientos.activos());
+  const data = useApi(() => api.tratamientos.cerrados());
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const list = data.data ?? [];
 

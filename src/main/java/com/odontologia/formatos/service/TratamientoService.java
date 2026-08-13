@@ -107,6 +107,10 @@ public class TratamientoService {
         return repository.findByEstado("ABIERTO");
     }
 
+    public List<Tratamiento> cerrados() throws SQLException {
+        return repository.findByEstado("CERRADO");
+    }
+
     public List<Tratamiento> porUnidad(int unidadID) throws SQLException {
         return repository.findByUnidad(unidadID);
     }
