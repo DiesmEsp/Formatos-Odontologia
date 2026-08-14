@@ -61,4 +61,18 @@ describe('StationCard', () => {
     );
     expect(container.querySelector('.station-card.ocupado')).toBeTruthy();
   });
+
+  it('muestra nombres completos cuando se proporcionan', () => {
+    render(
+      <StationCard unidadNro={2} tratamiento={tratamientoMock} operadorNombre="Ana Perez" pacienteNombre="Juan Lopez" onClick={vi.fn()} />
+    );
+    expect(screen.getByText('Ana Perez')).toBeInTheDocument();
+    expect(screen.getByText('Juan Lopez')).toBeInTheDocument();
+  });
+
+  it('muestra id como respaldo cuando no hay nombre', () => {
+    render(<StationCard unidadNro={2} tratamiento={tratamientoMock} onClick={vi.fn()} />);
+    expect(screen.getByText('Operador #1')).toBeInTheDocument();
+    expect(screen.getByText('Paciente #1')).toBeInTheDocument();
+  });
 });

@@ -17,6 +17,8 @@ const TIPOS_POS = ['R1', 'R2', 'R3'];
 export default function Tratamientos() {
   const unidades = useApi(() => api.unidades.listar());
   const tratamientos = useApi(() => api.tratamientos.activos());
+  const operadores = useApi(() => api.catalogos.operadores.listar());
+  const pacientes = useApi(() => api.catalogos.pacientes.listar());
   const { addToast } = useToast();
 
   const [crearUnidad, setCrearUnidad] = useState<Unidad | null>(null);
@@ -24,6 +26,9 @@ export default function Tratamientos() {
 
   const tratamientosActivos = tratamientos.data ?? [];
   const unidadesList = unidades.data ?? [];
+
+  const operadorNombreMap = new Map((operadores.data ?? []).map((o) => [o.operadorID, nombreCompleto(o.nombres, o.apellidos)]));
+  const pacienteNombreMap = new Map((pacientes.data ?? []).map((p) => [p.pacienteID, nombreCompleto(p.nombres, p.apellidos)]));
 
   const getTratamientoEnUnidad = (unidadId: number) => {
     return tratamientosActivos.find((t) => t.unidadID === unidadId && t.estado !== 'CERRADO' && t.estado !== 'ANULADO') ?? null;
@@ -39,18 +44,22 @@ export default function Tratamientos() {
       </div>
 
       <div className="station-grid">
-        {unidadesList.map((u) => (
-          <StationCard
-            key={u.unidadID}
-            unidadNro={u.unidadNro}
-            tratamiento={getTratamientoEnUnidad(u.unidadID)}
-            onClick={() => {
-              const t = getTratamientoEnUnidad(u.unidadID);
-              if (t) setDetalleTratamiento(t);
-              else setCrearUnidad(u);
-            }}
-          />
-        ))}
+        {unidadesList.map((u) => {
+          const t = getTratamientoEnUnidad(u.unidadID);
+          return (
+            <StationCard
+              key={u.unidadID}
+              unidadNro={u.unidadNro}
+              tratamiento={t}
+              operadorNombre={t ? operadorNombreMap.get(t.operadorID) : undefined}
+              pacienteNombre={t ? pacienteNombreMap.get(t.pacienteID) : undefined}
+              onClick={() => {
+                if (t) setDetalleTratamiento(t);
+                else setCrearUnidad(u);
+              }}
+            />
+          );
+        })}
         {unidadesList.length === 0 && (
           <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
             <span className="empty-title">No hay unidades registradas</span>
@@ -63,7 +72,7 @@ export default function Tratamientos() {
         <CrearTratamientoModal
           unidad={crearUnidad}
           onClose={() => setCrearUnidad(null)}
-          onSuccess={() => { setCrearUnidad(null); tratamientos.refetch(); }}
+          onSuccess={() => { setCrearUnidad(null); tratamientos.refetch(); operadores.refetch(); pacientes.refetch(); }}
           addToast={addToast}
         />
       )}
@@ -71,6 +80,8 @@ export default function Tratamientos() {
       {detalleTratamiento && (
         <DetalleTratamientoSubventana
           tratamiento={detalleTratamiento}
+          operadorNombre={operadorNombreMap.get(detalleTratamiento.operadorID)}
+          pacienteNombre={pacienteNombreMap.get(detalleTratamiento.pacienteID)}
           onClose={() => { setDetalleTratamiento(null); tratamientos.refetch(); }}
           addToast={addToast}
         />
@@ -94,21 +105,73 @@ function CrearTratamientoModal({
   const [qTrat, setQTrat] = useState('');
   const [showNewPaciente, setShowNewPaciente] = useState(false);
   const [showNewOperador, setShowNewOperador] = useState(false);
+  const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
+  const materialRowsRef = useRef<MaterialRow[]>([]);
 
   const pacientes = useApi(() => api.catalogos.pacientes.listar(qPac || undefined), [qPac]);
   const operadores = useApi(() => api.catalogos.operadores.listar(qOpe || undefined), [qOpe]);
   const tratsPred = useApi(() => api.catalogos.tratamientosPred.listar(qTrat || undefined), [qTrat]);
+  const materiales = useApi(() => api.catalogos.materiales.listar());
 
   const pOptions: SearchableOption[] = (pacientes.data ?? []).map((p) => ({ id: p.pacienteID, label: nombreCompleto(p.nombres, p.apellidos) }));
   const oOptions: SearchableOption[] = (operadores.data ?? []).map((o) => ({ id: o.operadorID, label: nombreCompleto(o.nombres, o.apellidos), badge: o.grado }));
   const tOptions: SearchableOption[] = (tratsPred.data ?? []).map((t) => ({ id: t.tratPredID, label: t.nombreTratamiento, extra: t.montoSugerido != null ? `S/ ${t.montoSugerido.toFixed(2)}` : undefined }));
 
-  const handleTratChange = (id: number | null) => {
+  const handleTratChange = async (id: number | null) => {
     setTratPredId(id);
     if (id) {
       const tp = tratsPred.data?.find((t) => t.tratPredID === id);
       if (tp?.montoSugerido != null && tipo !== 'CONTINUO') setMontoStr(String(tp.montoSugerido));
+      try {
+        const mats = await api.catalogos.tratamientosPred.materiales(id);
+        const rows: MaterialRow[] = mats.map((m, i) => ({
+          key: `new-${Date.now()}-${i}`,
+          materialId: m.materialID,
+          nombreMaterial: m.nombreMaterial,
+          cantidad: m.cantidad,
+        }));
+        setMaterialRows(rows);
+        materialRowsRef.current = rows;
+      } catch {
+        setMaterialRows([]);
+        materialRowsRef.current = [];
+      }
+    } else {
+      setMaterialRows([]);
+      materialRowsRef.current = [];
     }
+  };
+
+  const handleAddRow = () => {
+    setMaterialRows((prev) => {
+      const next = [...prev, { key: `new-${Date.now()}`, materialId: null, nombreMaterial: '', cantidad: 0 }];
+      materialRowsRef.current = next;
+      return next;
+    });
+  };
+
+  const handleRemoveRow = (key: string) => {
+    setMaterialRows((prev) => {
+      const next = prev.filter((r) => r.key !== key);
+      materialRowsRef.current = next;
+      return next;
+    });
+  };
+
+  const handleMaterialChange = (key: string, materialId: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, materialId } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
+  };
+
+  const handleCantidadChange = (key: string, cantidad: number) => {
+    setMaterialRows((prev) => {
+      const next = prev.map((r) => r.key === key ? { ...r, cantidad } : r);
+      materialRowsRef.current = next;
+      return next;
+    });
   };
 
   const handleTipoChange = (nuevoTipo: string) => {
@@ -145,11 +208,18 @@ function CrearTratamientoModal({
   const handleGuardar = async () => {
     if (!operadorId || !pacienteId) { addToast('error', 'Seleccione paciente y operador'); return; }
     const montoVal = montoStr === '' ? null : Number(montoStr);
+    const materialesMap: Record<string, number> = {};
+    for (const row of materialRowsRef.current) {
+      if (row.materialId != null && row.cantidad > 0) {
+        materialesMap[String(row.materialId)] = row.cantidad;
+      }
+    }
     setSaving(true);
     try {
       await api.tratamientos.crear({
         operadorID: operadorId, pacienteID: pacienteId, unidadID: unidad.unidadID, fecha,
         tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
+        materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
       });
       addToast('success', 'Tratamiento creado correctamente');
       onSuccess();
@@ -197,6 +267,11 @@ function CrearTratamientoModal({
                 <option value="NORMAL">Normal</option>
                 <option value="CONTINUO">Continuo</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Materiales</label>
+              <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddRow} onRemove={handleRemoveRow} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
             </div>
           </div>
           <div className="dialog-footer">
@@ -306,8 +381,8 @@ function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
 }
 
 function DetalleTratamientoSubventana({
-  tratamiento: initialTrat, onClose, addToast,
-}: { tratamiento: Tratamiento; onClose: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
+  tratamiento: initialTrat, operadorNombre, pacienteNombre, onClose, addToast,
+}: { tratamiento: Tratamiento; operadorNombre?: string; pacienteNombre?: string; onClose: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
   const [tratamiento, setTratamiento] = useState<Tratamiento>(initialTrat);
   const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
   const [showPago, setShowPago] = useState(false);
@@ -503,8 +578,8 @@ function DetalleTratamientoSubventana({
           </div>
           <div className="subventana-body">
             <div className="sv-grid">
-              <div className="sv-row"><span className="sv-label">Operador</span><span>#{tratamiento.operadorID}</span></div>
-              <div className="sv-row"><span className="sv-label">Paciente</span><span>#{tratamiento.pacienteID}</span></div>
+              <div className="sv-row"><span className="sv-label">Operador</span><span>{operadorNombre ?? `#${tratamiento.operadorID}`}</span></div>
+              <div className="sv-row"><span className="sv-label">Paciente</span><span>{pacienteNombre ?? `#${tratamiento.pacienteID}`}</span></div>
               <div className="sv-row"><span className="sv-label">Fecha</span><span>{tratamiento.fecha}</span></div>
               <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
               <div className="sv-row"><span className="sv-label">Monto pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>

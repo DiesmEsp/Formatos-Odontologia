@@ -6,10 +6,12 @@ import type { Tratamiento } from '../api/types';
 interface StationCardProps {
   unidadNro: number;
   tratamiento: Tratamiento | null;
+  operadorNombre?: string;
+  pacienteNombre?: string;
   onClick: (unidadNro: number) => void;
 }
 
-export function StationCard({ unidadNro, tratamiento, onClick }: StationCardProps) {
+export function StationCard({ unidadNro, tratamiento, operadorNombre, pacienteNombre, onClick }: StationCardProps) {
   const ocupado = !!tratamiento;
 
   return (
@@ -34,11 +36,11 @@ export function StationCard({ unidadNro, tratamiento, onClick }: StationCardProp
           <div className="ticket-meta">
             <div className="meta-row">
               <Stethoscope size={14} />
-              <span>Operador #{tratamiento.operadorID}</span>
+              <span>{operadorNombre ?? `Operador #${tratamiento.operadorID}`}</span>
             </div>
             <div className="meta-row">
               <User size={14} />
-              <span>Paciente #{tratamiento.pacienteID}</span>
+              <span>{pacienteNombre ?? `Paciente #${tratamiento.pacienteID}`}</span>
             </div>
           </div>
           <div className="ticket-monto">{formatMonto(tratamiento.monto)}</div>

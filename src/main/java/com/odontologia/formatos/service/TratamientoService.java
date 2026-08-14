@@ -42,6 +42,12 @@ public class TratamientoService {
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, Double monto, String tipo,
+                     Map<Integer, Double> materiales) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
@@ -84,12 +90,27 @@ public class TratamientoService {
 
             int tratamientoID = repository.insert(con, tratamiento);
             tratamiento.setTratamientoID(tratamientoID);
-            for (TratamientoPredefinidoMaterial sugerido : sugeridos) {
-                TratamientoMaterial item = new TratamientoMaterial();
-                item.setTratamientoID(tratamientoID);
-                item.setMaterialID(sugerido.getMaterialID());
-                item.setCantidad(sugerido.getCantidad());
-                materialRepository.insert(con, item);
+
+            if (materiales != null) {
+                for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
+                    if (entrada.getValue() == null || entrada.getValue() <= 0) {
+                        continue;
+                    }
+                    validarMaterialExiste(entrada.getKey());
+                    TratamientoMaterial item = new TratamientoMaterial();
+                    item.setTratamientoID(tratamientoID);
+                    item.setMaterialID(entrada.getKey());
+                    item.setCantidad(entrada.getValue());
+                    materialRepository.insert(con, item);
+                }
+            } else {
+                for (TratamientoPredefinidoMaterial sugerido : sugeridos) {
+                    TratamientoMaterial item = new TratamientoMaterial();
+                    item.setTratamientoID(tratamientoID);
+                    item.setMaterialID(sugerido.getMaterialID());
+                    item.setCantidad(sugerido.getCantidad());
+                    materialRepository.insert(con, item);
+                }
             }
             return tratamientoID;
         });
@@ -311,31 +332,38 @@ public class TratamientoService {
         }
 
         TransaccionBD.ejecutar(con -> {
+            boolean continuo;
             if (dto.tipo != null) {
                 String tipoNormalizado = normalizarTipo(dto.tipo);
                 t.setTipo(tipoNormalizado);
-                if ("CONTINUO".equals(tipoNormalizado)) {
-                    t.setMonto(0);
-                    t.setEstadoPago("PAGADO");
-                    t.setMontoPagado(0);
-                }
+                continuo = "CONTINUO".equals(tipoNormalizado);
+            } else {
+                continuo = "CONTINUO".equals(t.getTipo());
             }
-            if (dto.monto != null) {
-                if (dto.monto < 0) {
-                    throw new NegocioException("El monto del tratamiento no puede ser negativo.");
+
+            if (continuo) {
+                t.setMonto(0);
+                t.setMontoPagado(0);
+                t.setEstadoPago("PAGADO");
+            } else {
+                if (dto.monto != null) {
+                    if (dto.monto < 0) {
+                        throw new NegocioException("El monto del tratamiento no puede ser negativo.");
+                    }
+                    t.setMonto(dto.monto);
                 }
-                t.setMonto(dto.monto);
-            }
-            if (dto.montoPagado != null) {
-                if (dto.montoPagado > t.getMonto()) {
+                if (dto.montoPagado != null) {
+                    if (dto.montoPagado < 0) {
+                        throw new NegocioException("El monto pagado no puede ser negativo.");
+                    }
+                    t.setMontoPagado(dto.montoPagado);
+                }
+                if (t.getMontoPagado() > t.getMonto() + EPSILON) {
                     throw new NegocioException("El monto pagado no puede superar el monto total.");
                 }
-                t.setMontoPagado(dto.montoPagado);
-                t.setEstadoPago(derivarEstadoPago(dto.montoPagado, t.getMonto()));
+                t.setEstadoPago(derivarEstadoPago(t.getMontoPagado(), t.getMonto()));
             }
-            if (dto.estadoPago != null) {
-                t.setEstadoPago(dto.estadoPago);
-            }
+
             if (dto.fecha != null) {
                 validarFecha(dto.fecha);
                 t.setFecha(dto.fecha);
@@ -394,11 +422,17 @@ public class TratamientoService {
         if (t == null) {
             throw new NegocioException("El tratamiento no existe.");
         }
+        if ("ANULADO".equals(t.getEstado())) {
+            throw new NegocioException("No se puede registrar pago sobre un tratamiento anulado.");
+        }
         if ("CONTINUO".equals(t.getTipo())) {
             throw new NegocioException("Un tratamiento continuo no requiere pago.");
         }
         TransaccionBD.ejecutar(con -> {
             double nuevoPagado = t.getMontoPagado() + abono;
+            if (nuevoPagado > t.getMonto() + EPSILON) {
+                throw new NegocioException("El pago supera el monto total del tratamiento.");
+            }
             t.setMontoPagado(nuevoPagado);
             t.setEstadoPago(derivarEstadoPago(nuevoPagado, t.getMonto()));
             repository.update(con, t);

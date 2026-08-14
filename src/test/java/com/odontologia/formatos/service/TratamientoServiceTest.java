@@ -136,6 +136,53 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void crearConMaterialesExplicitos() throws SQLException {
+        int matID = crearMaterial("Algodon test", "paquete");
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(matID, 4.0);
+
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL", materiales);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("ABIERTO", t.getEstado());
+
+        List<TratamientoMaterialRepository.MaterialConCantidad> mats = service.materialesConNombre(id);
+        assertEquals(1, mats.size());
+        assertEquals(matID, mats.get(0).getMaterialID());
+        assertEquals(4.0, mats.get(0).getCantidad(), 0.001);
+    }
+
+    @Test
+    void crearConMaterialesExplicitosSobrescribePlantilla() throws SQLException {
+        int predID = crearPlantillaConMateriales();
+        int matID = crearMaterial("Guante test", "guante");
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(matID, 7.0);
+
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", predID, null, "NORMAL", materiales);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Tratamiento de prueba unico", t.getNombreTratamiento());
+        assertEquals(150.0, t.getMonto(), 0.001);
+
+        List<TratamientoMaterialRepository.MaterialConCantidad> mats = service.materialesConNombre(id);
+        assertEquals(1, mats.size());
+        assertEquals(matID, mats.get(0).getMaterialID());
+        assertEquals(7.0, mats.get(0).getCantidad(), 0.001);
+    }
+
+    @Test
+    void crearConMaterialesExplicitosRechazaMaterialInexistente() {
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(9999, 1.0);
+
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL", materiales));
+    }
+
+    @Test
     void agregarMaterialAcumulaCantidad() throws SQLException {
         int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
 
@@ -262,6 +309,22 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     @Test
     void rechazaAbonoDeContinuo() throws SQLException {
         int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, null, "CONTINUO");
+
+        assertThrows(NegocioException.class, () -> service.registrarPago(id, 10.0));
+    }
+
+    @Test
+    void rechazaSobrepago() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        assertThrows(NegocioException.class, () -> service.registrarPago(id, 101.0));
+    }
+
+    @Test
+    void rechazaPagoSobreAnulado() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.anular(id, "Motivo");
 
         assertThrows(NegocioException.class, () -> service.registrarPago(id, 10.0));
     }

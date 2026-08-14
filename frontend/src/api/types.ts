@@ -141,6 +141,7 @@ export interface CrearTratamientoDTO {
   tratPredID: number | null;
   monto: number | null;
   tipo: string;
+  materiales?: Record<string, number>;
 }
 
 export interface EditarTratamientoDTO {

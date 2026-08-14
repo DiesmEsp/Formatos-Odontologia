@@ -52,8 +52,18 @@ public class TratamientoController {
                     ? ((Number) body.get("monto")).doubleValue() : null;
             String tipo = (String) body.get("tipo");
 
+            Map<Integer, Double> materiales = new HashMap<>();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> rawMateriales = (Map<String, Object>) body.get("materiales");
+            if (rawMateriales != null) {
+                for (Map.Entry<String, Object> e : rawMateriales.entrySet()) {
+                    materiales.put(Integer.parseInt(e.getKey()), ((Number) e.getValue()).doubleValue());
+                }
+            }
+
             try {
-                int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo);
+                int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
+                        rawMateriales != null ? materiales : null);
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
