@@ -174,6 +174,23 @@ public class AsistenciaService {
         TransaccionBD.ejecutar(con -> acumular(con, asistenciaID, materialID, cantidad));
     }
 
+    public void reemplazarMateriales(int asistenciaID, Map<Integer, Double> materiales) throws SQLException {
+        if (materiales == null) throw new NegocioException("Debe enviar el listado de materiales.");
+        validarMaterialesExisten(materiales);
+        validarCantidades(materiales);
+        TransaccionBD.ejecutar(con -> {
+            Asistencia a = validarAsistenciaActiva(asistenciaID);
+            materialRepository.deleteByAsistenciaID(con, asistenciaID);
+            for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
+                AsistenciaMaterial item = new AsistenciaMaterial();
+                item.setAsistenciaID(asistenciaID);
+                item.setMaterialID(entrada.getKey());
+                item.setCantidad(entrada.getValue());
+                materialRepository.insert(con, item);
+            }
+        });
+    }
+
     public List<AsistenciaMaterialRepository.MaterialConCantidad> materialesDelDia(int asistenciaID)
             throws SQLException {
         return materialRepository.findMaterialesConNombre(asistenciaID);

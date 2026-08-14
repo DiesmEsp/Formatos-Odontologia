@@ -140,6 +140,29 @@ public class AsistenciaController {
             ctx.json(Map.of("ok", true));
         });
 
+        app.put("/api/asistencia/{id}/materiales", ctx -> {
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
+            var body = ctx.bodyAsClass(Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> raw = (Map<String, Object>) body.get("materiales");
+            if (raw == null) {
+                ctx.status(400).json(Map.of("error", "El campo 'materiales' es obligatorio."));
+                return;
+            }
+            Map<Integer, Double> materiales = raw.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            e -> Integer.parseInt(e.getKey()),
+                            e -> ((Number) e.getValue()).doubleValue(),
+                            (a, b) -> b,
+                            LinkedHashMap::new));
+            try {
+                service.reemplazarMateriales(id, materiales);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.post("/api/asistencia/{id}/registrar", ctx -> {
             int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);

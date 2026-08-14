@@ -107,6 +107,38 @@ class AsistenciaServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void reemplazarMaterialesReduceYElimina() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.registrarMateriales(docenteID, "2026-08-03", Map.of(1, 2.0));
+        service.registrarMateriales(docenteID, "2026-08-03", Map.of(2, 1.5));
+
+        service.reemplazarMateriales(a.getAsistenciaID(), Map.of(1, 5.0));
+
+        List<AsistenciaMaterialRepository.MaterialConCantidad> materiales = service.materialesDelDia(a.getAsistenciaID());
+        assertEquals(1, materiales.size());
+        assertEquals(1, materiales.get(0).getMaterialID());
+        assertEquals(5.0, materiales.get(0).getCantidad(), 0.001);
+    }
+
+    @Test
+    void reemplazarMaterialesVacioLimpiaTodo() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+        service.registrarMateriales(docenteID, "2026-08-03", Map.of(1, 2.0));
+
+        service.reemplazarMateriales(a.getAsistenciaID(), Map.of());
+
+        assertEquals(0, service.materialesDelDia(a.getAsistenciaID()).size());
+    }
+
+    @Test
+    void reemplazarMaterialesRechazaCantidadInvalida() throws SQLException {
+        Asistencia a = service.abrirDia(docenteID, "2026-08-03", "08:00:00");
+
+        assertThrows(NegocioException.class,
+                () -> service.reemplazarMateriales(a.getAsistenciaID(), Map.of(1, 0.0)));
+    }
+
+    @Test
     void rechazaMaterialInexistente() {
         assertThrows(NegocioException.class,
                 () -> service.registrarMateriales(docenteID, "2026-08-03", Map.of(9999, 1.0)));

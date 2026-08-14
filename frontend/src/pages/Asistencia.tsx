@@ -134,25 +134,14 @@ export default function Asistencia() {
   const guardarMaterialesEnBloque = async () => {
     setSavingMat(true);
     try {
-      const rows = materialRowsRef.current;
-      const original = originalRowsRef.current;
-
-      for (const row of rows) {
-        if (row.materialId == null) continue;
-        if (!asistencia) continue;
-
-        const orig = original.find((or) => or.key === row.key);
-
-        if (!orig) {
-          if (row.cantidad > 0) {
-            await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: row.materialId, cantidad: row.cantidad });
-          }
-        } else if (orig.cantidad !== row.cantidad || orig.materialId !== row.materialId) {
-          await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: row.materialId, cantidad: row.cantidad - orig.cantidad });
-        }
+      if (!asistencia) return;
+      const materiales: Record<number, number> = {};
+      for (const row of materialRowsRef.current) {
+        if (row.materialId == null || row.cantidad <= 0) continue;
+        materiales[row.materialId] = (materiales[row.materialId] ?? 0) + row.cantidad;
       }
-
-      await cargarDetalle(asistencia!.asistenciaID);
+      await api.asistencia.reemplazarMateriales(asistencia.asistenciaID, materiales);
+      await cargarDetalle(asistencia.asistenciaID);
       setDirty(false);
       addToast('success', 'Materiales guardados correctamente');
     } catch (err) {
@@ -476,7 +465,7 @@ export default function Asistencia() {
                   className="text-field w-160"
                   step="1"
                   value={asistencia.horaEntrada?.substring(0, 8) ?? ''}
-                  onChange={(e) => handleEditarEntrada(e.target.value + ':00')}
+                  onChange={(e) => handleEditarEntrada(e.target.value)}
                 />
                 {diaActivo && (
                   <span className="text-muted text-sm">en clínica desde las {formatearHora(asistencia.horaEntrada)}</span>

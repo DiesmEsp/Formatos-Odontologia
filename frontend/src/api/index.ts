@@ -173,6 +173,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(dto),
     }),
+    reemplazarMateriales: (asistenciaId: number, materiales: Record<number, number>) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/materiales`, {
+      method: 'PUT',
+      body: JSON.stringify({ materiales }),
+    }),
     anular: (asistenciaId: number, motivo: string) => request<{ ok: boolean }>(`/api/asistencia/${asistenciaId}/anular`, {
       method: 'POST',
       body: JSON.stringify({ motivo }),
