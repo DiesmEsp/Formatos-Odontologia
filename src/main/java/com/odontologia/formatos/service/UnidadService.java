@@ -12,10 +12,12 @@ public class UnidadService {
 
     private final UnidadRepository repository = new UnidadRepository();
 
-    public int crear() throws SQLException {
-        String sql = "INSERT INTO Unidad (UnidadNro) SELECT COALESCE(MAX(UnidadNro), 0) + 1 FROM Unidad";
+    public int crear(int clinicaID) throws SQLException {
+        String sql = "INSERT INTO Unidad (UnidadNro, ClinicaID) SELECT COALESCE(MAX(UnidadNro), 0) + 1, ? FROM Unidad WHERE ClinicaID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, clinicaID);
+            ps.setInt(2, clinicaID);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) return rs.getInt(1);

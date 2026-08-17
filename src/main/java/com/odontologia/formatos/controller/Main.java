@@ -2,6 +2,8 @@ package com.odontologia.formatos.controller;
 
 import com.odontologia.formatos.config.AppConfig;
 import com.odontologia.formatos.db.ConnectionManager;
+import com.odontologia.formatos.model.Clinica;
+import com.odontologia.formatos.repository.ClinicaRepository;
 import com.odontologia.formatos.service.EntidadDuplicadaException;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.LogConfig;
@@ -11,6 +13,8 @@ import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.javalin.http.TooManyRequestsResponse;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,6 +54,20 @@ public class Main {
             if (!limiteDashboard.permitir("dashboard:" + ctx.ip())) {
                 throw new TooManyRequestsResponse("Demasiadas solicitudes. Intente nuevamente en un momento.");
             }
+        });
+
+        app.before("/api/*", ctx -> {
+            String header = ctx.header("X-Clinica-Nombre");
+            if (header == null || header.isBlank()) {
+                ctx.attribute("clinicaID", null);
+                return;
+            }
+            String nombre = URLDecoder.decode(header, StandardCharsets.UTF_8);
+            Clinica clinica = new ClinicaRepository().findByNombreActiva(nombre);
+            if (clinica == null) {
+                throw new ControllerUtil.ValidationException("Clínica no encontrada o inactiva: '" + nombre + "'.");
+            }
+            ctx.attribute("clinicaID", clinica.getClinicaID());
         });
 
         app.exception(NegocioException.class, (e, ctx) -> {

@@ -4,13 +4,19 @@ public class Unidad {
 
     private int unidadID;
     private int unidadNro;
+    private int clinicaID = 1;
 
     public Unidad() {
     }
 
     public Unidad(int unidadID, int unidadNro) {
+        this(unidadID, unidadNro, 1);
+    }
+
+    public Unidad(int unidadID, int unidadNro, int clinicaID) {
         this.unidadID = unidadID;
         this.unidadNro = unidadNro;
+        this.clinicaID = clinicaID;
     }
 
     public int getUnidadID() {
@@ -27,6 +33,14 @@ public class Unidad {
 
     public void setUnidadNro(int unidadNro) {
         this.unidadNro = unidadNro;
+    }
+
+    public int getClinicaID() {
+        return clinicaID;
+    }
+
+    public void setClinicaID(int clinicaID) {
+        this.clinicaID = clinicaID;
     }
 
     @Override

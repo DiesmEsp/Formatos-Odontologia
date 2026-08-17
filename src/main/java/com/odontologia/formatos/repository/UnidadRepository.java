@@ -14,10 +14,11 @@ import java.util.List;
 public class UnidadRepository {
 
     public int insert(Unidad unidad) throws SQLException {
-        String sql = "INSERT INTO Unidad (UnidadNro) VALUES (?)";
+        String sql = "INSERT INTO Unidad (UnidadNro, ClinicaID) VALUES (?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, unidad.getUnidadNro());
+            ps.setInt(2, unidad.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -48,31 +49,36 @@ public class UnidadRepository {
         }
     }
 
-    public List<Unidad> findAll() throws SQLException {
+    public List<Unidad> findAll(int clinicaID) throws SQLException {
         List<Unidad> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Unidad ORDER BY UnidadNro";
+        String sql = "SELECT * FROM Unidad WHERE ClinicaID = ? ORDER BY UnidadNro";
         try (Connection con = ConnectionManager.getInstance().getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(rowToModel(rs));
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, clinicaID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
             }
         }
         return lista;
     }
 
-    public int maxUnidadNro() throws SQLException {
-        String sql = "SELECT COALESCE(MAX(UnidadNro), 0) FROM Unidad";
+    public int maxUnidadNro(int clinicaID) throws SQLException {
+        String sql = "SELECT COALESCE(MAX(UnidadNro), 0) FROM Unidad WHERE ClinicaID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            return rs.next() ? rs.getInt(1) : 0;
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, clinicaID);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
         }
     }
 
     private Unidad rowToModel(ResultSet rs) throws SQLException {
         return new Unidad(
                 rs.getInt("UnidadID"),
-                rs.getInt("UnidadNro"));
+                rs.getInt("UnidadNro"),
+                rs.getInt("ClinicaID"));
     }
 }

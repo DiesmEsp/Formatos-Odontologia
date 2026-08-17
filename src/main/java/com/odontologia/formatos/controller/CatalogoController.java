@@ -53,9 +53,9 @@ public class CatalogoController {
         app.get("/api/catalogos/operadores", ctx -> {
             String q = ctx.queryParam("q");
             if (q != null && !q.isBlank()) {
-                ctx.json(operadorRepo.buscarPorTexto(q));
+                ctx.json(operadorRepo.buscarPorTexto(q, ControllerUtil.clinicaID(ctx)));
             } else {
-                ctx.json(operadorRepo.findAll());
+                ctx.json(operadorRepo.findAll(ControllerUtil.clinicaID(ctx)));
             }
         });
 
@@ -67,7 +67,8 @@ public class CatalogoController {
                     (String) body.get("dni"),
                     (String) body.get("grado"),
                     (String) body.get("tipo"),
-                    ((Number) body.get("periodo")).intValue());
+                    ((Number) body.get("periodo")).intValue(),
+                    ControllerUtil.clinicaID(ctx));
             ctx.status(201).json(Map.of("id", id));
         });
 
@@ -83,6 +84,7 @@ public class CatalogoController {
             o.setTipo((String) body.getOrDefault("tipo", ""));
             o.setPeriodo(body.get("periodo") != null ? ((Number) body.get("periodo")).intValue() : 0);
             o.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : operadorRepo.findById(id).getEstado());
+            o.setClinicaID(operadorRepo.findById(id).getClinicaID());
             operadorService.actualizar(o);
             ctx.json(Map.of("ok", true));
         });
@@ -98,9 +100,9 @@ public class CatalogoController {
         app.get("/api/catalogos/docentes", ctx -> {
             String q = ctx.queryParam("q");
             if (q != null && !q.isBlank()) {
-                ctx.json(docenteRepo.buscarPorTexto(q));
+                ctx.json(docenteRepo.buscarPorTexto(q, ControllerUtil.clinicaID(ctx)));
             } else {
-                ctx.json(docenteRepo.findAll());
+                ctx.json(docenteRepo.findAll(ControllerUtil.clinicaID(ctx)));
             }
         });
 
@@ -109,7 +111,8 @@ public class CatalogoController {
             int id = docenteService.crear(
                     (String) body.get("nombres"),
                     (String) body.get("apellidos"),
-                    (String) body.get("telefono"));
+                    (String) body.get("telefono"),
+                    ControllerUtil.clinicaID(ctx));
             ctx.status(201).json(Map.of("id", id));
         });
 
@@ -122,6 +125,7 @@ public class CatalogoController {
             d.setApellidos((String) body.getOrDefault("apellidos", ""));
             d.setTelefono((String) body.getOrDefault("telefono", ""));
             d.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : docenteRepo.findById(id).getEstado());
+            d.setClinicaID(docenteRepo.findById(id).getClinicaID());
             docenteService.actualizar(d);
             ctx.json(Map.of("ok", true));
         });
@@ -137,9 +141,9 @@ public class CatalogoController {
         app.get("/api/catalogos/pacientes", ctx -> {
             String q = ctx.queryParam("q");
             if (q != null && !q.isBlank()) {
-                ctx.json(pacienteRepo.buscarPorTexto(q));
+                ctx.json(pacienteRepo.buscarPorTexto(q, ControllerUtil.clinicaID(ctx)));
             } else {
-                ctx.json(pacienteRepo.findAll());
+                ctx.json(pacienteRepo.findAll(ControllerUtil.clinicaID(ctx)));
             }
         });
 
@@ -147,7 +151,8 @@ public class CatalogoController {
             var body = ctx.bodyAsClass(Map.class);
             int id = pacienteService.crear(
                     (String) body.get("nombres"),
-                    (String) body.get("apellidos"));
+                    (String) body.get("apellidos"),
+                    ControllerUtil.clinicaID(ctx));
             ctx.status(201).json(Map.of("id", id));
         });
 
@@ -159,6 +164,7 @@ public class CatalogoController {
             p.setNombres((String) body.getOrDefault("nombres", ""));
             p.setApellidos((String) body.getOrDefault("apellidos", ""));
             p.setEstado(body.containsKey("estado") ? ((Number) body.get("estado")).intValue() : pacienteRepo.findById(id).getEstado());
+            p.setClinicaID(pacienteRepo.findById(id).getClinicaID());
             pacienteService.actualizar(p);
             ctx.json(Map.of("ok", true));
         });

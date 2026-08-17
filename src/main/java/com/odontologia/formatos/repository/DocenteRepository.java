@@ -14,13 +14,14 @@ import java.util.List;
 public class DocenteRepository {
 
     public int insert(Docente docente) throws SQLException {
-        String sql = "INSERT INTO Docentes (Nombres, Apellidos, Telefono, Estado) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Docentes (Nombres, Apellidos, Telefono, Estado, ClinicaID) VALUES (?, ?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, docente.getNombres());
             ps.setString(2, docente.getApellidos());
             ps.setString(3, docente.getTelefono());
             ps.setInt(4, docente.getEstado());
+            ps.setInt(5, docente.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -32,14 +33,15 @@ public class DocenteRepository {
     }
 
     public void update(Docente docente) throws SQLException {
-        String sql = "UPDATE Docentes SET Nombres = ?, Apellidos = ?, Telefono = ?, Estado = ? WHERE DocenteID = ?";
+        String sql = "UPDATE Docentes SET Nombres = ?, Apellidos = ?, Telefono = ?, Estado = ?, ClinicaID = ? WHERE DocenteID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, docente.getNombres());
             ps.setString(2, docente.getApellidos());
             ps.setString(3, docente.getTelefono());
             ps.setInt(4, docente.getEstado());
-            ps.setInt(5, docente.getDocenteID());
+            ps.setInt(5, docente.getClinicaID());
+            ps.setInt(6, docente.getDocenteID());
             ps.executeUpdate();
         }
     }
@@ -64,27 +66,30 @@ public class DocenteRepository {
         }
     }
 
-    public List<Docente> findAll() throws SQLException {
+    public List<Docente> findAll(int clinicaID) throws SQLException {
         List<Docente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Docentes ORDER BY Apellidos, Nombres";
+        String sql = "SELECT * FROM Docentes WHERE ClinicaID = ? ORDER BY Apellidos, Nombres";
         try (Connection con = ConnectionManager.getInstance().getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(rowToModel(rs));
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, clinicaID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
             }
         }
         return lista;
     }
 
-    public List<Docente> buscarPorTexto(String texto) throws SQLException {
+    public List<Docente> buscarPorTexto(String texto, int clinicaID) throws SQLException {
         List<Docente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Docentes WHERE Nombres LIKE ? OR Apellidos LIKE ? ORDER BY Apellidos, Nombres";
+        String sql = "SELECT * FROM Docentes WHERE ClinicaID = ? AND (Nombres LIKE ? OR Apellidos LIKE ?) ORDER BY Apellidos, Nombres";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             String patron = "%" + texto + "%";
-            ps.setString(1, patron);
+            ps.setInt(1, clinicaID);
             ps.setString(2, patron);
+            ps.setString(3, patron);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(rowToModel(rs));
@@ -100,6 +105,7 @@ public class DocenteRepository {
                 rs.getString("Nombres"),
                 rs.getString("Apellidos"),
                 rs.getString("Telefono"),
-                rs.getInt("Estado"));
+                rs.getInt("Estado"),
+                rs.getInt("ClinicaID"));
     }
 }

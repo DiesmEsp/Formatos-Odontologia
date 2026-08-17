@@ -10,11 +10,16 @@ public class Operador {
     private String tipo;
     private int periodo;
     private int estado;
+    private int clinicaID = 1;
 
     public Operador() {
     }
 
     public Operador(int operadorID, String nombres, String apellidos, String dni, String grado, String tipo, int periodo, int estado) {
+        this(operadorID, nombres, apellidos, dni, grado, tipo, periodo, estado, 1);
+    }
+
+    public Operador(int operadorID, String nombres, String apellidos, String dni, String grado, String tipo, int periodo, int estado, int clinicaID) {
         this.operadorID = operadorID;
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -23,6 +28,7 @@ public class Operador {
         this.tipo = tipo;
         this.periodo = periodo;
         this.estado = estado;
+        this.clinicaID = clinicaID;
     }
 
     public int getOperadorID() {
@@ -87,6 +93,14 @@ public class Operador {
 
     public void setEstado(int estado) {
         this.estado = estado;
+    }
+
+    public int getClinicaID() {
+        return clinicaID;
+    }
+
+    public void setClinicaID(int clinicaID) {
+        this.clinicaID = clinicaID;
     }
 
     @Override

@@ -39,6 +39,14 @@ public final class ControllerUtil {
         return (String) val;
     }
 
+    public static int clinicaID(Context ctx) {
+        Object val = ctx.attribute("clinicaID");
+        if (val == null) {
+            throw new ValidationException("Falta el contexto de clínica (header X-Clinica-Nombre).");
+        }
+        return (int) val;
+    }
+
     public static class ValidationException extends RuntimeException {
         public ValidationException(String message) {
             super(message);

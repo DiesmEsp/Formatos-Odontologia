@@ -7,16 +7,22 @@ public class Docente {
     private String apellidos;
     private String telefono;
     private int estado;
+    private int clinicaID = 1;
 
     public Docente() {
     }
 
     public Docente(int docenteID, String nombres, String apellidos, String telefono, int estado) {
+        this(docenteID, nombres, apellidos, telefono, estado, 1);
+    }
+
+    public Docente(int docenteID, String nombres, String apellidos, String telefono, int estado, int clinicaID) {
         this.docenteID = docenteID;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.telefono = telefono;
         this.estado = estado;
+        this.clinicaID = clinicaID;
     }
 
     public int getDocenteID() {
@@ -57,6 +63,14 @@ public class Docente {
 
     public void setEstado(int estado) {
         this.estado = estado;
+    }
+
+    public int getClinicaID() {
+        return clinicaID;
+    }
+
+    public void setClinicaID(int clinicaID) {
+        this.clinicaID = clinicaID;
     }
 
     @Override

@@ -14,7 +14,7 @@ import java.util.List;
 public class OperadorRepository {
 
     public int insert(Operador operador) throws SQLException {
-        String sql = "INSERT INTO Operadores (Nombres, Apellidos, DNI, Grado, Tipo, Periodo, Estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Operadores (Nombres, Apellidos, DNI, Grado, Tipo, Periodo, Estado, ClinicaID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, operador.getNombres());
@@ -24,6 +24,7 @@ public class OperadorRepository {
             ps.setString(5, operador.getTipo());
             ps.setInt(6, operador.getPeriodo());
             ps.setInt(7, operador.getEstado());
+            ps.setInt(8, operador.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -35,7 +36,7 @@ public class OperadorRepository {
     }
 
     public void update(Operador operador) throws SQLException {
-        String sql = "UPDATE Operadores SET Nombres = ?, Apellidos = ?, DNI = ?, Grado = ?, Tipo = ?, Periodo = ?, Estado = ? WHERE OperadorID = ?";
+        String sql = "UPDATE Operadores SET Nombres = ?, Apellidos = ?, DNI = ?, Grado = ?, Tipo = ?, Periodo = ?, Estado = ?, ClinicaID = ? WHERE OperadorID = ?";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, operador.getNombres());
@@ -45,7 +46,8 @@ public class OperadorRepository {
             ps.setString(5, operador.getTipo());
             ps.setInt(6, operador.getPeriodo());
             ps.setInt(7, operador.getEstado());
-            ps.setInt(8, operador.getOperadorID());
+            ps.setInt(8, operador.getClinicaID());
+            ps.setInt(9, operador.getOperadorID());
             ps.executeUpdate();
         }
     }
@@ -70,25 +72,12 @@ public class OperadorRepository {
         }
     }
 
-    public List<Operador> findAll() throws SQLException {
+    public List<Operador> findAll(int clinicaID) throws SQLException {
         List<Operador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Operadores ORDER BY Apellidos, Nombres";
-        try (Connection con = ConnectionManager.getInstance().getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(rowToModel(rs));
-            }
-        }
-        return lista;
-    }
-
-    public List<Operador> findByPeriodo(int periodo) throws SQLException {
-        List<Operador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Operadores WHERE Periodo = ? ORDER BY Apellidos, Nombres";
+        String sql = "SELECT * FROM Operadores WHERE ClinicaID = ? ORDER BY Apellidos, Nombres";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, periodo);
+            ps.setInt(1, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(rowToModel(rs));
@@ -98,14 +87,31 @@ public class OperadorRepository {
         return lista;
     }
 
-    public List<Operador> buscarPorTexto(String texto) throws SQLException {
+    public List<Operador> findByPeriodo(int periodo, int clinicaID) throws SQLException {
         List<Operador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Operadores WHERE Nombres LIKE ? OR Apellidos LIKE ? ORDER BY Apellidos, Nombres";
+        String sql = "SELECT * FROM Operadores WHERE Periodo = ? AND ClinicaID = ? ORDER BY Apellidos, Nombres";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, periodo);
+            ps.setInt(2, clinicaID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<Operador> buscarPorTexto(String texto, int clinicaID) throws SQLException {
+        List<Operador> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Operadores WHERE ClinicaID = ? AND (Nombres LIKE ? OR Apellidos LIKE ?) ORDER BY Apellidos, Nombres";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             String patron = "%" + texto + "%";
-            ps.setString(1, patron);
+            ps.setInt(1, clinicaID);
             ps.setString(2, patron);
+            ps.setString(3, patron);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(rowToModel(rs));
@@ -124,6 +130,7 @@ public class OperadorRepository {
                 rs.getString("Grado"),
                 rs.getString("Tipo"),
                 rs.getInt("Periodo"),
-                rs.getInt("Estado"));
+                rs.getInt("Estado"),
+                rs.getInt("ClinicaID"));
     }
 }

@@ -14,7 +14,7 @@ public class OperadorService {
 
     private final OperadorRepository repository = new OperadorRepository();
 
-    public int crear(String nombres, String apellidos, String dni, String grado, String tipo, int periodo) throws SQLException {
+    public int crear(String nombres, String apellidos, String dni, String grado, String tipo, int periodo, int clinicaID) throws SQLException {
         validarObligatorios(nombres, apellidos, grado, tipo);
         validarGradoTipo(grado, tipo);
         Operador operador = new Operador();
@@ -25,6 +25,7 @@ public class OperadorService {
         operador.setTipo(tipo.trim().toUpperCase());
         operador.setPeriodo(periodo);
         operador.setEstado(1);
+        operador.setClinicaID(clinicaID);
         return repository.insert(operador);
     }
 

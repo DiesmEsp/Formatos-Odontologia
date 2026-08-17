@@ -5,21 +5,25 @@ public class Paciente {
     private String nombres;
     private String apellidos;
     private int estado;
+    private int clinicaID = 1;
 
     public Paciente() {
     }
 
     public Paciente(int pacienteID, String nombres, String apellidos) {
-        this.pacienteID = pacienteID;
-        this.nombres = nombres;
-        this.apellidos = apellidos;
+        this(pacienteID, nombres, apellidos, 1, 1);
     }
 
     public Paciente(int pacienteID, String nombres, String apellidos, int estado) {
+        this(pacienteID, nombres, apellidos, estado, 1);
+    }
+
+    public Paciente(int pacienteID, String nombres, String apellidos, int estado, int clinicaID) {
         this.pacienteID = pacienteID;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.estado = estado;
+        this.clinicaID = clinicaID;
     }
 
     public int getPacienteID() { return pacienteID; }
@@ -33,6 +37,9 @@ public class Paciente {
 
     public int getEstado() { return estado; }
     public void setEstado(int estado) { this.estado = estado; }
+
+    public int getClinicaID() { return clinicaID; }
+    public void setClinicaID(int clinicaID) { this.clinicaID = clinicaID; }
 
     @Override
     public String toString() {

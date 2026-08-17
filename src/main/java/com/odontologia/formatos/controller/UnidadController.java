@@ -17,12 +17,12 @@ public class UnidadController {
 
     public void register(Javalin app) {
         app.get("/api/unidades", ctx -> {
-            List<Unidad> unidades = repository.findAll();
+            List<Unidad> unidades = repository.findAll(ControllerUtil.clinicaID(ctx));
             ctx.json(unidades);
         });
 
         app.post("/api/unidades", ctx -> {
-            int id = service.crear();
+            int id = service.crear(ControllerUtil.clinicaID(ctx));
             ctx.status(201).json(Map.of("id", id));
         });
 

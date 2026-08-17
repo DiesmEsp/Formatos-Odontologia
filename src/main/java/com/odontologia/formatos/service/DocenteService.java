@@ -9,9 +9,9 @@ public class DocenteService {
 
     private final DocenteRepository repository = new DocenteRepository();
 
-    public int crear(String nombres, String apellidos, String telefono) throws SQLException {
+    public int crear(String nombres, String apellidos, String telefono, int clinicaID) throws SQLException {
         validarObligatorios(nombres, apellidos);
-        for (Docente d : repository.findAll()) {
+        for (Docente d : repository.findAll(clinicaID)) {
             if (mismoNombre(d, nombres, apellidos)) {
                 throw new EntidadDuplicadaException(
                         "Ya existe un docente con el nombre '" + nombres.trim() + " " + apellidos.trim() + "'.");
@@ -22,12 +22,13 @@ public class DocenteService {
         docente.setApellidos(apellidos.trim());
         docente.setTelefono(telefono == null ? null : telefono.trim());
         docente.setEstado(1);
+        docente.setClinicaID(clinicaID);
         return repository.insert(docente);
     }
 
     public void actualizar(Docente docente) throws SQLException {
         validarObligatorios(docente.getNombres(), docente.getApellidos());
-        for (Docente d : repository.findAll()) {
+        for (Docente d : repository.findAll(docente.getClinicaID())) {
             if (d.getDocenteID() != docente.getDocenteID() && mismoNombre(d, docente.getNombres(), docente.getApellidos())) {
                 throw new EntidadDuplicadaException(
                         "Ya existe un docente con el nombre '" + docente.getNombres().trim() + " " + docente.getApellidos().trim() + "'.");
