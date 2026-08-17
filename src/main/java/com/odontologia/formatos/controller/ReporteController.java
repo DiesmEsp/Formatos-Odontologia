@@ -1,5 +1,6 @@
 package com.odontologia.formatos.controller;
 
+import com.odontologia.formatos.config.AppConfig;
 import com.odontologia.formatos.export.ReporteEconomicoGenerator;
 import com.odontologia.formatos.export.ReporteMaterialesGenerator;
 import com.odontologia.formatos.export.ReporteAsistenciaGenerator;
@@ -171,8 +172,7 @@ public class ReporteController {
     }
 
     private Path carpetaReportes() {
-        String userHome = System.getProperty("user.home");
-        Path dir = Paths.get(userHome, "Documents", "FormatosOdontologia", "Reportes");
+        Path dir = Paths.get(AppConfig.carpetaInicialReportes());
         try {
             Files.createDirectories(dir);
         } catch (Exception e) {

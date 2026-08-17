@@ -2,6 +2,7 @@ package com.odontologia.formatos.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public final class AppConfig {
@@ -34,7 +35,14 @@ public final class AppConfig {
 
     public static String carpetaInicialReportes() {
         String override = System.getProperty("reportes.carpetaInicial");
-        return resolver(override != null ? override : PROPS.getProperty("reportes.carpetaInicial", "Reportes"));
+        if (override != null && !override.isBlank()) {
+            return resolver(override);
+        }
+        String configurada = PROPS.getProperty("reportes.carpetaInicial");
+        if (configurada != null && !configurada.isBlank()) {
+            return resolver(configurada);
+        }
+        return Paths.get(System.getProperty("user.home"), "Documents", "FormatosOdontologia", "Reportes").toString();
     }
 
     public static int getInt(String key, int defaultValue) {
