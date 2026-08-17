@@ -115,7 +115,7 @@ Formatos-Odontologia/
 - **Dashboard**: KPIs, graficos de ingresos, top materiales, asistencia del dia
 - **Asistencia Docente**: Registro con hora de entrada/salida, periodos de ausencia, acumulacion de materiales
 - **Tratamientos**: Grid de unidades, creacion con plantilla, cierre, pagos, reapertura, edicion retroactiva
-- **Catalogos**: Materiales, Docentes, Especialistas, Tratamientos Predefinidos, Conversiones de unidad
+- **Catalogos**: Materiales, Docentes, Pacientes, Operadores, Tratamientos Predefinidos, Trat. Realizados, Conversiones de unidad
 - **Unidades**: Gestion de modulos de atencion con bloqueo visual
 - **Reportes**: Exportacion Excel — Materiales, Economico, Asistencia Docente, Anual
 
