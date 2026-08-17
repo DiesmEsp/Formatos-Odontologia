@@ -92,6 +92,11 @@ public class ReporteController {
             var body = ctx.bodyAsClass(Map.class);
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
+            Integer operadorID = body.get("operadorID") != null
+                    ? ((Number) body.get("operadorID")).intValue() : null;
+            String tipo = (String) body.get("tipo");
+            tratamientoGen.setOperadorID(operadorID);
+            tratamientoGen.setTipo(tipo);
             try {
                 Path path = tratamientoGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
@@ -99,6 +104,9 @@ public class ReporteController {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                tratamientoGen.setOperadorID(null);
+                tratamientoGen.setTipo(null);
             }
         });
 

@@ -18,6 +18,17 @@ import java.util.Map;
  */
 public class ReporteTratamientoGenerator extends ReporteGeneradorBase {
 
+    private Integer operadorID;
+    private String tipo;
+
+    public void setOperadorID(Integer operadorID) {
+        this.operadorID = operadorID;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
     @Override
     protected String nombreArchivo(int anio, int mes) {
         return ReporteNomenclatura.nombreTratamiento(anio, mes);
@@ -26,7 +37,7 @@ public class ReporteTratamientoGenerator extends ReporteGeneradorBase {
     @Override
     protected void construir(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Por Tratamiento");
-        List<FilaTratamiento> filas = service.consumoPorTratamiento(anio, mes);
+        List<FilaTratamiento> filas = service.consumoPorTratamiento(anio, mes, operadorID, tipo);
 
         titulo(hoja, "Consumo de Materiales por Tratamiento — " + ReporteNomenclatura.mes(mes) + " " + anio, 5);
 

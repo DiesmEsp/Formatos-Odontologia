@@ -295,7 +295,13 @@ public class ReporteRepository {
     }
 
     public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes) throws SQLException {
-        String sql = "SELECT t.TratamientoID, t.NombreTratamiento, t.Fecha, "
+        return consumoPorTratamiento(anio, mes, null, null);
+    }
+
+    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes, Integer operadorID, String tipo)
+            throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.TratamientoID, t.NombreTratamiento, t.Fecha, "
                 + "o.Nombres || ' ' || o.Apellidos AS Operador, o.Grado, o.Tipo, "
                 + "m.Nombre AS Material, COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
                 + "ml.Cantidad * COALESCE(uc.Factor, 1) AS Cantidad "
@@ -304,12 +310,26 @@ public class ReporteRepository {
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
                 + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID AND uc.UnidadEmpaque = m.Unidad "
-                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
-                + "ORDER BY o.Apellidos, o.Nombres, t.Fecha, t.TratamientoID, m.Nombre";
+                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? ");
+        if (operadorID != null) {
+            sql.append("AND o.OperadorID = ? ");
+        }
+        if (tipo != null && !tipo.isBlank()) {
+            sql.append("AND t.Tipo = ? ");
+        }
+        sql.append("ORDER BY o.Apellidos, o.Nombres, t.Fecha, t.TratamientoID, m.Nombre");
+
         List<FilaTratamiento> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, patronMes(anio, mes));
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setString(idx++, patronMes(anio, mes));
+            if (operadorID != null) {
+                ps.setInt(idx++, operadorID);
+            }
+            if (tipo != null && !tipo.isBlank()) {
+                ps.setString(idx++, tipo);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaTratamiento(

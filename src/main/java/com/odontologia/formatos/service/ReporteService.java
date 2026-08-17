@@ -58,6 +58,12 @@ public class ReporteService {
         return repository.consumoPorTratamiento(anio, mes);
     }
 
+    public List<ReporteRepository.FilaTratamiento> consumoPorTratamiento(int anio, int mes, Integer operadorID, String tipo)
+            throws SQLException {
+        validarMes(mes);
+        return repository.consumoPorTratamiento(anio, mes, operadorID, tipo);
+    }
+
     private void validarMes(int mes) {
         if (mes < 1 || mes > 12) {
             throw new NegocioException("El mes debe estar entre 1 y 12.");

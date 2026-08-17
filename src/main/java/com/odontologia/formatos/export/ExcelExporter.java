@@ -51,6 +51,17 @@ public final class ExcelExporter {
         }
     }
 
+    public static void escribirEncabezadoDia(Sheet hoja, int filaIndex, List<String> encabezados, boolean[] domingo) {
+        Row fila = hoja.createRow(filaIndex);
+        CellStyle estiloNormal = estiloEncabezado(hoja.getWorkbook());
+        CellStyle estiloDomingo = estiloEncabezadoDomingo(hoja.getWorkbook());
+        for (int i = 0; i < encabezados.size(); i++) {
+            Cell celda = fila.createCell(i);
+            celda.setCellValue(encabezados.get(i));
+            celda.setCellStyle(i < domingo.length && domingo[i] ? estiloDomingo : estiloNormal);
+        }
+    }
+
     public static void escribirFila(Sheet hoja, int filaIndex, List<?> valores) {
         Row fila = hoja.createRow(filaIndex);
         for (int i = 0; i < valores.size(); i++) {
@@ -145,6 +156,21 @@ public final class ExcelExporter {
         Font fuente = libro.createFont();
         fuente.setBold(true);
         fuente.setColor(IndexedColors.WHITE.getIndex());
+        estilo.setFont(fuente);
+        return estilo;
+    }
+
+    private static CellStyle estiloEncabezadoDomingo(Workbook libro) {
+        CellStyle estilo = libro.createCellStyle();
+        estilo.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
+        estilo.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        estilo.setBorderBottom(BorderStyle.THIN);
+        estilo.setBorderTop(BorderStyle.THIN);
+        estilo.setBorderLeft(BorderStyle.THIN);
+        estilo.setBorderRight(BorderStyle.THIN);
+        Font fuente = libro.createFont();
+        fuente.setBold(true);
+        fuente.setColor(IndexedColors.BLACK.getIndex());
         estilo.setFont(fuente);
         return estilo;
     }

@@ -98,8 +98,10 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
         }
 
         List<String> encabezados = new ArrayList<>(Arrays.asList("Material", "Unidad (base)"));
+        boolean[] domingo = new boolean[dias + 3];
         for (int d = 1; d <= dias; d++) {
-            encabezados.add(String.valueOf(d));
+            encabezados.add(diaConNombre(anio, mes, d));
+            domingo[d + 1] = esDomingo(anio, mes, d);
         }
         encabezados.add("Total");
 
@@ -109,7 +111,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
             String nombre = entry.getValue();
             seccion(hoja, filaIndex, "Docente: " + nombre, encabezados.size());
             filaIndex++;
-            encabezado(hoja, filaIndex, encabezados);
+            encabezadoDia(hoja, filaIndex, encabezados, domingo);
             filaIndex++;
 
             Map<Integer, double[]> porMaterial = new LinkedHashMap<>();

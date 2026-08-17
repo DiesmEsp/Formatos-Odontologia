@@ -292,9 +292,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ anio, mes }),
     }),
-    generarTratamiento: (anio: number, mes: number) => request<ReporteGenerado>('/api/reportes/tratamiento/generar', {
+    generarTratamiento: (anio: number, mes: number, operadorID?: number | null, tipo?: string) => request<ReporteGenerado>('/api/reportes/tratamiento/generar', {
       method: 'POST',
-      body: JSON.stringify({ anio, mes }),
+      body: JSON.stringify({ anio, mes, operadorID, tipo }),
     }),
     generarAnual: (anio: number) => request<ReporteGenerado>('/api/reportes/anual/generar', {
       method: 'POST',

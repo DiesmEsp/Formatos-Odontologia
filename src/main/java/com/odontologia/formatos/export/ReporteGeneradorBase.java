@@ -77,6 +77,10 @@ public abstract class ReporteGeneradorBase {
         ExcelExporter.escribirEncabezado(hoja, filaIndex, encabezados);
     }
 
+    protected void encabezadoDia(Sheet hoja, int filaIndex, List<String> encabezados, boolean[] domingo) {
+        ExcelExporter.escribirEncabezadoDia(hoja, filaIndex, encabezados, domingo);
+    }
+
     protected void titulo(Sheet hoja, String texto, int colspan) {
         ExcelExporter.escribirTitulo(hoja, 0, texto, colspan);
     }
@@ -122,6 +126,26 @@ public abstract class ReporteGeneradorBase {
 
     protected int diasDelMes(int anio, int mes) {
         return ExcelExporter.diasDelMes(anio, mes);
+    }
+
+    protected String diaConNombre(int anio, int mes, int dia) {
+        return dia + " " + nombreDiaCorto(anio, mes, dia);
+    }
+
+    protected boolean esDomingo(int anio, int mes, int dia) {
+        return java.time.LocalDate.of(anio, mes, dia).getDayOfWeek() == java.time.DayOfWeek.SUNDAY;
+    }
+
+    private String nombreDiaCorto(int anio, int mes, int dia) {
+        switch (java.time.LocalDate.of(anio, mes, dia).getDayOfWeek()) {
+            case MONDAY: return "lun";
+            case TUESDAY: return "mar";
+            case WEDNESDAY: return "mié";
+            case THURSDAY: return "jue";
+            case FRIDAY: return "vie";
+            case SATURDAY: return "sáb";
+            default: return "dom";
+        }
     }
 
     protected double redondear2(double valor) {

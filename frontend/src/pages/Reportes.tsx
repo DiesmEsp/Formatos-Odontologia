@@ -18,6 +18,9 @@ export default function Reportes() {
   const { addToast } = useToast();
 
   const recientes = useApi(() => api.reportes.listarRecientes());
+  const operadores = useApi(() => api.catalogos.operadores.listar());
+  const [filtroOperador, setFiltroOperador] = useState<number | ''>('');
+  const [filtroTipo, setFiltroTipo] = useState('');
 
   const generar = async (tipo: string, fn: () => Promise<any>) => {
     setGenerating(tipo);
@@ -107,7 +110,7 @@ export default function Reportes() {
       icon: ClipboardList,
       title: 'Consumo por Tratamiento',
       desc: 'Materiales consumidos por operador y tratamiento cerrado.',
-      generar: () => api.reportes.generarTratamiento(anio, mes),
+      generar: () => api.reportes.generarTratamiento(anio, mes, filtroOperador || null, filtroTipo || undefined),
     },
     {
       tipo: 'asistencia',
@@ -141,6 +144,25 @@ export default function Reportes() {
 
       <div className="card" style={{ marginBottom: 20 }}>
         <h3 className="card-title" style={{ marginBottom: 14 }}>Reportes mensuales</h3>
+        <div className="filter-bar" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+          <select
+            className="combo-box"
+            value={filtroOperador}
+            onChange={(e) => setFiltroOperador(e.target.value === '' ? '' : Number(e.target.value))}
+          >
+            <option value="">Todos los operadores</option>
+            {(operadores.data ?? []).map((o) => (
+              <option key={o.operadorID} value={o.operadorID}>{o.nombres} {o.apellidos}</option>
+            ))}
+          </select>
+          <select className="combo-box" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
+            <option value="">Todos los tipos</option>
+            <option value="NORMAL">Normal</option>
+            <option value="CONTINUO">Continuo</option>
+            <option value="AVANCE">Avance</option>
+          </select>
+          <span className="text-muted text-sm">Filtros de "Consumo por Tratamiento"</span>
+        </div>
         <div className="report-grid">
           {reportes.map((r) => (
             <div key={r.tipo} className="report-card">
