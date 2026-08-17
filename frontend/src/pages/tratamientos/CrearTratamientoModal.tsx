@@ -8,7 +8,7 @@ import { MaterialTable, type MaterialRow } from '../../components/MaterialTable'
 import { CrearPacienteOnTheFly } from './CrearPacienteOnTheFly';
 import { CrearOperadorOnTheFly } from './CrearOperadorOnTheFly';
 import { hoyISO, nombreCompleto } from '../../lib/format';
-import type { Unidad } from '../../api/types';
+import type { Tratamiento, Unidad } from '../../api/types';
 
 export function CrearTratamientoModal({
   unidad, unidadesList, onClose, onSuccess, addToast,
@@ -34,14 +34,21 @@ export function CrearTratamientoModal({
   const operadores = useApi(() => api.catalogos.operadores.listar(qOpe || undefined), [qOpe]);
   const tratsPred = useApi(() => api.catalogos.tratamientosPred.listar(qTrat || undefined), [qTrat]);
   const materiales = useApi(() => api.catalogos.materiales.listar());
-  const tratamientosActivos = useApi(() => api.tratamientos.activos());
+  const candidatosPadre = useApi(
+    () => (pacienteId ? api.tratamientos.candidatosPadre(pacienteId) : Promise.resolve([] as Tratamiento[])),
+    [pacienteId],
+  );
 
   const pOptions: SearchableOption[] = (pacientes.data ?? []).map((p) => ({ id: p.pacienteID, label: nombreCompleto(p.nombres, p.apellidos) }));
   const oOptions: SearchableOption[] = (operadores.data ?? []).map((o) => ({ id: o.operadorID, label: nombreCompleto(o.nombres, o.apellidos), badge: o.grado }));
   const tOptions: SearchableOption[] = (tratsPred.data ?? []).map((t) => ({ id: t.tratPredID, label: t.nombreTratamiento, extra: t.montoSugerido != null ? `S/ ${t.montoSugerido.toFixed(2)}` : undefined }));
-  const padreOptions: SearchableOption[] = (tratamientosActivos.data ?? [])
-    .filter((t) => t.tipo !== 'AVANCE')
-    .map((t) => ({ id: t.tratamientoID, label: `#${t.tratamientoID} - ${t.nombreTratamiento}` }));
+  const padreOptions: SearchableOption[] = (candidatosPadre.data ?? [])
+    .map((t) => ({ id: t.tratamientoID, label: `#${t.tratamientoID} - ${t.nombreTratamiento}`, badge: t.estado }));
+
+  const handlePacienteChange = (id: number | null) => {
+    setPacienteId(id);
+    setTratamientoPadreId(null);
+  };
 
   const handleTratChange = async (id: number | null) => {
     setTratPredId(id);
@@ -186,7 +193,7 @@ export function CrearTratamientoModal({
 
             <div className="form-group">
               <label className="form-label">Paciente</label>
-              <SearchableCombo options={pOptions} value={pacienteId} onChange={setPacienteId} onSearch={setQPac} placeholder="Buscar paciente..." />
+              <SearchableCombo options={pOptions} value={pacienteId} onChange={handlePacienteChange} onSearch={setQPac} placeholder="Buscar paciente..." />
               <button className="btn btn-ghost btn-sm btn-inline-add" onClick={() => setShowNewPaciente(true)}>+ Nuevo paciente</button>
             </div>
 
@@ -221,7 +228,7 @@ export function CrearTratamientoModal({
             {tipo === 'AVANCE' && (
               <div className="form-group">
                 <label className="form-label">Tratamiento padre</label>
-                <SearchableCombo options={padreOptions} value={tratamientoPadreId} onChange={setTratamientoPadreId} placeholder="Buscar tratamiento padre..." />
+                <SearchableCombo options={padreOptions} value={tratamientoPadreId} onChange={setTratamientoPadreId} placeholder={pacienteId ? 'Buscar tratamiento padre...' : 'Seleccione primero un paciente'} disabled={!pacienteId} loading={!!pacienteId && candidatosPadre.loading} />
               </div>
             )}
 
@@ -237,7 +244,7 @@ export function CrearTratamientoModal({
         </div>
       </div>
 
-      {showNewPaciente && <CrearPacienteOnTheFly onClose={() => setShowNewPaciente(false)} onCreated={(id) => { setPacienteId(id); setShowNewPaciente(false); pacientes.refetch(); }} addToast={addToast} />}
+      {showNewPaciente && <CrearPacienteOnTheFly onClose={() => setShowNewPaciente(false)} onCreated={(id) => { handlePacienteChange(id); setShowNewPaciente(false); pacientes.refetch(); }} addToast={addToast} />}
       {showNewOperador && <CrearOperadorOnTheFly onClose={() => setShowNewOperador(false)} onCreated={(id) => { setOperadorId(id); setShowNewOperador(false); operadores.refetch(); }} addToast={addToast} />}
     </>
   );

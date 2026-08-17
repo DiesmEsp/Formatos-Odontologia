@@ -131,6 +131,7 @@ export const api = {
     }),
     pagos: (id: number) => request<Pago[]>(`/api/tratamientos/${id}/pagos`),
     avances: (id: number) => request<Tratamiento[]>(`/api/tratamientos/${id}/avances`),
+    candidatosPadre: (pacienteID: number) => request<Tratamiento[]>(`/api/tratamientos/candidatos-padre?pacienteID=${pacienteID}`),
     cerradosPorPagar: () => request<Tratamiento[]>('/api/tratamientos/cerrados-por-pagar'),
     editarPago: (pagoID: number, monto: number, fecha?: string) => request<{ ok: boolean }>(`/api/tratamientos/pagos/${pagoID}`, {
       method: 'PUT',
