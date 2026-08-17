@@ -235,6 +235,11 @@ public class TratamientoService {
     }
 
     public void quitarMaterial(int materialesListID) throws SQLException {
+        TratamientoMaterial item = materialRepository.findById(materialesListID);
+        if (item == null) {
+            throw new NegocioException("El material indicado no existe.");
+        }
+        validarAbierto(item.getTratamientoID());
         materialRepository.delete(materialesListID);
     }
 
