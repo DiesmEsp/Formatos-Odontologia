@@ -9,6 +9,7 @@ import {
   CircleDollarSign,
 } from 'lucide-react';
 import { ToothMark } from './ToothMark';
+import { nombreClinicaSesion } from '../lib/clinicaStore';
 
 const ATENCION_ITEMS = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -66,7 +67,7 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        Clinica Odontologica UNMSM
+        {nombreClinicaSesion() ?? 'Clinica Odontologica UNMSM'}
       </div>
     </aside>
   );

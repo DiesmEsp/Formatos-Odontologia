@@ -4,6 +4,7 @@ import { api } from '../api';
 import { KpiCard } from '../components/KpiCard';
 import { LineChart } from '../components/Chart/LineChart';
 import { formatMonto, formatMes, formatearHora } from '../lib/format';
+import { nombreClinicaSesion } from '../lib/clinicaStore';
 import { DollarSign, Clock, Activity, Users, Archive, CalendarCheck, FileSpreadsheet, Stethoscope, Monitor } from 'lucide-react';
 import { COLORS_CHART } from '../lib/constants';
 
@@ -40,7 +41,7 @@ export default function Dashboard() {
       <div className="view-header">
         <div>
           <h1 className="view-title">{obtenerSaludo()}</h1>
-          <p className="subtitle">{fechaDeHoy()} · Clínica Odontológica UNMSM</p>
+          <p className="subtitle">{fechaDeHoy()} · {nombreClinicaSesion() ?? 'Clinica Odontologica UNMSM'}</p>
         </div>
       </div>
 

@@ -1,3 +1,15 @@
+export interface Clinica {
+  clinicaID: number;
+  nombre: string;
+  grupo: string | null;
+  estado: number;
+}
+
+export interface CrearClinicaDTO {
+  nombre: string;
+  grupo: string | null;
+}
+
 export interface Materiales {
   materialID: number;
   nombre: string;

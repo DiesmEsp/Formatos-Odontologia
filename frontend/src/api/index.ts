@@ -2,7 +2,9 @@ import type {
   Asistencia,
   AsistenciaDetalle,
   AsistenciaHoy,
+  Clinica,
   CrearAsistenciaDTO,
+  CrearClinicaDTO,
   CrearConversionDTO,
   CrearDocenteDTO,
   CrearMaterialDTO,
@@ -33,6 +35,7 @@ import type {
   UnidadConversion,
 } from './types';
 import { API_BASE } from '../lib/constants';
+import { nombreClinicaSesion } from '../lib/clinicaStore';
 
 class ApiError extends Error {
   status: number;
@@ -47,9 +50,16 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
+  const headers = new Headers(options?.headers);
+  headers.set('Content-Type', 'application/json');
+  const clinicaNombre = nombreClinicaSesion();
+  if (clinicaNombre) {
+    headers.set('X-Clinica-Nombre', encodeURIComponent(clinicaNombre));
+  }
+
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       signal: controller.signal,
       ...options,
     });
@@ -76,6 +86,19 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 export const api = {
   health: {
     check: () => request<{ status: string }>('/health'),
+  },
+
+  clinicas: {
+    listar: () => request<Clinica[]>('/api/clinicas'),
+    crear: (data: CrearClinicaDTO) => request<{ id: number }>('/api/clinicas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    actualizar: (data: Clinica) => request<{ ok: boolean }>(`/api/clinicas/${data.clinicaID}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    eliminar: (id: number) => request<void>(`/api/clinicas/${id}`, { method: 'DELETE' }),
   },
 
   unidades: {
