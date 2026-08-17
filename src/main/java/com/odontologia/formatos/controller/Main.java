@@ -78,6 +78,7 @@ public class Main {
             });
         }
 
+        new ClinicaController().register(app);
         new TratamientoController().register(app);
         new AsistenciaController().register(app);
         new CatalogoController().register(app);
