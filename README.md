@@ -16,8 +16,8 @@ Arquitectura: **Electron + React 19** (frontend) + **Java 21 + Javalin** (backen
 | Excel | Apache POI 5.5 |
 | Build Backend | Gradle 8.14 (Shadow JAR, jlink) |
 | Build Frontend | Vite + electron-builder (NSIS .exe) |
-| Tests Backend | JUnit 5 (119 tests) + JaCoCo |
-| Tests Frontend | Vitest (138 tests) + Playwright (E2E) |
+| Tests Backend | JUnit 5 (131 tests) + JaCoCo |
+| Tests Frontend | Vitest (147 tests) + Playwright (E2E) |
 
 ## Arquitectura
 
@@ -78,6 +78,32 @@ npm run electron:build
 
 El instalador se genera en `frontend/release/Formatos Odontologicos Setup *.exe`.
 
+## Troubleshooting
+
+### El backend no inicia
+- Verifique que el puerto 7070 no este ocupado: `netstat -ano | findstr 7070`
+- Revise la base de datos `%APPDATA%\FormatosOdontologia\clinica.db`; si esta corrupta, elimine el archivo y reinicie (Flyway la recrea)
+- Ejecute el backend por separado: `java -jar build/libs/FormatosOdontologia-0.1.0-all.jar`
+
+### Electron no carga el frontend
+- Verifique que el backend este corriendo en `localhost:7070`
+- Revise la consola de Electron (`Ctrl+Shift+I`) para errores de red
+- En modo dev, ejecute `npm run dev` (Vite) y luego `npm run electron:dev`
+
+### Error "archivo en uso" al generar reportes
+- Cierre Excel antes de generar un nuevo reporte con el mismo nombre
+- Los archivos se generan en `Documents\FormatosOdontologia\Reportes`
+
+### La base de datos se corrompio
+- Detenga la aplicacion
+- Elimine `%APPDATA%\FormatosOdontologia\clinica.db`
+- Reinicie — Flyway ejecutara todas las migraciones desde cero
+
+### Flyway "Migrations have failed validation" (checksum mismatch)
+- Ocurre cuando una migracion ya aplicada fue modificada (cambia su checksum)
+- No edite migraciones que ya se ejecutaron en una base con datos reales
+- En desarrollo, se resuelve eliminando `clinica.db` y dejando que Flyway re-migre desde cero
+
 ## Estructura del proyecto
 
 ```
@@ -94,7 +120,7 @@ Formatos-Odontologia/
 │   │   ├── service/                # Business logic
 │   │   └── util/                   # Logging, errors, transactions
 │   ├── main/resources/
-│   │   └── db/migration/           # Flyway migrations (V1-V5)
+│   │   └── db/migration/           # Flyway migrations (V1-V12)
 │   └── test/                       # JUnit tests
 ├── frontend/
 │   ├── electron/                   # main.ts, preload.ts
