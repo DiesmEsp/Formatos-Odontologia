@@ -5,6 +5,7 @@ import { api } from "../api";
 import { CatalogoTabla, type Column } from "../components/CatalogoTabla";
 import { CatalogoModal } from "../components/CatalogoModal";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { RegistrarPagoModal } from "../components/RegistrarPagoModal";
 import { Badge } from "../components/Badge";
 import { Plus, ChevronDown, Trash2, Pencil, X, DollarSign } from "lucide-react";
 import type {
@@ -17,7 +18,7 @@ import type {
 } from "../api/types";
 import { MaterialTable, type MaterialRow } from "../components/MaterialTable";
 import { SearchableCombo, type SearchableOption } from "../components/SearchableCombo";
-import { hoyISO, nombreCompleto, formatMonto } from "../lib/format";
+import { hoyISO, nombreCompleto } from "../lib/format";
 
 type TabId = "materiales" | "docentes" | "pacientes" | "operadores" | "tratamientos-pred" | "tratamientos-realizados";
 
@@ -764,33 +765,3 @@ function EditarRealizadoModal({ tratamiento, onClose, onSuccess, addToast }: { t
   );
 }
 
-function RegistrarPagoModal({ tratamiento, onClose, onSuccess, addToast }: { tratamiento: Tratamiento; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>["addToast"] }) {
-  const [abono, setAbono] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const saldo = tratamiento.monto - tratamiento.montoPagado;
-
-  const handleGuardar = async () => {
-    if (abono <= 0) return;
-    setSaving(true);
-    try { await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono); addToast("success", "Pago registrado"); onSuccess(); }
-    catch (err) { addToast("error", err instanceof Error ? err.message : "Error al registrar pago"); }
-    finally { setSaving(false); }
-  };
-
-  return (
-    <div className="dialog-overlay" onClick={onClose}>
-      <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
-        <div className="dialog-header"><h3 className="dialog-title">Registrar Pago</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
-        <div className="dialog-body">
-          <div className="sv-grid mb-16">
-            <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
-            <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
-            <div className="sv-row"><span className="sv-label">Saldo</span><span className="num" style={{ color: saldo > 0 ? 'var(--color-danger-text)' : 'var(--color-success-text)' }}>{formatMonto(saldo)}</span></div>
-          </div>
-          <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
-        </div>
-        <div className="dialog-footer"><button className="btn btn-secondary" onClick={onClose}>Cancelar</button><button className="btn btn-primary" onClick={handleGuardar} disabled={saving || abono <= 0}>{saving ? "Guardando..." : "Registrar"}</button></div>
-      </div>
-    </div>
-  );
-}

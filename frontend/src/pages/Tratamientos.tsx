@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Badge } from '../components/Badge';
 import { SearchableCombo, type SearchableOption } from '../components/SearchableCombo';
 import { MaterialTable, type MaterialRow } from '../components/MaterialTable';
+import { RegistrarPagoModal } from '../components/RegistrarPagoModal';
 import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus } from 'lucide-react';
 import { formatMonto, hoyISO, nombreCompleto } from '../lib/format';
 import type { Tratamiento, Unidad } from '../api/types';
@@ -412,7 +413,6 @@ function DetalleTratamientoSubventana({
   const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
   const [showPago, setShowPago] = useState(false);
   const [showAnular, setShowAnular] = useState(false);
-  const [abono, setAbono] = useState(0);
   const [saving, setSaving] = useState(false);
   const [savingMat, setSavingMat] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -583,7 +583,6 @@ function DetalleTratamientoSubventana({
   const handleCerrar = async () => { setSaving(true); try { await api.tratamientos.cerrar(tratamiento.tratamientoID); addToast('success', 'Tratamiento cerrado'); onClose(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cerrar'); } finally { setSaving(false); } };
   const handleAnular = async (motivo?: string) => { if (!motivo) return; try { await api.tratamientos.anular(tratamiento.tratamientoID, motivo); addToast('success', 'Tratamiento anulado'); onClose(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular'); } setShowAnular(false); };
   const handleReabrir = async () => { try { await api.tratamientos.reabrir(tratamiento.tratamientoID); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', 'Tratamiento reabierto'); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al reabrir'); } };
-  const handleRegistrarPago = async () => { if (abono <= 0) return; try { await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', 'Pago registrado'); setShowPago(false); setAbono(0); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al registrar pago'); } };
   const handleCambiarTipo = async () => { const nuevo = tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'; try { await api.tratamientos.cambiarTipo(tratamiento.tratamientoID, nuevo); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', `Tipo cambiado a ${nuevo}`); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cambiar tipo'); } };
 
   const getEstadoVariant = (e: string) => e === 'CERRADO' ? 'success' : e === 'ANULADO' ? 'danger' : 'info';
@@ -647,20 +646,16 @@ function DetalleTratamientoSubventana({
         </div>
       </div>
       {showPago && (
-        <div className="dialog-overlay overlay-top" onClick={() => setShowPago(false)}>
-          <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
-            <div className="dialog-header"><h3 className="dialog-title">Registrar Pago</h3><button className="btn btn-ghost btn-sm" onClick={() => setShowPago(false)}><X size={18} /></button></div>
-            <div className="dialog-body">
-              <div className="sv-grid mb-16">
-                <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
-                <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
-                <div className="sv-row"><span className="sv-label">Saldo</span><span className={`num ${saldo > 0 ? 'text-danger' : 'text-success'}`}>{formatMonto(saldo)}</span></div>
-              </div>
-              <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
-            </div>
-            <div className="dialog-footer"><button className="btn btn-secondary" onClick={() => setShowPago(false)}>Cancelar</button><button className="btn btn-primary" onClick={handleRegistrarPago} disabled={abono <= 0}>Registrar</button></div>
-          </div>
-        </div>
+        <RegistrarPagoModal
+          tratamiento={tratamiento}
+          onClose={() => setShowPago(false)}
+          onSuccess={async () => {
+            const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID);
+            setTratamiento(t);
+            setShowPago(false);
+          }}
+          addToast={addToast}
+        />
       )}
       <ConfirmDialog open={showAnular} title="Anular tratamiento" message={`Confirme que desea anular el tratamiento #${tratamiento.tratamientoID}.`} confirmLabel="Si, anular" variant="danger" requireMotivo onConfirm={handleAnular} onCancel={() => setShowAnular(false)} />
     </>
