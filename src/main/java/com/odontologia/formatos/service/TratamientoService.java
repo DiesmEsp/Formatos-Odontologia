@@ -1,5 +1,6 @@
 package com.odontologia.formatos.service;
 
+import com.odontologia.formatos.model.Pago;
 import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.model.Tratamiento;
 import com.odontologia.formatos.model.TratamientoMaterial;
@@ -8,6 +9,7 @@ import com.odontologia.formatos.model.TratamientoPredefinidoMaterial;
 import com.odontologia.formatos.repository.MaterialRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
+import com.odontologia.formatos.repository.PagoRepository;
 import com.odontologia.formatos.repository.RegistroAnulacionRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoMaterialRepository;
@@ -16,7 +18,9 @@ import com.odontologia.formatos.repository.TratamientoRepository;
 import com.odontologia.formatos.repository.UnidadRepository;
 import com.odontologia.formatos.util.TransaccionBD;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,15 +43,22 @@ public class TratamientoService {
     private final UnidadRepository unidadRepository = new UnidadRepository();
     private final MaterialRepository materialRepositoryCatalogo = new MaterialRepository();
     private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
+    private final PagoRepository pagoRepository = new PagoRepository();
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null);
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, null);
     }
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Map<Integer, Double> materiales) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, materiales);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, Double monto, String tipo,
+                     Integer tratamientoPadreID, Map<Integer, Double> materiales) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
@@ -55,6 +66,7 @@ public class TratamientoService {
         }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
+        validarPadre(tratamientoPadreID, tipoNormalizado);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -63,6 +75,7 @@ public class TratamientoService {
             tratamiento.setUnidadID(unidadID);
             tratamiento.setFecha(fecha);
             tratamiento.setTipo(tipoNormalizado);
+            tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("ABIERTO");
             tratamiento.setCerradoEn(null);
 
@@ -134,10 +147,17 @@ public class TratamientoService {
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Map<Integer, Double> materiales) throws SQLException {
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, null, materiales);
+    }
+
+    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
+                            Double monto, String tipo, Integer tratamientoPadreID,
+                            Map<Integer, Double> materiales) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
+        validarPadre(tratamientoPadreID, tipoNormalizado);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -146,6 +166,7 @@ public class TratamientoService {
             tratamiento.setUnidadID(null);
             tratamiento.setFecha(fecha);
             tratamiento.setTipo(tipoNormalizado);
+            tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("CERRADO");
             tratamiento.setCerradoEn(timestampLocal());
 
@@ -197,6 +218,13 @@ public class TratamientoService {
 
     public List<Tratamiento> porUnidad(int unidadID) throws SQLException {
         return repository.findByUnidad(unidadID);
+    }
+
+    public int crearAvance(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                           Integer tratPredID, Double monto, Integer tratamientoPadreID,
+                           Map<Integer, Double> materiales) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, "AVANCE",
+                tratamientoPadreID, materiales);
     }
 
     public void agregarMaterial(int tratamientoID, int materialID, double cantidad) throws SQLException {
@@ -309,6 +337,9 @@ public class TratamientoService {
             throw new NegocioException("Solo se puede cambiar el tipo en tratamientos abiertos.");
         }
         String tipoNormalizado = normalizarTipo(tipo);
+        if ("AVANCE".equals(tipoNormalizado) || "AVANCE".equals(t.getTipo())) {
+            throw new NegocioException("Un tratamiento AVANCE no puede cambiar de tipo.");
+        }
         if (tipoNormalizado.equals(t.getTipo())) {
             throw new NegocioException("El tratamiento ya es de tipo " + tipoNormalizado + ".");
         }
@@ -316,10 +347,14 @@ public class TratamientoService {
         TransaccionBD.ejecutar(con -> {
             t.setTipo(tipoNormalizado);
             if ("CONTINUO".equals(tipoNormalizado)) {
+                t.setMontoAnterior(t.getMonto());
                 t.setMonto(0);
                 t.setEstadoPago("PAGADO");
                 t.setMontoPagado(0);
             } else {
+                double anterior = t.getMontoAnterior() != null ? t.getMontoAnterior() : 0;
+                t.setMonto(anterior);
+                t.setMontoAnterior(null);
                 t.setEstadoPago("PENDIENTE");
                 t.setMontoPagado(0);
             }
@@ -420,8 +455,15 @@ public class TratamientoService {
     }
 
     public void registrarPago(int tratamientoID, double abono) throws SQLException {
+        registrarPago(tratamientoID, abono, null);
+    }
+
+    public void registrarPago(int tratamientoID, double abono, String fecha) throws SQLException {
         if (abono <= 0) {
             throw new NegocioException("El abono debe ser mayor a 0.");
+        }
+        if (fecha != null) {
+            validarFecha(fecha);
         }
         Tratamiento t = repository.findById(tratamientoID);
         if (t == null) {
@@ -433,15 +475,135 @@ public class TratamientoService {
         if ("CONTINUO".equals(t.getTipo())) {
             throw new NegocioException("Un tratamiento continuo no requiere pago.");
         }
+
+        Tratamiento objetivo = t;
+        if ("AVANCE".equals(t.getTipo())) {
+            if (t.getTratamientoPadreID() == null) {
+                throw new NegocioException("El avance no tiene un tratamiento padre.");
+            }
+            objetivo = repository.findById(t.getTratamientoPadreID());
+            if (objetivo == null) {
+                throw new NegocioException("El tratamiento padre no existe.");
+            }
+        }
+        if ("CONTINUO".equals(objetivo.getTipo())) {
+            throw new NegocioException("Un tratamiento continuo no requiere pago.");
+        }
+
+        final Tratamiento target = objetivo;
         TransaccionBD.ejecutar(con -> {
-            double nuevoPagado = t.getMontoPagado() + abono;
-            if (nuevoPagado > t.getMonto() + EPSILON) {
+            double nuevoPagado = pagoRepository.sumByTratamiento(con, target.getTratamientoID()) + abono;
+            if (nuevoPagado > target.getMonto() + EPSILON) {
                 throw new NegocioException("El pago supera el monto total del tratamiento.");
             }
-            t.setMontoPagado(nuevoPagado);
-            t.setEstadoPago(derivarEstadoPago(nuevoPagado, t.getMonto()));
+            Pago pago = new Pago();
+            pago.setTratamientoID(target.getTratamientoID());
+            pago.setFecha(fecha != null ? fecha : fechaHoy());
+            pago.setMonto(abono);
+            pagoRepository.insert(con, pago);
+            recalcularPagos(con, target);
+        });
+    }
+
+    public void editarPago(int pagoID, double monto, String fecha) throws SQLException {
+        if (monto <= 0) {
+            throw new NegocioException("El monto del pago debe ser mayor a 0.");
+        }
+        if (fecha != null) {
+            validarFecha(fecha);
+        }
+        Pago pago = pagoRepository.findById(pagoID);
+        if (pago == null) {
+            throw new NegocioException("El pago no existe.");
+        }
+        Tratamiento t = repository.findById(pago.getTratamientoID());
+        if (t == null) {
+            throw new NegocioException("El tratamiento del pago no existe.");
+        }
+        TransaccionBD.ejecutar(con -> {
+            pago.setMonto(monto);
+            if (fecha != null) {
+                pago.setFecha(fecha);
+            }
+            pagoRepository.update(con, pago);
+            recalcularPagos(con, t);
+        });
+    }
+
+    public void eliminarPago(int pagoID) throws SQLException {
+        Pago pago = pagoRepository.findById(pagoID);
+        if (pago == null) {
+            throw new NegocioException("El pago no existe.");
+        }
+        Tratamiento t = repository.findById(pago.getTratamientoID());
+        if (t == null) {
+            throw new NegocioException("El tratamiento del pago no existe.");
+        }
+        TransaccionBD.ejecutar(con -> {
+            pagoRepository.delete(con, pagoID);
+            recalcularPagos(con, t);
+        });
+    }
+
+    public void editarEnCurso(int tratamientoID, EditarRetroactivoDto dto) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        if (!"ABIERTO".equals(t.getEstado())) {
+            throw new NegocioException("Solo se pueden editar tratamientos en curso (abiertos).");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            if (dto.fecha != null) {
+                validarFecha(dto.fecha);
+                t.setFecha(dto.fecha);
+            }
+            if (dto.nombreTratamiento != null) {
+                t.setNombreTratamiento(dto.nombreTratamiento);
+            }
+            if (dto.operadorID != null) {
+                validarEspecialista(dto.operadorID);
+                t.setOperadorID(dto.operadorID);
+            }
+            if (dto.pacienteID != null) {
+                validarPaciente(dto.pacienteID);
+                t.setPacienteID(dto.pacienteID);
+            }
+            if (dto.monto != null) {
+                if (dto.monto < 0) {
+                    throw new NegocioException("El monto del tratamiento no puede ser negativo.");
+                }
+                if ("CONTINUO".equals(t.getTipo())) {
+                    throw new NegocioException("Un tratamiento continuo no tiene monto editable.");
+                }
+                t.setMonto(dto.monto);
+                t.setEstadoPago(derivarEstadoPago(t.getMontoPagado(), dto.monto));
+            }
             repository.update(con, t);
         });
+    }
+
+    public List<Tratamiento> cerradosConSaldo() throws SQLException {
+        List<Tratamiento> resultado = new ArrayList<>();
+        for (Tratamiento t : repository.findByEstado("CERRADO")) {
+            if (requiereAdvertenciaPago(t) && t.getMonto() - t.getMontoPagado() > EPSILON) {
+                resultado.add(t);
+            }
+        }
+        return resultado;
+    }
+
+    public List<Pago> pagosDe(int tratamientoID) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t != null && "AVANCE".equals(t.getTipo()) && t.getTratamientoPadreID() != null) {
+            return pagoRepository.findByTratamiento(t.getTratamientoPadreID());
+        }
+        return pagoRepository.findByTratamiento(tratamientoID);
+    }
+
+    public List<Tratamiento> avancesDe(int tratamientoID) throws SQLException {
+        return repository.findAvances(tratamientoID);
     }
 
     public boolean requiereAdvertenciaPago(Tratamiento t) {
@@ -449,6 +611,13 @@ public class TratamientoService {
             return false;
         }
         return !"PAGADO".equals(t.getEstadoPago());
+    }
+
+    private void recalcularPagos(Connection con, Tratamiento t) throws SQLException {
+        double pagado = pagoRepository.sumByTratamiento(con, t.getTratamientoID());
+        t.setMontoPagado(pagado);
+        t.setEstadoPago(derivarEstadoPago(pagado, t.getMonto()));
+        repository.update(con, t);
     }
 
     private List<TratamientoPredefinidoMaterial> cargarPlantilla(Tratamiento tratamiento, int tratPredID,
@@ -508,10 +677,31 @@ public class TratamientoService {
             return "NORMAL";
         }
         String t = tipo.trim().toUpperCase();
-        if (!t.equals("NORMAL") && !t.equals("CONTINUO")) {
-            throw new NegocioException("El tipo de tratamiento debe ser NORMAL o CONTINUO.");
+        if (!t.equals("NORMAL") && !t.equals("CONTINUO") && !t.equals("AVANCE")) {
+            throw new NegocioException("El tipo de tratamiento debe ser NORMAL, CONTINUO o AVANCE.");
         }
         return t;
+    }
+
+    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado) throws SQLException {
+        if ("AVANCE".equals(tipoNormalizado)) {
+            if (tratamientoPadreID == null) {
+                throw new NegocioException("Un tratamiento AVANCE debe indicar un tratamiento padre.");
+            }
+            Tratamiento padre = repository.findById(tratamientoPadreID);
+            if (padre == null) {
+                throw new NegocioException("El tratamiento padre no existe.");
+            }
+            if ("AVANCE".equals(padre.getTipo())) {
+                throw new NegocioException("El tratamiento padre no puede ser un avance.");
+            }
+        } else if (tratamientoPadreID != null) {
+            throw new NegocioException("Solo los tratamientos AVANCE pueden tener un tratamiento padre.");
+        }
+    }
+
+    private String fechaHoy() {
+        return java.time.LocalDate.now().toString();
     }
 
     private String derivarEstadoPago(double pagado, double monto) {

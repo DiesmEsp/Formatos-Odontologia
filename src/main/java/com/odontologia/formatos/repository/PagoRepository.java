@@ -104,12 +104,21 @@ public class PagoRepository {
     }
 
     public double sumByTratamiento(int tratamientoID) throws SQLException {
+        return sumByTratamiento(null, tratamientoID);
+    }
+
+    public double sumByTratamiento(Connection con, int tratamientoID) throws SQLException {
         String sql = "SELECT COALESCE(SUM(Monto), 0) AS Total FROM Pago WHERE TratamientoID = ?";
-        try (Connection con = ConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, tratamientoID);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getDouble("Total") : 0;
+            }
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
             }
         }
     }
