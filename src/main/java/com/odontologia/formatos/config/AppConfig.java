@@ -56,14 +56,15 @@ public final class AppConfig {
     }
 
     private static String resolver(String valor) {
-        return valor.replace("${APPDATA}", appDataDir());
+        return valor.replace("${APPDATA}", appDataBase());
+    }
+
+    private static String appDataBase() {
+        String env = System.getenv("APPDATA");
+        return (env == null || env.isBlank()) ? System.getProperty("user.home") : env;
     }
 
     private static String appDataDir() {
-        String env = System.getenv("APPDATA");
-        if (env == null || env.isBlank()) {
-            return System.getProperty("user.home");
-        }
-        return env + "\\" + CARPETA_APP;
+        return appDataBase() + "\\" + CARPETA_APP;
     }
 }
