@@ -19,6 +19,7 @@ import type {
   MaterialesRegistrarDTO,
   Operador,
   Paciente,
+  Pago,
   PeriodoAusencia,
   ReporteGenerado,
   ReporteReciente,
@@ -99,8 +100,22 @@ export const api = {
       tratPredID: number | null;
       monto: number | null;
       tipo: string;
+      tratamientoPadreID?: number | null;
       materiales: Record<string, number>;
     }) => request<{ id: number }>('/api/tratamientos/cerrado', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    crearAvance: (data: {
+      operadorID: number;
+      pacienteID: number;
+      unidadID: number | null;
+      fecha: string;
+      tratPredID: number | null;
+      monto: number | null;
+      tratamientoPadreID: number;
+      materiales?: Record<string, number>;
+    }) => request<{ id: number }>('/api/tratamientos/avance', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -110,10 +125,25 @@ export const api = {
       body: JSON.stringify({ motivo }),
     }),
     reabrir: (id: number) => request<{ ok: boolean }>(`/api/tratamientos/${id}/reabrir`, { method: 'POST' }),
-    registrarPago: (id: number, abono: number) => request<{ ok: boolean }>(`/api/tratamientos/${id}/pago`, {
+    registrarPago: (id: number, abono: number, fecha?: string) => request<{ ok: boolean }>(`/api/tratamientos/${id}/pago`, {
       method: 'POST',
-      body: JSON.stringify({ abono }),
+      body: JSON.stringify({ abono, fecha }),
     }),
+    pagos: (id: number) => request<Pago[]>(`/api/tratamientos/${id}/pagos`),
+    avances: (id: number) => request<Tratamiento[]>(`/api/tratamientos/${id}/avances`),
+    cerradosPorPagar: () => request<Tratamiento[]>('/api/tratamientos/cerrados-por-pagar'),
+    editarPago: (pagoID: number, monto: number, fecha?: string) => request<{ ok: boolean }>(`/api/tratamientos/pagos/${pagoID}`, {
+      method: 'PUT',
+      body: JSON.stringify({ monto, fecha }),
+    }),
+    eliminarPago: (pagoID: number) => request<void>(`/api/tratamientos/pagos/${pagoID}`, {
+      method: 'DELETE',
+    }),
+    editarEnCurso: (id: number, dto: { monto?: number | null; fecha?: string; nombreTratamiento?: string; operadorID?: number | null; pacienteID?: number | null }) =>
+      request<{ ok: boolean }>(`/api/tratamientos/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(dto),
+      }),
     cambiarTipo: (id: number, tipo: string) => request<{ ok: boolean }>(`/api/tratamientos/${id}/cambiar-tipo`, {
       method: 'POST',
       body: JSON.stringify({ tipo }),

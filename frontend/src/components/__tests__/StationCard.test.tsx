@@ -7,6 +7,7 @@ const tratamientoMock = {
   unidadID: 1, fecha: '2026-08-01', nombreTratamiento: 'Exodoncia',
   monto: 30, tipo: 'NORMAL', estadoPago: 'PENDIENTE',
   montoPagado: 0, estado: 'ABIERTO', cerradoEn: null,
+  tratamientoPadreID: null, montoAnterior: null,
 };
 
 describe('StationCard', () => {
