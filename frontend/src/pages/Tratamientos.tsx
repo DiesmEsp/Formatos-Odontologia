@@ -7,7 +7,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Badge } from '../components/Badge';
 import { SearchableCombo, type SearchableOption } from '../components/SearchableCombo';
 import { MaterialTable, type MaterialRow } from '../components/MaterialTable';
-import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight } from 'lucide-react';
+import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus } from 'lucide-react';
 import { formatMonto, hoyISO, nombreCompleto } from '../lib/format';
 import type { Tratamiento, Unidad } from '../api/types';
 
@@ -22,6 +22,7 @@ export default function Tratamientos() {
   const { addToast } = useToast();
 
   const [crearUnidad, setCrearUnidad] = useState<Unidad | null>(null);
+  const [crearManual, setCrearManual] = useState(false);
   const [detalleTratamiento, setDetalleTratamiento] = useState<Tratamiento | null>(null);
 
   const tratamientosActivos = tratamientos.data ?? [];
@@ -41,6 +42,9 @@ export default function Tratamientos() {
           <h1 className="view-title">Tratamientos en Curso</h1>
           <p className="subtitle">Seleccione una unidad libre para iniciar un nuevo tratamiento</p>
         </div>
+        <button className="btn btn-primary" onClick={() => setCrearManual(true)}>
+          <Plus size={16} /> Nuevo tratamiento (manual)
+        </button>
       </div>
 
       <div className="station-grid">
@@ -71,8 +75,19 @@ export default function Tratamientos() {
       {crearUnidad && (
         <CrearTratamientoModal
           unidad={crearUnidad}
+          unidadesList={unidadesList}
           onClose={() => setCrearUnidad(null)}
           onSuccess={() => { setCrearUnidad(null); tratamientos.refetch(); operadores.refetch(); pacientes.refetch(); }}
+          addToast={addToast}
+        />
+      )}
+
+      {crearManual && (
+        <CrearTratamientoModal
+          unidad={null}
+          unidadesList={unidadesList}
+          onClose={() => setCrearManual(false)}
+          onSuccess={() => { setCrearManual(false); tratamientos.refetch(); operadores.refetch(); pacientes.refetch(); }}
           addToast={addToast}
         />
       )}
@@ -91,12 +106,13 @@ export default function Tratamientos() {
 }
 
 function CrearTratamientoModal({
-  unidad, onClose, onSuccess, addToast,
-}: { unidad: Unidad; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
+  unidad, unidadesList, onClose, onSuccess, addToast,
+}: { unidad: Unidad | null; unidadesList: Unidad[]; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
   const [fecha, setFecha] = useState(hoyISO());
   const [pacienteId, setPacienteId] = useState<number | null>(null);
   const [operadorId, setOperadorId] = useState<number | null>(null);
   const [tratPredId, setTratPredId] = useState<number | null>(null);
+  const [unidadId, setUnidadId] = useState<number | null>(unidad?.unidadID ?? null);
   const [montoStr, setMontoStr] = useState<string>('');
   const [tipo, setTipo] = useState<string>('NORMAL');
   const [saving, setSaving] = useState(false);
@@ -217,7 +233,7 @@ function CrearTratamientoModal({
     setSaving(true);
     try {
       await api.tratamientos.crear({
-        operadorID: operadorId, pacienteID: pacienteId, unidadID: unidad.unidadID, fecha,
+        operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
         tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
         materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
       });
@@ -236,7 +252,17 @@ function CrearTratamientoModal({
             <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
           </div>
           <div className="dialog-body">
-            <div className="form-group"><label className="form-label">Unidad</label><input className="text-field w-full" value={`Unidad ${unidad.unidadNro}`} readOnly /></div>
+            {unidad ? (
+              <div className="form-group"><label className="form-label">Unidad</label><input className="text-field w-full" value={`Unidad ${unidad.unidadNro}`} readOnly /></div>
+            ) : (
+              <div className="form-group">
+                <label className="form-label">Unidad (opcional)</label>
+                <select className="combo-box w-full" value={unidadId ?? ''} onChange={(e) => setUnidadId(e.target.value === '' ? null : Number(e.target.value))}>
+                  <option value="">Sin unidad</option>
+                  {unidadesList.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
+                </select>
+              </div>
+            )}
             <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
 
             <div className="form-group">
