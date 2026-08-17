@@ -37,7 +37,7 @@ public class AsistenciaController {
             String fecha = (String) body.get("fecha");
             String horaEntrada = (String) body.get("horaEntrada");
             try {
-                Asistencia a = service.abrirDia(docenteId, fecha, horaEntrada);
+                Asistencia a = service.abrirDia(docenteId, fecha, horaEntrada, ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(a);
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -119,7 +119,7 @@ public class AsistenciaController {
                 ctx.status(400).json(Map.of("error", "El parametro 'fecha' es obligatorio con formato AAAA-MM-DD."));
                 return;
             }
-            ctx.json(asistenciaPorFecha(fecha));
+            ctx.json(asistenciaPorFecha(fecha, ControllerUtil.clinicaID(ctx)));
         });
 
         app.get("/api/asistencia/{id}/detalle", ctx -> {
@@ -176,7 +176,7 @@ public class AsistenciaController {
                             e -> ((Number) e.getValue()).doubleValue(),
                             (a, b) -> b,
                             LinkedHashMap::new));
-            service.registrarMateriales(docenteId, fecha, materiales);
+            service.registrarMateriales(docenteId, fecha, materiales, ControllerUtil.clinicaID(ctx));
             ctx.json(Map.of("ok", true));
         });
 
@@ -210,7 +210,7 @@ public class AsistenciaController {
         });
     }
 
-    private List<Map<String, Object>> asistenciaPorFecha(String fecha) throws SQLException {
+    private List<Map<String, Object>> asistenciaPorFecha(String fecha, int clinicaID) throws SQLException {
         List<Map<String, Object>> resultado = new ArrayList<>();
 
         try (Connection con = ConnectionManager.getInstance().getConnection()) {
@@ -218,11 +218,14 @@ public class AsistenciaController {
                     SELECT d.DocenteID, d.Nombres, d.Apellidos, a.Estado, a.AsistenciaID,
                            a.HoraEntrada, a.HoraSalida
                     FROM Docentes d
-                    LEFT JOIN Asistencia a ON d.DocenteID = a.DocenteID AND a.Fecha = ? AND a.Estado = 'ACTIVO'
-                    WHERE d.Estado = 1""";
+                    LEFT JOIN Asistencia a ON d.DocenteID = a.DocenteID AND a.Fecha = ?
+                                             AND a.Estado = 'ACTIVO' AND a.ClinicaID = ?
+                    WHERE d.Estado = 1 AND d.ClinicaID = ?""";
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, fecha);
+                ps.setInt(2, clinicaID);
+                ps.setInt(3, clinicaID);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         Map<String, Object> entry = new LinkedHashMap<>();

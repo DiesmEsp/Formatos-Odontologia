@@ -19,8 +19,8 @@ public class TratamientoRepository {
 
     public int insert(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "INSERT INTO Tratamiento (OperadorID, PacienteID, UnidadID, Fecha, NombreTratamiento, "
-                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, TratamientoPadreID, MontoAnterior) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, TratamientoPadreID, MontoAnterior, ClinicaID) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -49,6 +49,7 @@ public class TratamientoRepository {
             } else {
                 ps.setNull(13, java.sql.Types.REAL);
             }
+            ps.setInt(14, tratamiento.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -70,7 +71,7 @@ public class TratamientoRepository {
     public void update(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "UPDATE Tratamiento SET OperadorID = ?, PacienteID = ?, UnidadID = ?, Fecha = ?, "
                 + "NombreTratamiento = ?, Monto = ?, Tipo = ?, EstadoPago = ?, MontoPagado = ?, "
-                + "Estado = ?, CerradoEn = ?, TratamientoPadreID = ?, MontoAnterior = ? WHERE TratamientoID = ?";
+                + "Estado = ?, CerradoEn = ?, TratamientoPadreID = ?, MontoAnterior = ?, ClinicaID = ? WHERE TratamientoID = ?";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -99,7 +100,8 @@ public class TratamientoRepository {
             } else {
                 ps.setNull(13, java.sql.Types.REAL);
             }
-            ps.setInt(14, tratamiento.getTratamientoID());
+            ps.setInt(14, tratamiento.getClinicaID());
+            ps.setInt(15, tratamiento.getTratamientoID());
             ps.executeUpdate();
         } finally {
             if (cerrarConexion) {
@@ -119,12 +121,13 @@ public class TratamientoRepository {
         }
     }
 
-    public List<Tratamiento> findByEstado(String estado) throws SQLException {
+    public List<Tratamiento> findByEstado(String estado, int clinicaID) throws SQLException {
         List<Tratamiento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Tratamiento WHERE Estado = ? ORDER BY Fecha DESC, TratamientoID DESC";
+        String sql = "SELECT * FROM Tratamiento WHERE Estado = ? AND ClinicaID = ? ORDER BY Fecha DESC, TratamientoID DESC";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, estado);
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(rowToModel(rs));
@@ -193,6 +196,7 @@ public class TratamientoRepository {
         t.setTratamientoPadreID(rs.wasNull() ? null : padre);
         double montoAnterior = rs.getDouble("MontoAnterior");
         t.setMontoAnterior(rs.wasNull() ? null : montoAnterior);
+        t.setClinicaID(rs.getInt("ClinicaID"));
         return t;
     }
 
@@ -211,13 +215,14 @@ public class TratamientoRepository {
         return lista;
     }
 
-    public List<Tratamiento> findCandidatosPadre(int pacienteID) throws SQLException {
+    public List<Tratamiento> findCandidatosPadre(int pacienteID, int clinicaID) throws SQLException {
         List<Tratamiento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Tratamiento WHERE PacienteID = ? AND Tipo != 'AVANCE' "
+        String sql = "SELECT * FROM Tratamiento WHERE PacienteID = ? AND ClinicaID = ? AND Tipo != 'AVANCE' "
                 + "AND Estado IN ('ABIERTO', 'CERRADO') ORDER BY Fecha DESC, TratamientoID DESC";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, pacienteID);
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(rowToModel(rs));

@@ -28,6 +28,10 @@ public class AsistenciaService {
     private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
 
     public Asistencia abrirDia(int docenteID, String fecha, String horaEntrada) throws SQLException {
+        return abrirDia(docenteID, fecha, horaEntrada, 1);
+    }
+
+    public Asistencia abrirDia(int docenteID, String fecha, String horaEntrada, int clinicaID) throws SQLException {
         validarDocente(docenteID);
         validarFecha(fecha);
         validarHora(horaEntrada, "hora de entrada");
@@ -45,6 +49,7 @@ public class AsistenciaService {
             nueva.setFecha(fecha);
             nueva.setEstado("ACTIVO");
             nueva.setHoraEntrada(horaEntrada);
+            nueva.setClinicaID(clinicaID);
             int id = asistenciaRepository.insert(con, nueva);
             nueva.setAsistenciaID(id);
             return nueva;
@@ -131,6 +136,11 @@ public class AsistenciaService {
 
     public void registrarMateriales(int docenteID, String fecha, Map<Integer, Double> materiales)
             throws SQLException {
+        registrarMateriales(docenteID, fecha, materiales, 1);
+    }
+
+    public void registrarMateriales(int docenteID, String fecha, Map<Integer, Double> materiales,
+                                    int clinicaID) throws SQLException {
         validarDocente(docenteID);
         validarFecha(fecha);
         if (materiales == null || materiales.isEmpty()) throw new NegocioException("Debe registrar al menos un material.");
@@ -143,6 +153,7 @@ public class AsistenciaService {
                 asistencia.setDocenteID(docenteID);
                 asistencia.setFecha(fecha);
                 asistencia.setEstado("ACTIVO");
+                asistencia.setClinicaID(clinicaID);
                 int id = asistenciaRepository.insert(con, asistencia);
                 asistencia.setAsistenciaID(id);
             }
@@ -164,6 +175,7 @@ public class AsistenciaService {
             r.setIdRegistroAnulado(asistenciaID);
             r.setMotivo(motivo);
             r.setUsuario("SYSTEM");
+            r.setClinicaID(a.getClinicaID());
             anulacionRepository.insert(con, r);
         });
     }

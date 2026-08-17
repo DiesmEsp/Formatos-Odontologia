@@ -17,15 +17,15 @@ public class TratamientoController {
 
     public void register(Javalin app) {
         app.get("/api/tratamientos", ctx -> {
-            ctx.json(service.activos());
+            ctx.json(service.activos(ControllerUtil.clinicaID(ctx)));
         });
 
         app.get("/api/tratamientos/cerrados", ctx -> {
-            ctx.json(service.cerrados());
+            ctx.json(service.cerrados(ControllerUtil.clinicaID(ctx)));
         });
 
         app.get("/api/tratamientos/cerrados-por-pagar", ctx -> {
-            ctx.json(service.cerradosConSaldo());
+            ctx.json(service.cerradosConSaldo(ControllerUtil.clinicaID(ctx)));
         });
 
         app.get("/api/tratamientos/candidatos-padre", ctx -> {
@@ -34,7 +34,7 @@ public class TratamientoController {
                 ctx.status(400).json(Map.of("error", "Indique el parametro pacienteID"));
                 return;
             }
-            ctx.json(service.candidatosPadre(Integer.parseInt(raw)));
+            ctx.json(service.candidatosPadre(Integer.parseInt(raw), ControllerUtil.clinicaID(ctx)));
         });
 
         app.get("/api/tratamientos/unidad/{id}", ctx -> {
@@ -78,7 +78,8 @@ public class TratamientoController {
 
             try {
                 int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
-                        tratamientoPadreID, rawMateriales != null ? materiales : null);
+                        tratamientoPadreID, rawMateriales != null ? materiales : null,
+                        ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -109,7 +110,7 @@ public class TratamientoController {
 
             try {
                 int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo,
-                        tratamientoPadreID, materiales);
+                        tratamientoPadreID, materiales, ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -141,7 +142,8 @@ public class TratamientoController {
 
             try {
                 int id = service.crearAvance(operadorID, pacienteID, unidadID, fecha, tratPredID, monto,
-                        tratamientoPadreID, rawMateriales != null ? materiales : null);
+                        tratamientoPadreID, rawMateriales != null ? materiales : null,
+                        ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));

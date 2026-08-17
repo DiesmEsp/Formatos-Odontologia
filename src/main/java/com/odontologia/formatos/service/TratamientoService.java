@@ -45,20 +45,28 @@ public class TratamientoService {
     private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
     private final PagoRepository pagoRepository = new PagoRepository();
 
-    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
-                     Integer tratPredID, Double monto, String tipo) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, null);
+public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                 Integer tratPredID, Double monto, String tipo) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, null, 1);
     }
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Map<Integer, Double> materiales) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, materiales);
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, materiales, 1);
     }
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Integer tratamientoPadreID, Map<Integer, Double> materiales) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
+                tratamientoPadreID, materiales, 1);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, Double monto, String tipo,
+                     Integer tratamientoPadreID, Map<Integer, Double> materiales,
+                     int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
@@ -66,7 +74,7 @@ public class TratamientoService {
         }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID);
+        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID, clinicaID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -78,6 +86,7 @@ public class TratamientoService {
             tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("ABIERTO");
             tratamiento.setCerradoEn(null);
+            tratamiento.setClinicaID(clinicaID);
 
             List<TratamientoPredefinidoMaterial> sugeridos = List.of();
             if (tratPredID != null) {
@@ -138,26 +147,41 @@ public class TratamientoService {
     }
 
     public List<Tratamiento> activos() throws SQLException {
-        return repository.findByEstado("ABIERTO");
+        return activos(1);
+    }
+
+    public List<Tratamiento> activos(int clinicaID) throws SQLException {
+        return repository.findByEstado("ABIERTO", clinicaID);
     }
 
     public List<Tratamiento> cerrados() throws SQLException {
-        return repository.findByEstado("CERRADO");
+        return cerrados(1);
+    }
+
+    public List<Tratamiento> cerrados(int clinicaID) throws SQLException {
+        return repository.findByEstado("CERRADO", clinicaID);
     }
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Map<Integer, Double> materiales) throws SQLException {
-        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, null, materiales);
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, null, materiales, 1);
     }
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Integer tratamientoPadreID,
                             Map<Integer, Double> materiales) throws SQLException {
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo,
+                tratamientoPadreID, materiales, 1);
+    }
+
+    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
+                            Double monto, String tipo, Integer tratamientoPadreID,
+                            Map<Integer, Double> materiales, int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID);
+        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID, clinicaID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -169,6 +193,7 @@ public class TratamientoService {
             tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("CERRADO");
             tratamiento.setCerradoEn(timestampLocal());
+            tratamiento.setClinicaID(clinicaID);
 
             if (tratPredID != null) {
                 TratamientoPredefinido predefinido = predefinidoRepository.findById(tratPredID);
@@ -223,8 +248,15 @@ public class TratamientoService {
     public int crearAvance(int operadorID, int pacienteID, Integer unidadID, String fecha,
                            Integer tratPredID, Double monto, Integer tratamientoPadreID,
                            Map<Integer, Double> materiales) throws SQLException {
+        return crearAvance(operadorID, pacienteID, unidadID, fecha, tratPredID, monto,
+                tratamientoPadreID, materiales, 1);
+    }
+
+    public int crearAvance(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                           Integer tratPredID, Double monto, Integer tratamientoPadreID,
+                           Map<Integer, Double> materiales, int clinicaID) throws SQLException {
         return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, "AVANCE",
-                tratamientoPadreID, materiales);
+                tratamientoPadreID, materiales, clinicaID);
     }
 
     public void agregarMaterial(int tratamientoID, int materialID, double cantidad) throws SQLException {
@@ -311,6 +343,7 @@ public class TratamientoService {
             r.setIdRegistroAnulado(tratamientoID);
             r.setMotivo(motivo);
             r.setUsuario("SYSTEM");
+            r.setClinicaID(t.getClinicaID());
             anulacionRepository.insert(con, r);
         });
     }
@@ -575,8 +608,12 @@ public class TratamientoService {
     }
 
     public List<Tratamiento> cerradosConSaldo() throws SQLException {
+        return cerradosConSaldo(1);
+    }
+
+    public List<Tratamiento> cerradosConSaldo(int clinicaID) throws SQLException {
         List<Tratamiento> resultado = new ArrayList<>();
-        for (Tratamiento t : repository.findByEstado("CERRADO")) {
+        for (Tratamiento t : repository.findByEstado("CERRADO", clinicaID)) {
             if (requiereAdvertenciaPago(t) && t.getMonto() - t.getMontoPagado() > EPSILON) {
                 resultado.add(t);
             }
@@ -593,7 +630,11 @@ public class TratamientoService {
     }
 
     public List<Tratamiento> candidatosPadre(int pacienteID) throws SQLException {
-        return repository.findCandidatosPadre(pacienteID);
+        return candidatosPadre(pacienteID, 1);
+    }
+
+    public List<Tratamiento> candidatosPadre(int pacienteID, int clinicaID) throws SQLException {
+        return repository.findCandidatosPadre(pacienteID, clinicaID);
     }
 
     public boolean requiereAdvertenciaPago(Tratamiento t) {
@@ -673,8 +714,8 @@ public class TratamientoService {
         return t;
     }
 
-    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado, int pacienteID)
-            throws SQLException {
+    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado, int pacienteID,
+                              int clinicaID) throws SQLException {
         if ("AVANCE".equals(tipoNormalizado)) {
             if (tratamientoPadreID == null) {
                 throw new NegocioException("Un tratamiento AVANCE debe indicar un tratamiento padre.");
@@ -688,6 +729,9 @@ public class TratamientoService {
             }
             if (padre.getPacienteID() != pacienteID) {
                 throw new NegocioException("El tratamiento padre debe pertenecer al mismo paciente.");
+            }
+            if (padre.getClinicaID() != clinicaID) {
+                throw new NegocioException("El tratamiento padre debe pertenecer a la misma clínica.");
             }
         } else if (tratamientoPadreID != null) {
             throw new NegocioException("Solo los tratamientos AVANCE pueden tener un tratamiento padre.");

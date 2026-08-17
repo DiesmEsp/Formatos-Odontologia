@@ -16,7 +16,7 @@ public class AsistenciaRepository {
     }
 
     public int insert(Connection con, Asistencia asistencia) throws SQLException {
-        String sql = "INSERT INTO Asistencia (DocenteID, Fecha, Estado, HoraEntrada) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Asistencia (DocenteID, Fecha, Estado, HoraEntrada, ClinicaID) VALUES (?, ?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -24,6 +24,7 @@ public class AsistenciaRepository {
             ps.setString(2, asistencia.getFecha());
             ps.setString(3, asistencia.getEstado());
             ps.setString(4, asistencia.getHoraEntrada());
+            ps.setInt(5, asistencia.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -135,6 +136,7 @@ public class AsistenciaRepository {
                 rs.getString("Fecha"),
                 rs.getString("Estado"),
                 rs.getString("HoraEntrada"),
-                rs.getString("HoraSalida"));
+                rs.getString("HoraSalida"),
+                rs.getInt("ClinicaID"));
     }
 }
