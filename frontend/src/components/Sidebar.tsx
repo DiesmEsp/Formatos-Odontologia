@@ -6,6 +6,7 @@ import {
   Archive,
   FileSpreadsheet,
   Monitor,
+  CircleDollarSign,
 } from 'lucide-react';
 import { ToothMark } from './ToothMark';
 
@@ -17,6 +18,7 @@ const ATENCION_ITEMS = [
 
 const GESTION_ITEMS = [
   { to: '/catalogos', icon: Archive, label: 'Catalogos' },
+  { to: '/pagos', icon: CircleDollarSign, label: 'Pagos' },
   { to: '/reportes', icon: FileSpreadsheet, label: 'Reportes' },
   { to: '/unidades', icon: Monitor, label: 'Unidades' },
 ];

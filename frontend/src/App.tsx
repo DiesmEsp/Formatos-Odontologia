@@ -8,6 +8,7 @@ import Asistencia from './pages/Asistencia';
 import Catalogos from './pages/Catalogos';
 import Reportes from './pages/Reportes';
 import Unidades from './pages/Unidades';
+import Pagos from './pages/Pagos';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/catalogos" element={<Catalogos />} />
             <Route path="/reportes" element={<Reportes />} />
             <Route path="/unidades" element={<Unidades />} />
+            <Route path="/pagos" element={<Pagos />} />
           </Route>
           </Routes>
         </ErrorBoundary>

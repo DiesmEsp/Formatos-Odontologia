@@ -30,6 +30,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Tratamientos')).toBeInTheDocument();
     expect(screen.getByText('Asistencia')).toBeInTheDocument();
     expect(screen.getByText('Catalogos')).toBeInTheDocument();
+    expect(screen.getByText('Pagos')).toBeInTheDocument();
     expect(screen.getByText('Reportes')).toBeInTheDocument();
     expect(screen.getByText('Unidades')).toBeInTheDocument();
   });
@@ -37,7 +38,7 @@ describe('Sidebar', () => {
   it('los links son NavLink con clase sidebar-link', () => {
     renderSidebar();
     const links = document.querySelectorAll('.sidebar-link');
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(7);
   });
 
   it('el link activo tiene clase active', () => {
