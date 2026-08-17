@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   Monitor,
   CircleDollarSign,
+  Building2,
 } from 'lucide-react';
 import { ToothMark } from './ToothMark';
 import { nombreClinicaSesion } from '../lib/clinicaStore';
@@ -22,6 +23,7 @@ const GESTION_ITEMS = [
   { to: '/pagos', icon: CircleDollarSign, label: 'Pagos' },
   { to: '/reportes', icon: FileSpreadsheet, label: 'Reportes' },
   { to: '/unidades', icon: Monitor, label: 'Unidades' },
+  { to: '/clinicas', icon: Building2, label: 'Clinicas' },
 ];
 
 export function Sidebar() {

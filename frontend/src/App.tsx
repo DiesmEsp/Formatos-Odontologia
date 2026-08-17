@@ -11,6 +11,7 @@ import Catalogos from './pages/Catalogos';
 import Reportes from './pages/Reportes';
 import Unidades from './pages/Unidades';
 import Pagos from './pages/Pagos';
+import Clinicas from './pages/Clinicas';
 
 function AppContent() {
   const { clinica } = useClinica();
@@ -30,6 +31,7 @@ function AppContent() {
           <Route path="/reportes" element={<Reportes />} />
           <Route path="/unidades" element={<Unidades />} />
           <Route path="/pagos" element={<Pagos />} />
+          <Route path="/clinicas" element={<Clinicas />} />
         </Route>
       </Routes>
     </ErrorBoundary>
