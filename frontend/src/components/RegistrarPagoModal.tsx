@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api';
-import { formatMonto } from '../lib/format';
+import { formatMonto, hoyISO } from '../lib/format';
 import type { Tratamiento } from '../api/types';
 
 export function RegistrarPagoModal({
@@ -17,6 +17,7 @@ export function RegistrarPagoModal({
   addToast: ReturnType<typeof useToast>['addToast'];
 }) {
   const [abono, setAbono] = useState(0);
+  const [fecha, setFecha] = useState(hoyISO());
   const [saving, setSaving] = useState(false);
   const saldo = tratamiento.monto - tratamiento.montoPagado;
 
@@ -24,7 +25,7 @@ export function RegistrarPagoModal({
     if (abono <= 0) return;
     setSaving(true);
     try {
-      await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono);
+      await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono, fecha);
       addToast('success', 'Pago registrado');
       onSuccess();
     } catch (err) {
@@ -47,6 +48,7 @@ export function RegistrarPagoModal({
             <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
             <div className="sv-row"><span className="sv-label">Saldo</span><span className={`num ${saldo > 0 ? 'text-danger' : 'text-success'}`}>{formatMonto(saldo)}</span></div>
           </div>
+          <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
           <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
         </div>
         <div className="dialog-footer">

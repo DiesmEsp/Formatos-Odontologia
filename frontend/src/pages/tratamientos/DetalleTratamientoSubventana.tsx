@@ -8,7 +8,7 @@ import { Badge } from '../../components/Badge';
 import { MaterialTable, type MaterialRow } from '../../components/MaterialTable';
 import { RegistrarPagoModal } from '../../components/RegistrarPagoModal';
 import { formatMonto } from '../../lib/format';
-import type { Tratamiento } from '../../api/types';
+import type { Tratamiento, Pago } from '../../api/types';
 
 export function DetalleTratamientoSubventana({
   tratamiento: initialTrat, operadorNombre, pacienteNombre, onClose, addToast,
@@ -20,6 +20,8 @@ export function DetalleTratamientoSubventana({
   const [saving, setSaving] = useState(false);
   const [savingMat, setSavingMat] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [pagos, setPagos] = useState<Pago[]>([]);
+  const [avances, setAvances] = useState<Tratamiento[]>([]);
   const materiales = useApi(() => api.catalogos.materiales.listar());
   const mounted = useRef(true);
   const originalRowsRef = useRef<MaterialRow[]>([]);
@@ -42,6 +44,12 @@ export function DetalleTratamientoSubventana({
       materialRowsRef.current = rows;
       originalRowsRef.current = rows.map((r) => ({ ...r }));
       setDirty(false);
+
+      const pagosData = await api.tratamientos.pagos(t.tratamientoID);
+      const avancesData = await api.tratamientos.avances(t.tratamientoID);
+      if (!mounted.current) return;
+      setPagos(pagosData);
+      setAvances(avancesData);
     } catch {
       if (mounted.current) addToast('error', 'Error al cargar los datos del tratamiento');
     }
@@ -216,6 +224,32 @@ export function DetalleTratamientoSubventana({
             </div>
             {saldo > 0 && tratamiento.estado === 'ABIERTO' && (
               <div className="alert-banner alert-warning mt-16"><AlertTriangle size={16} /><span>Saldo pendiente: {formatMonto(saldo)}</span></div>
+            )}
+            {pagos.length > 0 && (
+              <div className="mt-16">
+                <h4 className="mb-12">Pagos</h4>
+                <ul className="material-list">
+                  {pagos.map((p) => (
+                    <li key={p.pagoID} className="material-list-item">
+                      <span className="material-list-name">{p.fecha}</span>
+                      <span className="material-list-cant">{formatMonto(p.monto)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {avances.length > 0 && (
+              <div className="mt-16">
+                <h4 className="mb-12">Avances</h4>
+                <ul className="material-list">
+                  {avances.map((a) => (
+                    <li key={a.tratamientoID} className="material-list-item">
+                      <span className="material-list-name">#{a.tratamientoID} - {a.nombreTratamiento} ({a.fecha})</span>
+                      <Badge variant="info">{a.estado}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <h4 className="mt-20 mb-12">Materiales del tratamiento</h4>
             <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddRow} onRemove={handleRemoveRow} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
