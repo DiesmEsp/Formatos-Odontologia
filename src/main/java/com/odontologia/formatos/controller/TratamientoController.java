@@ -24,6 +24,10 @@ public class TratamientoController {
             ctx.json(service.cerrados());
         });
 
+        app.get("/api/tratamientos/cerrados-por-pagar", ctx -> {
+            ctx.json(service.cerradosConSaldo());
+        });
+
         app.get("/api/tratamientos/unidad/{id}", ctx -> {
             int unidadId = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.porUnidad(unidadId));
@@ -51,6 +55,8 @@ public class TratamientoController {
             Double monto = body.get("monto") != null
                     ? ((Number) body.get("monto")).doubleValue() : null;
             String tipo = (String) body.get("tipo");
+            Integer tratamientoPadreID = body.get("tratamientoPadreID") != null
+                    ? ((Number) body.get("tratamientoPadreID")).intValue() : null;
 
             Map<Integer, Double> materiales = new HashMap<>();
             @SuppressWarnings("unchecked")
@@ -63,7 +69,7 @@ public class TratamientoController {
 
             try {
                 int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
-                        rawMateriales != null ? materiales : null);
+                        tratamientoPadreID, rawMateriales != null ? materiales : null);
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -80,6 +86,8 @@ public class TratamientoController {
             Double monto = body.get("monto") != null
                     ? ((Number) body.get("monto")).doubleValue() : null;
             String tipo = (String) body.get("tipo");
+            Integer tratamientoPadreID = body.get("tratamientoPadreID") != null
+                    ? ((Number) body.get("tratamientoPadreID")).intValue() : null;
 
             Map<Integer, Double> materiales = new HashMap<>();
             @SuppressWarnings("unchecked")
@@ -91,7 +99,40 @@ public class TratamientoController {
             }
 
             try {
-                int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, materiales);
+                int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo,
+                        tratamientoPadreID, materiales);
+                ctx.status(201).json(Map.of("id", id));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.post("/api/tratamientos/avance", ctx -> {
+            var body = ctx.bodyAsClass(Map.class);
+            int operadorID = ((Number) body.get("operadorID")).intValue();
+            int pacienteID = ((Number) body.get("pacienteID")).intValue();
+            Integer unidadID = body.get("unidadID") != null
+                    ? ((Number) body.get("unidadID")).intValue() : null;
+            String fecha = (String) body.get("fecha");
+            Integer tratPredID = body.get("tratPredID") != null
+                    ? ((Number) body.get("tratPredID")).intValue() : null;
+            Double monto = body.get("monto") != null
+                    ? ((Number) body.get("monto")).doubleValue() : null;
+            Integer tratamientoPadreID = body.get("tratamientoPadreID") != null
+                    ? ((Number) body.get("tratamientoPadreID")).intValue() : null;
+
+            Map<Integer, Double> materiales = new HashMap<>();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> rawMateriales = (Map<String, Object>) body.get("materiales");
+            if (rawMateriales != null) {
+                for (Map.Entry<String, Object> e : rawMateriales.entrySet()) {
+                    materiales.put(Integer.parseInt(e.getKey()), ((Number) e.getValue()).doubleValue());
+                }
+            }
+
+            try {
+                int id = service.crearAvance(operadorID, pacienteID, unidadID, fecha, tratPredID, monto,
+                        tratamientoPadreID, rawMateriales != null ? materiales : null);
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -134,8 +175,9 @@ public class TratamientoController {
             int id = ControllerUtil.parseIdPathParam(ctx, "id");
             var body = ctx.bodyAsClass(Map.class);
             double abono = ((Number) body.get("abono")).doubleValue();
+            String fecha = (String) body.get("fecha");
             try {
-                service.registrarPago(id, abono);
+                service.registrarPago(id, abono, fecha);
                 ctx.json(Map.of("ok", true));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -149,6 +191,61 @@ public class TratamientoController {
             try {
                 service.cambiarTipo(id, tipo);
                 ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.get("/api/tratamientos/{id}/pagos", ctx -> {
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
+            ctx.json(service.pagosDe(id));
+        });
+
+        app.get("/api/tratamientos/{id}/avances", ctx -> {
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
+            ctx.json(service.avancesDe(id));
+        });
+
+        app.put("/api/tratamientos/{id}", ctx -> {
+            int id = ControllerUtil.parseIdPathParam(ctx, "id");
+            var body = ctx.bodyAsClass(Map.class);
+
+            TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+            dto.monto = body.get("monto") != null
+                    ? ((Number) body.get("monto")).doubleValue() : null;
+            dto.fecha = (String) body.get("fecha");
+            dto.nombreTratamiento = (String) body.get("nombreTratamiento");
+            dto.operadorID = body.get("operadorID") != null
+                    ? ((Number) body.get("operadorID")).intValue() : null;
+            dto.pacienteID = body.get("pacienteID") != null
+                    ? ((Number) body.get("pacienteID")).intValue() : null;
+
+            try {
+                service.editarEnCurso(id, dto);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.put("/api/tratamientos/pagos/{pagoID}", ctx -> {
+            int pagoID = ControllerUtil.parseIdPathParam(ctx, "pagoID");
+            var body = ctx.bodyAsClass(Map.class);
+            double monto = ((Number) body.get("monto")).doubleValue();
+            String fecha = (String) body.get("fecha");
+            try {
+                service.editarPago(pagoID, monto, fecha);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
+        app.delete("/api/tratamientos/pagos/{pagoID}", ctx -> {
+            int pagoID = ControllerUtil.parseIdPathParam(ctx, "pagoID");
+            try {
+                service.eliminarPago(pagoID);
+                ctx.status(204);
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             }
