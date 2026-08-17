@@ -17,7 +17,16 @@ export function StationCard({ unidadNro, tratamiento, operadorNombre, pacienteNo
   return (
     <div
       className={`station-card ${ocupado ? 'ocupado' : 'libre'}`}
+      role="button"
+      tabIndex={0}
+      aria-label={ocupado ? `Unidad ${unidadNro} en curso` : `Unidad ${unidadNro} libre`}
       onClick={() => onClick(unidadNro)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(unidadNro);
+        }
+      }}
     >
       <div className="station-header">
         <span className="station-num">Unidad {unidadNro}</span>

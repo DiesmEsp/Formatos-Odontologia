@@ -75,9 +75,9 @@ export function CatalogoModal({
 
   return (
     <div className="dialog-overlay" onClick={handleCancel}>
-      <div className="dialog-pane" onClick={(e) => e.stopPropagation()} style={{ maxWidth: width ?? 480 }}>
+      <div className="dialog-pane" role="dialog" aria-modal="true" aria-labelledby="catalogo-modal-title" onClick={(e) => e.stopPropagation()} style={{ maxWidth: width ?? 480 }}>
         <div className="dialog-header">
-          <h3 className="dialog-title">{title}</h3>
+          <h3 className="dialog-title" id="catalogo-modal-title">{title}</h3>
           <button className="btn btn-ghost btn-sm dialog-close" onClick={handleCancel}>
             <X size={18} />
           </button>

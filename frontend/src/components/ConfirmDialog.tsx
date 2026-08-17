@@ -41,9 +41,9 @@ export function ConfirmDialog({
 
   return (
     <div className="dialog-overlay" onClick={handleCancel}>
-      <div className="dialog-pane" onClick={(e) => e.stopPropagation()}>
+      <div className="dialog-pane" role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h3 className="dialog-title">{title}</h3>
+          <h3 className="dialog-title" id="confirm-dialog-title">{title}</h3>
           <button className="btn btn-ghost btn-sm dialog-close" onClick={handleCancel}>
             <X size={18} />
           </button>

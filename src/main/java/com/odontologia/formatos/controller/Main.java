@@ -6,8 +6,10 @@ import com.odontologia.formatos.service.EntidadDuplicadaException;
 import com.odontologia.formatos.service.NegocioException;
 import com.odontologia.formatos.util.LogConfig;
 import com.odontologia.formatos.util.ControllerUtil;
+import com.odontologia.formatos.util.RateLimiter;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
+import io.javalin.http.TooManyRequestsResponse;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,6 +19,9 @@ public class Main {
 
     private static final int DEFAULT_PORT = 7070;
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
+
+    private static final int MAX_REPORTES_POR_MINUTO = 60;
+    private static final int MAX_DASHBOARD_POR_MINUTO = 120;
 
     public static void main(String[] args) {
         LogConfig.configurar();
@@ -30,6 +35,21 @@ public class Main {
                     it.allowCredentials = true;
                 });
             });
+        });
+
+        RateLimiter limiteReportes = new RateLimiter(MAX_REPORTES_POR_MINUTO, 60_000);
+        RateLimiter limiteDashboard = new RateLimiter(MAX_DASHBOARD_POR_MINUTO, 60_000);
+
+        app.before("/api/reportes/*", ctx -> {
+            if (!limiteReportes.permitir("reportes:" + ctx.ip())) {
+                throw new TooManyRequestsResponse("Demasiadas solicitudes. Intente nuevamente en un momento.");
+            }
+        });
+
+        app.before("/api/dashboard/*", ctx -> {
+            if (!limiteDashboard.permitir("dashboard:" + ctx.ip())) {
+                throw new TooManyRequestsResponse("Demasiadas solicitudes. Intente nuevamente en un momento.");
+            }
         });
 
         app.exception(NegocioException.class, (e, ctx) -> {

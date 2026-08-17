@@ -103,6 +103,7 @@ export function SearchableCombo({
     <div
       className="combo-dropdown"
       ref={dropdownRef}
+      role="listbox"
       style={{ position: 'fixed', top: coords.top, left: coords.left, width: coords.width, right: 'auto' }}
     >
       {loading && <div className="combo-dropdown-loading">Buscando...</div>}
@@ -114,6 +115,8 @@ export function SearchableCombo({
           type="button"
           key={opt.id}
           className={`combo-option ${opt.id === value ? 'selected' : ''}`}
+          role="option"
+          aria-selected={opt.id === value}
           onClick={() => handleSelect(opt.id)}
         >
           <span className="combo-option-id">{String(opt.id).padStart(3, '0')}</span>
@@ -141,7 +144,15 @@ export function SearchableCombo({
 
   return (
     <div className={`searchable-combo ${className}`} ref={containerRef}>
-      <div className="search-box" ref={boxRef} onClick={() => !disabled && setOpen(true)}>
+      <div
+        className="search-box"
+        ref={boxRef}
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={placeholder}
+        onClick={() => !disabled && setOpen(true)}
+      >
         <Search size={14} className="search-box-icon" />
         {open ? (
           <input

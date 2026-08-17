@@ -11,7 +11,7 @@ interface KpiCardProps {
 export function KpiCard({ label, value, sub, icon: Icon, variant = 'default' }: KpiCardProps) {
   const iconClass = variant === 'success' ? 'kpi-icon-ok' : variant === 'warning' ? 'kpi-icon-warn' : '';
   return (
-    <div className="kpi-card">
+    <div className="kpi-card" role="group" aria-label={label}>
       <div className="kpi-card-row">
         <div className="kpi-card-info">
           <span className="kpi-label">{label}</span>
