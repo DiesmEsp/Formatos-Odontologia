@@ -65,7 +65,7 @@ export default function Tratamientos() {
           );
         })}
         {unidadesList.length === 0 && (
-          <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
+          <div className="empty-state full">
             <span className="empty-title">No hay unidades registradas</span>
             <span className="empty-text">Cree unidades en la sección de Gestión para comenzar.</span>
           </div>
@@ -268,23 +268,22 @@ function CrearTratamientoModal({
             <div className="form-group">
               <label className="form-label">Paciente</label>
               <SearchableCombo options={pOptions} value={pacienteId} onChange={setPacienteId} onSearch={setQPac} placeholder="Buscar paciente..." />
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowNewPaciente(true)} style={{ alignSelf: 'flex-start', marginTop: 2, fontSize: 'var(--font-sm)' }}>+ Nuevo paciente</button>
+              <button className="btn btn-ghost btn-sm btn-inline-add" onClick={() => setShowNewPaciente(true)}>+ Nuevo paciente</button>
             </div>
 
             <div className="form-group">
               <label className="form-label">Operador</label>
               <SearchableCombo options={oOptions} value={operadorId} onChange={setOperadorId} onSearch={setQOpe} placeholder="Buscar operador..." />
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowNewOperador(true)} style={{ alignSelf: 'flex-start', marginTop: 2, fontSize: 'var(--font-sm)' }}>+ Nuevo operador</button>
+              <button className="btn btn-ghost btn-sm btn-inline-add" onClick={() => setShowNewOperador(true)}>+ Nuevo operador</button>
             </div>
 
             <div className="form-group"><label className="form-label">Tipo de tratamiento</label><SearchableCombo options={tOptions} value={tratPredId} onChange={handleTratChange} onSearch={setQTrat} placeholder="Buscar tratamiento..." /></div>
 
             <div className="form-group">
               <label className="form-label">Monto total</label>
-              <input type="text" inputMode="decimal" className="text-field" value={montoStr} onChange={(e) => setMontoStr(filterNumeric(e.target.value))}
+              <input type="text" inputMode="decimal" className="text-field w-full" value={montoStr} onChange={(e) => setMontoStr(filterNumeric(e.target.value))}
                 onKeyDown={handleMontoKeyDown}
-                disabled={tipo === 'CONTINUO'} placeholder="0.00"
-                style={{ width: '100%', ...(tipo === 'CONTINUO' ? { backgroundColor: '#e8ecec', color: 'var(--color-text-muted)', cursor: 'not-allowed' } : {}) }} />
+                disabled={tipo === 'CONTINUO'} placeholder="0.00" />
             </div>
 
             <div className="form-group">
@@ -330,7 +329,7 @@ function CrearPacienteOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
   };
 
   return (
-    <div className="dialog-overlay" onClick={onClose} style={{ zIndex: 210 }}>
+    <div className="dialog-overlay overlay-top" onClick={onClose}>
       <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header"><h3 className="dialog-title">Nuevo Paciente</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
         <div className="dialog-body">
@@ -371,7 +370,7 @@ function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClose: () =
   };
 
   return (
-    <div className="dialog-overlay" onClick={onClose} style={{ zIndex: 210 }}>
+    <div className="dialog-overlay overlay-top" onClick={onClose}>
       <div className="dialog-pane mw-460" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header"><h3 className="dialog-title">Nuevo Operador</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
         <div className="dialog-body">
@@ -615,12 +614,12 @@ function DetalleTratamientoSubventana({
             {saldo > 0 && tratamiento.estado === 'ABIERTO' && (
               <div className="alert-banner alert-warning mt-16"><AlertTriangle size={16} /><span>Saldo pendiente: {formatMonto(saldo)}</span></div>
             )}
-            <h4 style={{ marginTop: 20, marginBottom: 12 }}>Materiales del tratamiento</h4>
+            <h4 className="mt-20 mb-12">Materiales del tratamiento</h4>
             <MaterialTable rows={materialRows} materials={materiales.data ?? []} onAdd={handleAddRow} onRemove={handleRemoveRow} onMaterialChange={handleMaterialChange} onCantidadChange={handleCantidadChange} />
           </div>
           <div className="subventana-footer">
             <span className="text-muted text-sm">
-              {totalMat} material(es){dirty && <span style={{ color: 'var(--color-warning-text)', marginLeft: 8 }}>(cambios sin guardar)</span>}
+              {totalMat} material(es){dirty && <span className="text-warning ml-8">(cambios sin guardar)</span>}
             </span>
             <div className="flex gap-8 flex-wrap">
               {dirty && (
@@ -648,14 +647,14 @@ function DetalleTratamientoSubventana({
         </div>
       </div>
       {showPago && (
-        <div className="dialog-overlay" onClick={() => setShowPago(false)} style={{ zIndex: 210 }}>
+        <div className="dialog-overlay overlay-top" onClick={() => setShowPago(false)}>
           <div className="dialog-pane mw-420" onClick={(e) => e.stopPropagation()}>
             <div className="dialog-header"><h3 className="dialog-title">Registrar Pago</h3><button className="btn btn-ghost btn-sm" onClick={() => setShowPago(false)}><X size={18} /></button></div>
             <div className="dialog-body">
               <div className="sv-grid mb-16">
                 <div className="sv-row"><span className="sv-label">Monto total</span><span className="num">{formatMonto(tratamiento.monto)}</span></div>
                 <div className="sv-row"><span className="sv-label">Pagado</span><span className="num">{formatMonto(tratamiento.montoPagado)}</span></div>
-                <div className="sv-row"><span className="sv-label">Saldo</span><span className="num" style={{ color: saldo > 0 ? 'var(--color-danger-text)' : 'var(--color-success-text)' }}>{formatMonto(saldo)}</span></div>
+                <div className="sv-row"><span className="sv-label">Saldo</span><span className={`num ${saldo > 0 ? 'text-danger' : 'text-success'}`}>{formatMonto(saldo)}</span></div>
               </div>
               <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
             </div>
