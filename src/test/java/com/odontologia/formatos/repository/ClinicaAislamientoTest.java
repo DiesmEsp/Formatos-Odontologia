@@ -1,6 +1,5 @@
 package com.odontologia.formatos.repository;
 
-import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.Docente;
 import com.odontologia.formatos.model.Operador;
 import com.odontologia.formatos.model.Paciente;
