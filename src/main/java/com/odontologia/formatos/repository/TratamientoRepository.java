@@ -210,4 +210,20 @@ public class TratamientoRepository {
         }
         return lista;
     }
+
+    public List<Tratamiento> findCandidatosPadre(int pacienteID) throws SQLException {
+        List<Tratamiento> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Tratamiento WHERE PacienteID = ? AND Tipo != 'AVANCE' "
+                + "AND Estado IN ('ABIERTO', 'CERRADO') ORDER BY Fecha DESC, TratamientoID DESC";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, pacienteID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
+            }
+        }
+        return lista;
+    }
 }

@@ -66,7 +66,7 @@ public class TratamientoService {
         }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado);
+        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -157,7 +157,7 @@ public class TratamientoService {
         validarPaciente(pacienteID);
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado);
+        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -476,21 +476,11 @@ public class TratamientoService {
             throw new NegocioException("Un tratamiento continuo no requiere pago.");
         }
 
-        Tratamiento objetivo = t;
-        if ("AVANCE".equals(t.getTipo())) {
-            if (t.getTratamientoPadreID() == null) {
-                throw new NegocioException("El avance no tiene un tratamiento padre.");
-            }
-            objetivo = repository.findById(t.getTratamientoPadreID());
-            if (objetivo == null) {
-                throw new NegocioException("El tratamiento padre no existe.");
-            }
-        }
-        if ("CONTINUO".equals(objetivo.getTipo())) {
+        if ("CONTINUO".equals(t.getTipo())) {
             throw new NegocioException("Un tratamiento continuo no requiere pago.");
         }
 
-        final Tratamiento target = objetivo;
+        final Tratamiento target = t;
         TransaccionBD.ejecutar(con -> {
             double nuevoPagado = pagoRepository.sumByTratamiento(con, target.getTratamientoID()) + abono;
             if (nuevoPagado > target.getMonto() + EPSILON) {
@@ -595,15 +585,15 @@ public class TratamientoService {
     }
 
     public List<Pago> pagosDe(int tratamientoID) throws SQLException {
-        Tratamiento t = repository.findById(tratamientoID);
-        if (t != null && "AVANCE".equals(t.getTipo()) && t.getTratamientoPadreID() != null) {
-            return pagoRepository.findByTratamiento(t.getTratamientoPadreID());
-        }
         return pagoRepository.findByTratamiento(tratamientoID);
     }
 
     public List<Tratamiento> avancesDe(int tratamientoID) throws SQLException {
         return repository.findAvances(tratamientoID);
+    }
+
+    public List<Tratamiento> candidatosPadre(int pacienteID) throws SQLException {
+        return repository.findCandidatosPadre(pacienteID);
     }
 
     public boolean requiereAdvertenciaPago(Tratamiento t) {
@@ -683,7 +673,8 @@ public class TratamientoService {
         return t;
     }
 
-    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado) throws SQLException {
+    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado, int pacienteID)
+            throws SQLException {
         if ("AVANCE".equals(tipoNormalizado)) {
             if (tratamientoPadreID == null) {
                 throw new NegocioException("Un tratamiento AVANCE debe indicar un tratamiento padre.");
@@ -694,6 +685,9 @@ public class TratamientoService {
             }
             if ("AVANCE".equals(padre.getTipo())) {
                 throw new NegocioException("El tratamiento padre no puede ser un avance.");
+            }
+            if (padre.getPacienteID() != pacienteID) {
+                throw new NegocioException("El tratamiento padre debe pertenecer al mismo paciente.");
             }
         } else if (tratamientoPadreID != null) {
             throw new NegocioException("Solo los tratamientos AVANCE pueden tener un tratamiento padre.");

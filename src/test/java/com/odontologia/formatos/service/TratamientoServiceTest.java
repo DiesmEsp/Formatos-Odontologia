@@ -480,29 +480,30 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
-    void pagoDeAvanceAbonaAlPadre() throws SQLException {
+    void pagoDeAvanceAbonaAlPropioAvance() throws SQLException {
         int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
         int avance = service.crearAvance(operadorID, pacienteID, 1, "2026-08-04", null, 50.0, padre, null);
 
         service.registrarPago(avance, 40.0);
 
-        Tratamiento p = tratamientoRepository.findById(padre);
-        assertEquals("PARCIAL", p.getEstadoPago());
-        assertEquals(40.0, p.getMontoPagado(), 0.001);
-        assertEquals("PENDIENTE", tratamientoRepository.findById(avance).getEstadoPago());
+        Tratamiento a = tratamientoRepository.findById(avance);
+        assertEquals("PARCIAL", a.getEstadoPago());
+        assertEquals(40.0, a.getMontoPagado(), 0.001);
+        assertEquals("PENDIENTE", tratamientoRepository.findById(padre).getEstadoPago());
     }
 
     @Test
-    void pagosDeAvanceDevuelvePagosDelPadre() throws SQLException {
+    void pagosDeAvanceDevuelvePagosPropios() throws SQLException {
         int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
         int avance = service.crearAvance(operadorID, pacienteID, 1, "2026-08-04", null, 50.0, padre, null);
 
         service.registrarPago(avance, 40.0);
+        service.registrarPago(avance, 10.0);
         service.registrarPago(padre, 30.0);
 
         List<Pago> pagos = service.pagosDe(avance);
         assertEquals(2, pagos.size());
-        assertEquals(70.0, pagos.stream().mapToDouble(Pago::getMonto).sum(), 0.001);
+        assertEquals(50.0, pagos.stream().mapToDouble(Pago::getMonto).sum(), 0.001);
     }
 
     @Test
@@ -629,6 +630,31 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         int avance = service.crearAvance(operadorID, pacienteID, 1, "2026-08-04", null, 50.0, padre, null);
 
         assertThrows(NegocioException.class, () -> service.cambiarTipo(avance, "NORMAL"));
+    }
+
+    @Test
+    void avancePuedeTenerPadreCerrado() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(padre);
+
+        int avance = service.crearAvance(operadorID, pacienteID, 1, "2026-08-04", null, 50.0, padre, null);
+
+        Tratamiento a = tratamientoRepository.findById(avance);
+        assertEquals("AVANCE", a.getTipo());
+        assertEquals(padre, a.getTratamientoPadreID());
+    }
+
+    @Test
+    void avanceConPadreDeOtroPacienteArrojaError() throws SQLException {
+        Paciente otro = new Paciente();
+        otro.setNombres("Maria");
+        otro.setApellidos("Gomez");
+        int otroPaciente = pacienteRepository.insert(otro);
+
+        int padre = service.crear(operadorID, otroPaciente, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        assertThrows(NegocioException.class, () ->
+                service.crearAvance(operadorID, pacienteID, 1, "2026-08-04", null, 50.0, padre, null));
     }
 
     private int crearMaterial(String nombre, String unidad) throws SQLException {

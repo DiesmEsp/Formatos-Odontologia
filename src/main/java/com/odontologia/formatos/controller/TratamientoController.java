@@ -28,6 +28,15 @@ public class TratamientoController {
             ctx.json(service.cerradosConSaldo());
         });
 
+        app.get("/api/tratamientos/candidatos-padre", ctx -> {
+            String raw = ctx.queryParam("pacienteID");
+            if (raw == null) {
+                ctx.status(400).json(Map.of("error", "Indique el parametro pacienteID"));
+                return;
+            }
+            ctx.json(service.candidatosPadre(Integer.parseInt(raw)));
+        });
+
         app.get("/api/tratamientos/unidad/{id}", ctx -> {
             int unidadId = ControllerUtil.parseIdPathParam(ctx, "id");
             ctx.json(service.porUnidad(unidadId));
