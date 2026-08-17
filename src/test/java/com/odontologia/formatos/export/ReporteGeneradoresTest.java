@@ -21,6 +21,8 @@ import com.odontologia.formatos.repository.PeriodoAusenciaRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoRepository;
 import com.odontologia.formatos.repository.UnidadConversionRepository;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -33,6 +35,7 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -197,6 +200,47 @@ class ReporteGeneradoresTest extends BaseRepositoryTest {
         Path archivo = new ReporteMaterialesGenerator().generar(2024, 10, carpeta);
 
         assertTrue(Files.exists(archivo));
+    }
+
+    @Test
+    void materialesDetalleDocenteConNombreDeDiaYDomingosSombreados() throws Exception {
+        Path archivo = new ReporteMaterialesGenerator().generar(2024, 10, carpeta);
+
+        try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
+            Sheet detalle = libro.getSheet("Detalle Docente");
+            assertNotNull(detalle);
+
+            Row encabezado = detalle.getRow(1);
+            assertNotNull(encabezado);
+            assertTrue(encabezado.getCell(2).getStringCellValue().startsWith("1 "));
+            assertTrue(encabezado.getCell(2).getStringCellValue().length() > 2,
+                    "La cabecera del día debe incluir el nombre del día");
+            assertEquals("6 dom", encabezado.getCell(7).getStringCellValue());
+            assertEquals("Total", encabezado.getCell(33).getStringCellValue());
+
+            Cell domingo = encabezado.getCell(7);
+            Cell normal = encabezado.getCell(2);
+            assertNotNull(domingo.getCellStyle());
+            assertNotNull(normal.getCellStyle());
+            assertNotEquals(domingo.getCellStyle().getFillForegroundColor(),
+                    normal.getCellStyle().getFillForegroundColor(),
+                    "La columna del domingo debe tener relleno distinto al resto");
+        }
+    }
+
+    @Test
+    void docenteDetalleConNombreDeDia() throws Exception {
+        int id = insertarAsistenciaConHorario("2024-10-25", "ACTIVO", "08:00:00", "13:00:00");
+        insertarAusencia(id, "09:00:00", "10:00:00", "Reunion");
+
+        Path archivo = new ReporteDocenteGenerator().generar(2024, 10, carpeta);
+
+        try (Workbook libro = WorkbookFactory.create(archivo.toFile())) {
+            Sheet detalle = libro.getSheet("Detalle Docente");
+            assertNotNull(detalle);
+            assertEquals("1 mar", detalle.getRow(1).getCell(2).getStringCellValue());
+            assertEquals("6 dom", detalle.getRow(1).getCell(7).getStringCellValue());
+        }
     }
 
     private int buscarFila(Sheet hoja, String valor) {
