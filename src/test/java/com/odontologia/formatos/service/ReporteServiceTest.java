@@ -203,6 +203,31 @@ class ReporteServiceTest extends BaseRepositoryTest {
         assertThrows(NegocioException.class, () -> service.materiales(2024, 13));
     }
 
+    @Test
+    void reportesFiltranPorClinica() throws SQLException {
+        Tratamiento t2 = new Tratamiento();
+        t2.setOperadorID(operadorID);
+        t2.setPacienteID(pacienteID);
+        t2.setUnidadID(null);
+        t2.setFecha("2024-10-18");
+        t2.setNombreTratamiento("Tratamiento clinica 2");
+        t2.setMonto(200.0);
+        t2.setTipo("NORMAL");
+        t2.setEstadoPago("PENDIENTE");
+        t2.setMontoPagado(0);
+        t2.setEstado("CERRADO");
+        t2.setCerradoEn("2026-01-01 10:00:00");
+        t2.setClinicaID(2);
+        int id2 = tratamientoRepository.insert(t2);
+        insertarConsumoTratamiento(id2, algodon, 1.0);
+
+        List<ReporteRepository.FilaMaterial> clinica1 = service.materiales(2024, 10);
+        assertEquals(1500.0, fila(clinica1, algodon).cantidadTotal(), 0.001);
+
+        List<ReporteRepository.FilaMaterial> clinica2 = service.materiales(2024, 10, 2);
+        assertEquals(500.0, fila(clinica2, algodon).cantidadTotal(), 0.001);
+    }
+
     private int insertarMaterial(String nombre, String unidad) throws SQLException {
         Materiales m = new Materiales();
         m.setNombre(nombre);

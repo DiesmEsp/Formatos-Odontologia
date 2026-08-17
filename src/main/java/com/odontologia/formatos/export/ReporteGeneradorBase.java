@@ -21,8 +21,18 @@ public abstract class ReporteGeneradorBase {
 
     protected final ReporteService service;
 
+    private int clinicaID = 1;
+
     protected ReporteGeneradorBase() {
         this.service = new ReporteService();
+    }
+
+    public void setClinicaID(int clinicaID) {
+        this.clinicaID = clinicaID;
+    }
+
+    protected int clinicaID() {
+        return clinicaID;
     }
 
     public Path generar(int anio, int mes, Path carpetaDestino) throws SQLException, ReporteException {

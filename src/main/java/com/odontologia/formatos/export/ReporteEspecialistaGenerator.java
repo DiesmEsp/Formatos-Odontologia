@@ -40,7 +40,7 @@ public class ReporteEspecialistaGenerator extends ReporteGeneradorBase {
 
     private void construirPorOperador(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Por Operador");
-        List<FilaEspecialista> filas = service.especialista(anio, mes);
+        List<FilaEspecialista> filas = service.especialista(anio, mes, clinicaID());
 
         Map<Integer, String[]> nombresOperadores = new LinkedHashMap<>();
         for (FilaEspecialista f : filas) {
@@ -80,7 +80,7 @@ public class ReporteEspecialistaGenerator extends ReporteGeneradorBase {
         Map<Integer, String[]> nombresOperadores = new LinkedHashMap<>();
 
         for (int mes : meses) {
-            for (FilaEspecialista f : service.especialista(anio, mes)) {
+            for (FilaEspecialista f : service.especialista(anio, mes, clinicaID())) {
                 nombresOperadores.putIfAbsent(f.getOperadorID(),
                         new String[]{f.getEspecialista(), f.getGrado(), f.getTipo()});
             }
@@ -95,7 +95,7 @@ public class ReporteEspecialistaGenerator extends ReporteGeneradorBase {
 
             for (int i = 0; i < meses.size(); i++) {
                 int mes = meses.get(i);
-                for (FilaEspecialista f : service.especialista(anio, mes)) {
+                for (FilaEspecialista f : service.especialista(anio, mes, clinicaID())) {
                     if (f.getOperadorID() != operadorID) continue;
                     double[] valores = porMaterial.computeIfAbsent(f.getMaterialID(), k -> new double[meses.size()]);
                     valores[i] += f.getCantidad();

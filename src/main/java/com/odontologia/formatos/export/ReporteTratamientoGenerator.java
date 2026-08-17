@@ -37,7 +37,7 @@ public class ReporteTratamientoGenerator extends ReporteGeneradorBase {
     @Override
     protected void construir(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Por Tratamiento");
-        List<FilaTratamiento> filas = service.consumoPorTratamiento(anio, mes, operadorID, tipo);
+        List<FilaTratamiento> filas = service.consumoPorTratamiento(anio, mes, operadorID, tipo, clinicaID());
 
         titulo(hoja, "Consumo de Materiales por Tratamiento — " + ReporteNomenclatura.mes(mes) + " " + anio, 5);
 

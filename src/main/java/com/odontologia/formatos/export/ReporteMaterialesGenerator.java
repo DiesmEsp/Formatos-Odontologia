@@ -50,7 +50,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
     private void construirGeneral(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "General");
         encabezado(hoja, Arrays.asList("Material", "Unidad (base)", "Cantidad Total"));
-        List<FilaMaterial> filas = service.materiales(anio, mes);
+        List<FilaMaterial> filas = service.materiales(anio, mes, clinicaID());
         int filaIndex = 1;
         for (FilaMaterial f : filas) {
             fila(hoja, filaIndex++, Arrays.asList(
@@ -70,7 +70,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
         Map<Integer, String[]> meta = new TreeMap<>();
         for (int i = 0; i < meses.size(); i++) {
             int mes = meses.get(i);
-            for (FilaMaterial f : service.materiales(anio, mes)) {
+            for (FilaMaterial f : service.materiales(anio, mes, clinicaID())) {
                 double[] valores = porMaterial.computeIfAbsent(f.getMaterialID(), k -> new double[meses.size()]);
                 valores[i] += f.getCantidadTotal();
                 meta.putIfAbsent(f.getMaterialID(), new String[]{f.getNombre(), f.getUnidadBase()});
@@ -89,7 +89,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
     private void construirDetalleDocente(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Detalle Docente");
-        List<FilaDocente> filas = service.docenteDetalleDia(anio, mes);
+        List<FilaDocente> filas = service.docenteDetalleDia(anio, mes, clinicaID());
         int dias = diasDelMes(anio, mes);
 
         Map<Integer, String> nombresDocentes = new LinkedHashMap<>();
@@ -146,7 +146,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
         for (int i = 0; i < meses.size(); i++) {
             int mes = meses.get(i);
-            for (FilaDocente f : service.docenteConsolidado(anio, mes)) {
+            for (FilaDocente f : service.docenteConsolidado(anio, mes, clinicaID())) {
                 nombresDocentes.putIfAbsent(String.valueOf(f.getDocenteID()), f.getDocente());
             }
         }
@@ -160,7 +160,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
             for (int i = 0; i < meses.size(); i++) {
                 int mes = meses.get(i);
-                for (FilaDocente f : service.docenteConsolidado(anio, mes)) {
+                for (FilaDocente f : service.docenteConsolidado(anio, mes, clinicaID())) {
                     if (f.getDocenteID() != docenteID) continue;
                     double[] valores = porMaterial.computeIfAbsent(f.getMaterialID(), k -> new double[meses.size()]);
                     valores[i] += f.getCantidad();
@@ -187,7 +187,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
     private void construirPorOperador(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Por Operador");
-        List<FilaEspecialista> filas = service.especialista(anio, mes);
+        List<FilaEspecialista> filas = service.especialista(anio, mes, clinicaID());
 
         Map<Integer, String[]> nombresOperadores = new LinkedHashMap<>();
         for (FilaEspecialista f : filas) {
@@ -228,7 +228,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
         for (int i = 0; i < meses.size(); i++) {
             int mes = meses.get(i);
-            for (FilaEspecialista f : service.especialista(anio, mes)) {
+            for (FilaEspecialista f : service.especialista(anio, mes, clinicaID())) {
                 nombresOperadores.putIfAbsent(f.getOperadorID(),
                         new String[]{f.getEspecialista(), f.getGrado(), f.getTipo()});
             }
@@ -243,7 +243,7 @@ public class ReporteMaterialesGenerator extends ReporteGeneradorBase {
 
             for (int i = 0; i < meses.size(); i++) {
                 int mes = meses.get(i);
-                for (FilaEspecialista f : service.especialista(anio, mes)) {
+                for (FilaEspecialista f : service.especialista(anio, mes, clinicaID())) {
                     if (f.getOperadorID() != operadorID) continue;
                     double[] valores = porMaterial.computeIfAbsent(f.getMaterialID(), k -> new double[meses.size()]);
                     valores[i] += f.getCantidad();

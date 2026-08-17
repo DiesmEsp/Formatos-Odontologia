@@ -9,6 +9,7 @@ import com.odontologia.formatos.export.ReporteDocenteGenerator;
 import com.odontologia.formatos.export.ReporteEspecialistaGenerator;
 import com.odontologia.formatos.export.ReporteTratamientoGenerator;
 import com.odontologia.formatos.service.NegocioException;
+import com.odontologia.formatos.util.ControllerUtil;
 import io.javalin.Javalin;
 
 import java.io.File;
@@ -37,12 +38,15 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
+                materialesGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = materialesGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                materialesGen.setClinicaID(1);
             }
         });
 
@@ -51,12 +55,15 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
+                economicoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = economicoGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                economicoGen.setClinicaID(1);
             }
         });
 
@@ -65,12 +72,15 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
+                docenteGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = docenteGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                docenteGen.setClinicaID(1);
             }
         });
 
@@ -79,12 +89,15 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
+                especialistaGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = especialistaGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                especialistaGen.setClinicaID(1);
             }
         });
 
@@ -98,6 +111,7 @@ public class ReporteController {
             tratamientoGen.setOperadorID(operadorID);
             tratamientoGen.setTipo(tipo);
             try {
+                tratamientoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = tratamientoGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
@@ -107,6 +121,7 @@ public class ReporteController {
             } finally {
                 tratamientoGen.setOperadorID(null);
                 tratamientoGen.setTipo(null);
+                tratamientoGen.setClinicaID(1);
             }
         });
 
@@ -114,12 +129,15 @@ public class ReporteController {
             var body = ctx.bodyAsClass(Map.class);
             int anio = ((Number) body.get("anio")).intValue();
             try {
+                consolidadoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = consolidadoGen.generar(anio, 1, 12, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                consolidadoGen.setClinicaID(1);
             }
         });
 
@@ -128,12 +146,15 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             int mes = ((Number) body.get("mes")).intValue();
             try {
+                asistenciaGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = asistenciaGen.generar(anio, mes, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte: " + e.getMessage()));
+            } finally {
+                asistenciaGen.setClinicaID(1);
             }
         });
 
@@ -143,12 +164,15 @@ public class ReporteController {
             int mesInicio = ((Number) body.get("mesInicio")).intValue();
             int mesFin = ((Number) body.get("mesFin")).intValue();
             try {
+                consolidadoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
                 Path path = consolidadoGen.generar(anio, mesInicio, mesFin, carpetaReportes());
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reporte consolidado: " + e.getMessage()));
+            } finally {
+                consolidadoGen.setClinicaID(1);
             }
         });
 
@@ -160,6 +184,12 @@ public class ReporteController {
             try {
                 int mes = mesActual();
                 int anio = anioActual();
+                int clinicaID = ControllerUtil.clinicaID(ctx);
+                materialesGen.setClinicaID(clinicaID);
+                economicoGen.setClinicaID(clinicaID);
+                docenteGen.setClinicaID(clinicaID);
+                especialistaGen.setClinicaID(clinicaID);
+                asistenciaGen.setClinicaID(clinicaID);
                 Path matPath = materialesGen.generar(anio, mes, carpetaReportes());
                 Path ecoPath = economicoGen.generar(anio, mes, carpetaReportes());
                 Path docPath = docenteGen.generar(anio, mes, carpetaReportes());
@@ -175,6 +205,12 @@ public class ReporteController {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500).json(Map.of("error", "Error al generar reportes: " + e.getMessage()));
+            } finally {
+                materialesGen.setClinicaID(1);
+                economicoGen.setClinicaID(1);
+                docenteGen.setClinicaID(1);
+                especialistaGen.setClinicaID(1);
+                asistenciaGen.setClinicaID(1);
             }
         });
     }

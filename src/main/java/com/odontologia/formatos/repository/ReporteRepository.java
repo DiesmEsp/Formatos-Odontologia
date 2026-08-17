@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class ReporteRepository {
 
-    public List<FilaMaterial> materiales(int anio, int mes) throws SQLException {
+    public List<FilaMaterial> materiales(int anio, int mes, int clinicaID) throws SQLException {
         String patron = patronMes(anio, mes);
         String sql = "SELECT m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) AS UnidadBase, "
                 + "COALESCE(SUM(consumo.cant * COALESCE(uc.Factor, 1)), 0) AS CantidadTotal "
@@ -32,12 +32,12 @@ public class ReporteRepository {
                 + "  SELECT ml.MaterialID AS MaterialID, ml.Cantidad AS cant "
                 + "  FROM Materiales_List ml "
                 + "  JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
-                + "  WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
+                + "  WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "  UNION ALL "
                 + "  SELECT ma.MaterialesID AS MaterialID, ma.Cantidad AS cant "
                 + "  FROM Materiales_Asistencia ma "
                 + "  JOIN Asistencia a ON a.AsistenciaID = ma.AsistenciaID "
-                + "  WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? "
+                + "  WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? AND a.ClinicaID = ? "
                 + ") consumo ON consumo.MaterialID = m.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
                 + "  AND uc.UnidadEmpaque = m.Unidad "
@@ -48,7 +48,9 @@ public class ReporteRepository {
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patron);
-            ps.setString(2, patron);
+            ps.setInt(2, clinicaID);
+            ps.setString(3, patron);
+            ps.setInt(4, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaMaterial(
@@ -62,7 +64,7 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaIngreso> ingresos(int anio, int mes) throws SQLException {
+    public List<FilaIngreso> ingresos(int anio, int mes, int clinicaID) throws SQLException {
         String sql = "SELECT o.Grado, o.Tipo, "
                 + "COUNT(t.TratamientoID) AS CantidadTratamientos, "
                 + "COALESCE(SUM(t.Monto), 0) AS IngresoTotal, "
@@ -70,13 +72,14 @@ public class ReporteRepository {
                 + "COALESCE(SUM(t.Monto - t.MontoPagado), 0) AS MontoPendiente "
                 + "FROM Tratamiento t "
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
-                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
+                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "GROUP BY o.Grado, o.Tipo "
                 + "ORDER BY o.Grado, o.Tipo";
         List<FilaIngreso> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaIngreso(
@@ -92,15 +95,15 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaDocente> docenteConsolidado(int anio, int mes) throws SQLException {
-        return docente(anio, mes, false);
+    public List<FilaDocente> docenteConsolidado(int anio, int mes, int clinicaID) throws SQLException {
+        return docente(anio, mes, false, clinicaID);
     }
 
-    public List<FilaDocente> docenteDetalleDia(int anio, int mes) throws SQLException {
-        return docente(anio, mes, true);
+    public List<FilaDocente> docenteDetalleDia(int anio, int mes, int clinicaID) throws SQLException {
+        return docente(anio, mes, true, clinicaID);
     }
 
-    private List<FilaDocente> docente(int anio, int mes, boolean porDia) throws SQLException {
+    private List<FilaDocente> docente(int anio, int mes, boolean porDia, int clinicaID) throws SQLException {
         String selectDia = porDia ? "a.Fecha AS Dia, " : "NULL AS Dia, ";
         String groupBy = porDia
                 ? "GROUP BY d.DocenteID, d.Nombres, d.Apellidos, a.Fecha, m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
@@ -118,12 +121,13 @@ public class ReporteRepository {
                 + "JOIN Materiales m ON m.MaterialID = ma.MaterialesID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
                 + "  AND uc.UnidadEmpaque = m.Unidad "
-                + "WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? "
+                + "WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? AND a.ClinicaID = ? "
                 + groupBy + orderBy;
         List<FilaDocente> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String dia = rs.getString("Dia");
@@ -141,7 +145,7 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaEspecialista> especialista(int anio, int mes) throws SQLException {
+    public List<FilaEspecialista> especialista(int anio, int mes, int clinicaID) throws SQLException {
         String sql = "SELECT o.OperadorID, o.Nombres || ' ' || o.Apellidos AS Especialista, "
                 + "o.Grado, o.Tipo, m.MaterialID, m.Nombre AS Material, "
                 + "COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
@@ -152,7 +156,7 @@ public class ReporteRepository {
                 + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
                 + "  AND uc.UnidadEmpaque = m.Unidad "
-                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? "
+                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "GROUP BY o.OperadorID, o.Nombres, o.Apellidos, o.Grado, o.Tipo, "
                 + "m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
                 + "ORDER BY o.Apellidos, o.Nombres, m.Nombre";
@@ -160,6 +164,7 @@ public class ReporteRepository {
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaEspecialista(
@@ -177,20 +182,21 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaIngresoTratamiento> ingresosPorTratamiento(int anio, int mes) throws SQLException {
+    public List<FilaIngresoTratamiento> ingresosPorTratamiento(int anio, int mes, int clinicaID) throws SQLException {
         String sql = "SELECT t.NombreTratamiento, "
                 + "COUNT(*) AS CantidadTratamientos, "
                 + "COALESCE(SUM(t.Monto), 0) AS IngresoTotal, "
                 + "COALESCE(SUM(t.MontoPagado), 0) AS MontoPagado, "
                 + "COALESCE(SUM(t.Monto - t.MontoPagado), 0) AS MontoPendiente "
                 + "FROM Tratamiento t "
-                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? "
+                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "GROUP BY t.NombreTratamiento "
                 + "ORDER BY IngresoTotal DESC";
         List<FilaIngresoTratamiento> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaIngresoTratamiento(
@@ -205,7 +211,7 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaIngresoOperador> ingresosPorOperador(int anio, int mes) throws SQLException {
+    public List<FilaIngresoOperador> ingresosPorOperador(int anio, int mes, int clinicaID) throws SQLException {
         String sql = "SELECT o.OperadorID, o.Nombres || ' ' || o.Apellidos AS Nombre, "
                 + "o.Grado, o.Tipo, t.NombreTratamiento, "
                 + "COUNT(*) AS Cantidad, "
@@ -214,13 +220,14 @@ public class ReporteRepository {
                 + "COALESCE(SUM(t.Monto - t.MontoPagado), 0) AS MontoPendiente "
                 + "FROM Tratamiento t "
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
-                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? "
+                + "WHERE t.Estado = 'CERRADO' AND t.Tipo != 'CONTINUO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "GROUP BY o.OperadorID, t.NombreTratamiento "
                 + "ORDER BY o.Grado, o.Tipo, IngresoTotal DESC";
         List<FilaIngresoOperador> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaIngresoOperador(
@@ -243,18 +250,19 @@ public class ReporteRepository {
         return String.format("%04d-%02d%%", anio, mes);
     }
 
-    public List<FilaAsistencia> datosAsistencia(int anio, int mes) throws SQLException {
+    public List<FilaAsistencia> datosAsistencia(int anio, int mes, int clinicaID) throws SQLException {
         String sql = """
                 SELECT d.DocenteID, d.Nombres || ' ' || d.Apellidos AS Docente,
                        a.Fecha, a.HoraEntrada, a.HoraSalida
                 FROM Asistencia a
                 JOIN Docentes d ON d.DocenteID = a.DocenteID
-                WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ?
+                WHERE a.Estado = 'ACTIVO' AND a.Fecha LIKE ? AND a.ClinicaID = ?
                 ORDER BY a.Fecha, d.Apellidos, d.Nombres""";
         List<FilaAsistencia> lista = new ArrayList<>();
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
+            ps.setInt(2, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int asistenciaID = rs.getInt("DocenteID");
@@ -262,7 +270,7 @@ public class ReporteRepository {
                     String fecha = rs.getString("Fecha");
                     String horaEntrada = rs.getString("HoraEntrada");
                     String horaSalida = rs.getString("HoraSalida");
-                    List<FilaAusencia> ausencias = ausenciasPorAsistencia(con, fecha, docente);
+                    List<FilaAusencia> ausencias = ausenciasPorAsistencia(con, fecha, docente, clinicaID);
                     lista.add(new FilaAsistencia(asistenciaID, docente, fecha, horaEntrada, horaSalida, ausencias));
                 }
             }
@@ -270,18 +278,21 @@ public class ReporteRepository {
         return lista;
     }
 
-    private List<FilaAusencia> ausenciasPorAsistencia(Connection con, String fecha, String docente) throws SQLException {
+    private List<FilaAusencia> ausenciasPorAsistencia(Connection con, String fecha, String docente, int clinicaID)
+            throws SQLException {
         String sql = """
                 SELECT pa.HoraInicio, pa.HoraFin, pa.Motivo
                 FROM PeriodoAusencia pa
                 JOIN Asistencia a ON a.AsistenciaID = pa.AsistenciaID
                 JOIN Docentes d ON d.DocenteID = a.DocenteID
                 WHERE d.Nombres || ' ' || d.Apellidos = ? AND a.Fecha = ? AND a.Estado = 'ACTIVO'
+                      AND a.ClinicaID = ?
                 ORDER BY pa.HoraInicio""";
         List<FilaAusencia> lista = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, docente);
             ps.setString(2, fecha);
+            ps.setInt(3, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaAusencia(
@@ -294,12 +305,12 @@ public class ReporteRepository {
         return lista;
     }
 
-    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes) throws SQLException {
-        return consumoPorTratamiento(anio, mes, null, null);
+    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes, int clinicaID) throws SQLException {
+        return consumoPorTratamiento(anio, mes, null, null, clinicaID);
     }
 
-    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes, Integer operadorID, String tipo)
-            throws SQLException {
+    public List<FilaTratamiento> consumoPorTratamiento(int anio, int mes, Integer operadorID, String tipo,
+                                                       int clinicaID) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT t.TratamientoID, t.NombreTratamiento, t.Fecha, "
                 + "o.Nombres || ' ' || o.Apellidos AS Operador, o.Grado, o.Tipo, "
@@ -310,7 +321,7 @@ public class ReporteRepository {
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
                 + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID AND uc.UnidadEmpaque = m.Unidad "
-                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? ");
+                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? ");
         if (operadorID != null) {
             sql.append("AND o.OperadorID = ? ");
         }
@@ -324,6 +335,7 @@ public class ReporteRepository {
              PreparedStatement ps = con.prepareStatement(sql.toString())) {
             int idx = 1;
             ps.setString(idx++, patronMes(anio, mes));
+            ps.setInt(idx++, clinicaID);
             if (operadorID != null) {
                 ps.setInt(idx++, operadorID);
             }

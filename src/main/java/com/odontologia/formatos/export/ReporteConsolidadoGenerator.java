@@ -52,7 +52,7 @@ public class ReporteConsolidadoGenerator extends ReporteGeneradorBase {
         Map<String, String> unidades = new LinkedHashMap<>();
 
         for (int i = 0; i < meses.size(); i++) {
-            for (ReporteRepository.FilaMaterial f : service.materiales(anio, meses.get(i))) {
+            for (ReporteRepository.FilaMaterial f : service.materiales(anio, meses.get(i), clinicaID())) {
                 double[] vals = porMaterial.computeIfAbsent(f.getNombre(), k -> new double[meses.size()]);
                 vals[i] += f.getCantidadTotal();
                 unidades.putIfAbsent(f.getNombre(), f.getUnidadBase());
@@ -88,7 +88,7 @@ public class ReporteConsolidadoGenerator extends ReporteGeneradorBase {
         Map<String, double[]> porTratamiento = new LinkedHashMap<>();
 
         for (int i = 0; i < meses.size(); i++) {
-            for (ReporteRepository.FilaIngresoTratamiento f : service.ingresosPorTratamiento(anio, meses.get(i))) {
+            for (ReporteRepository.FilaIngresoTratamiento f : service.ingresosPorTratamiento(anio, meses.get(i), clinicaID())) {
                 double[] vals = porTratamiento.computeIfAbsent(f.getTratamiento(), k -> new double[meses.size()]);
                 vals[i] += f.getIngresoTotal();
             }
@@ -122,7 +122,7 @@ public class ReporteConsolidadoGenerator extends ReporteGeneradorBase {
         Map<String, int[]> porDocente = new LinkedHashMap<>();
 
         for (int i = 0; i < meses.size(); i++) {
-            for (ReporteRepository.FilaAsistencia f : service.datosAsistencia(anio, meses.get(i))) {
+            for (ReporteRepository.FilaAsistencia f : service.datosAsistencia(anio, meses.get(i), clinicaID())) {
                 int[] presencias = porDocente.computeIfAbsent(f.getDocente(), k -> new int[meses.size()]);
                 if (f.getHoraEntrada() != null && !f.getHoraEntrada().isEmpty()) {
                     presencias[i]++;

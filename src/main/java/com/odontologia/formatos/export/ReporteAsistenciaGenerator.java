@@ -20,7 +20,7 @@ public class ReporteAsistenciaGenerator extends ReporteGeneradorBase {
 
     @Override
     protected void construir(Workbook libro, int anio, int mes) throws SQLException {
-        List<FilaAsistencia> datos = service.datosAsistencia(anio, mes);
+        List<FilaAsistencia> datos = service.datosAsistencia(anio, mes, clinicaID());
         construirResumen(libro, anio, mes, datos);
         construirDetalleAusencias(libro, anio, mes, datos);
     }

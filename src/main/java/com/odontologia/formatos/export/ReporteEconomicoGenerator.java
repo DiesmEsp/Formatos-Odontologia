@@ -48,7 +48,7 @@ public class ReporteEconomicoGenerator extends ReporteGeneradorBase {
         Sheet hoja = crearHoja(libro, "General");
         encabezado(hoja, Arrays.asList(
                 "Tratamiento", "Cantidad Tratamientos", "Ingreso Total", "Monto Pagado", "Monto Pendiente"));
-        List<FilaIngresoTratamiento> filas = service.ingresosPorTratamiento(anio, mes);
+        List<FilaIngresoTratamiento> filas = service.ingresosPorTratamiento(anio, mes, clinicaID());
         int filaIndex = 1;
         for (FilaIngresoTratamiento f : filas) {
             fila(hoja, filaIndex++, Arrays.asList(
@@ -71,7 +71,7 @@ public class ReporteEconomicoGenerator extends ReporteGeneradorBase {
         Map<String, double[]> porTratamiento = new LinkedHashMap<>();
         for (int i = 0; i < meses.size(); i++) {
             int mes = meses.get(i);
-            for (FilaIngresoTratamiento f : service.ingresosPorTratamiento(anio, mes)) {
+            for (FilaIngresoTratamiento f : service.ingresosPorTratamiento(anio, mes, clinicaID())) {
                 double[] valores = porTratamiento.computeIfAbsent(f.getTratamiento(), k -> new double[meses.size()]);
                 valores[i] += f.getIngresoTotal();
             }
@@ -89,7 +89,7 @@ public class ReporteEconomicoGenerator extends ReporteGeneradorBase {
 
     private void construirPorOperador(Workbook libro, int anio, int mes) throws SQLException {
         Sheet hoja = crearHoja(libro, "Por Operador");
-        List<FilaIngresoOperador> filas = service.ingresosPorOperador(anio, mes);
+        List<FilaIngresoOperador> filas = service.ingresosPorOperador(anio, mes, clinicaID());
 
         Map<Integer, String[]> nombresOperadores = new LinkedHashMap<>();
         for (FilaIngresoOperador f : filas) {
@@ -135,7 +135,7 @@ public class ReporteEconomicoGenerator extends ReporteGeneradorBase {
 
         for (int i = 0; i < meses.size(); i++) {
             int mes = meses.get(i);
-            for (FilaIngresoOperador f : service.ingresosPorOperador(anio, mes)) {
+            for (FilaIngresoOperador f : service.ingresosPorOperador(anio, mes, clinicaID())) {
                 nombresOperadores.putIfAbsent(f.getOperadorID(),
                         new String[]{f.getNombre(), f.getGrado(), f.getTipo()});
             }
@@ -149,7 +149,7 @@ public class ReporteEconomicoGenerator extends ReporteGeneradorBase {
 
             for (int i = 0; i < meses.size(); i++) {
                 int mes = meses.get(i);
-                for (FilaIngresoOperador f : service.ingresosPorOperador(anio, mes)) {
+                for (FilaIngresoOperador f : service.ingresosPorOperador(anio, mes, clinicaID())) {
                     if (f.getOperadorID() != operadorID) continue;
                     double[] valores = porTratamiento.computeIfAbsent(f.getTratamiento(), k -> new double[meses.size()]);
                     valores[i] += f.getIngresoTotal();
