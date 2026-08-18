@@ -39,7 +39,7 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 materialesGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = materialesGen.generar(anio, mes, carpetaReportes());
+                Path path = materialesGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -56,7 +56,7 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 economicoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = economicoGen.generar(anio, mes, carpetaReportes());
+                Path path = economicoGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -73,7 +73,7 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 docenteGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = docenteGen.generar(anio, mes, carpetaReportes());
+                Path path = docenteGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -90,7 +90,7 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 especialistaGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = especialistaGen.generar(anio, mes, carpetaReportes());
+                Path path = especialistaGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -112,7 +112,7 @@ public class ReporteController {
             tratamientoGen.setTipo(tipo);
             try {
                 tratamientoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = tratamientoGen.generar(anio, mes, carpetaReportes());
+                Path path = tratamientoGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -130,7 +130,7 @@ public class ReporteController {
             int anio = ((Number) body.get("anio")).intValue();
             try {
                 consolidadoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = consolidadoGen.generar(anio, 1, 12, carpetaReportes());
+                Path path = consolidadoGen.generar(anio, 1, 12, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -147,7 +147,7 @@ public class ReporteController {
             int mes = ((Number) body.get("mes")).intValue();
             try {
                 asistenciaGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = asistenciaGen.generar(anio, mes, carpetaReportes());
+                Path path = asistenciaGen.generar(anio, mes, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -165,7 +165,7 @@ public class ReporteController {
             int mesFin = ((Number) body.get("mesFin")).intValue();
             try {
                 consolidadoGen.setClinicaID(ControllerUtil.clinicaID(ctx));
-                Path path = consolidadoGen.generar(anio, mesInicio, mesFin, carpetaReportes());
+                Path path = consolidadoGen.generar(anio, mesInicio, mesFin, carpetaReportes(ControllerUtil.clinicaID(ctx)));
                 ctx.json(Map.of("path", path.toAbsolutePath().toString()));
             } catch (NegocioException e) {
                 ctx.status(400).json(Map.of("error", e.getMessage()));
@@ -177,7 +177,7 @@ public class ReporteController {
         });
 
         app.get("/api/reportes/recientes", ctx -> {
-            ctx.json(archivosRecientes());
+            ctx.json(archivosRecientes(ControllerUtil.clinicaID(ctx)));
         });
 
         app.post("/api/reportes/semilla/generar", ctx -> {
@@ -190,11 +190,12 @@ public class ReporteController {
                 docenteGen.setClinicaID(clinicaID);
                 especialistaGen.setClinicaID(clinicaID);
                 asistenciaGen.setClinicaID(clinicaID);
-                Path matPath = materialesGen.generar(anio, mes, carpetaReportes());
-                Path ecoPath = economicoGen.generar(anio, mes, carpetaReportes());
-                Path docPath = docenteGen.generar(anio, mes, carpetaReportes());
-                Path espPath = especialistaGen.generar(anio, mes, carpetaReportes());
-                Path asisPath = asistenciaGen.generar(anio, mes, carpetaReportes());
+                Path carpeta = carpetaReportes(clinicaID);
+                Path matPath = materialesGen.generar(anio, mes, carpeta);
+                Path ecoPath = economicoGen.generar(anio, mes, carpeta);
+                Path docPath = docenteGen.generar(anio, mes, carpeta);
+                Path espPath = especialistaGen.generar(anio, mes, carpeta);
+                Path asisPath = asistenciaGen.generar(anio, mes, carpeta);
                 ctx.json(Map.of(
                         "materiales", matPath.toAbsolutePath().toString(),
                         "economico", ecoPath.toAbsolutePath().toString(),
@@ -216,23 +217,41 @@ public class ReporteController {
     }
 
     private Path carpetaReportes() {
-        Path dir = Paths.get(AppConfig.carpetaInicialReportes());
+        return carpetaReportes(1);
+    }
+
+    private Path carpetaReportes(int clinicaID) {
+        Path base = Paths.get(AppConfig.carpetaInicialReportes());
         try {
-            Files.createDirectories(dir);
+            Files.createDirectories(base);
         } catch (Exception e) {
-            dir = Paths.get(System.getProperty("java.io.tmpdir"), "FormatosOdontologia", "Reportes");
+            base = Paths.get(System.getProperty("java.io.tmpdir"), "FormatosOdontologia", "Reportes");
             try {
-                Files.createDirectories(dir);
+                Files.createDirectories(base);
             } catch (Exception ex) {
                 throw new NegocioException("No se pudo crear la carpeta de reportes: " + ex.getMessage());
             }
         }
-        return dir;
+        String nombreClinica = "Clinica_" + clinicaID;
+        try {
+            var clinica = new com.odontologia.formatos.repository.ClinicaRepository().findById(clinicaID);
+            if (clinica != null) {
+                nombreClinica = clinica.getNombre().replaceAll("[^a-zA-Z0-9_\\- ]", "").replaceAll("\\s+", "_");
+            }
+        } catch (Exception ignored) {
+        }
+        Path carpeta = base.resolve(nombreClinica);
+        try {
+            Files.createDirectories(carpeta);
+        } catch (Exception e) {
+            carpeta = base;
+        }
+        return carpeta;
     }
 
-    private List<Map<String, String>> archivosRecientes() {
+    private List<Map<String, String>> archivosRecientes(int clinicaID) {
         List<Map<String, String>> lista = new ArrayList<>();
-        Path dir = carpetaReportes();
+        Path dir = carpetaReportes(clinicaID);
         File[] archivos = dir.toFile().listFiles((d, name) -> name.endsWith(".xlsx"));
         if (archivos == null) return lista;
 
