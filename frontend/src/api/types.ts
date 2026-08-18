@@ -81,13 +81,35 @@ export interface Tratamiento {
   montoPagado: number;
   estado: string;
   cerradoEn: string | null;
-  tratamientoPadreID: number | null;
   montoAnterior: number | null;
+}
+
+export interface TratamientoAvance {
+  avanceID: number;
+  tratamientoID: number;
+  fecha: string;
+  unidadID: number | null;
+  estado: string;
+  timestamp: string;
+}
+
+export interface MaterialConsolidado {
+  materialID: number;
+  nombreMaterial: string;
+  unidad: string;
+  cantidad: number;
+}
+
+export interface ConsolidadoTratamiento {
+  tratamiento: Tratamiento;
+  materiales: MaterialConsolidado[];
+  pagos: Pago[];
 }
 
 export interface Pago {
   pagoID: number;
   tratamientoID: number;
+  avanceID: number | null;
   fecha: string;
   monto: number;
   timestamp: string;
@@ -284,7 +306,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'wa
 export type ButtonSize = 'sm' | 'md' | 'lg';
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 export type TratamientoEstadoValue = 'ABIERTO' | 'CERRADO' | 'ANULADO';
-export type TratamientoTipo = 'NORMAL' | 'CONTINUO' | 'AVANCE';
+export type TratamientoTipo = 'NORMAL' | 'CONTINUO';
 export type EstadoPago = 'PENDIENTE' | 'PAGADO' | 'PARCIAL';
 export type GradoOperador = 'PRE' | 'POS';
 export type TipoOperadorPRE = '3' | '4' | '5';

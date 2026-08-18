@@ -12,6 +12,7 @@ import type {
   CrearPacienteDTO,
   CrearTratamientoDTO,
   CrearTratamientoPredDTO,
+  ConsolidadoTratamiento,
   DashboardKpis,
   Docente,
   EditarTratamientoDTO,
@@ -27,6 +28,7 @@ import type {
   ReporteReciente,
   TopMaterial,
   Tratamiento,
+  TratamientoAvance,
   TratamientoEstado,
   TratamientoMaterialConNombre,
   TratamientoPredefinido,
@@ -123,22 +125,17 @@ export const api = {
       tratPredID: number | null;
       monto: number | null;
       tipo: string;
-      tratamientoPadreID?: number | null;
       materiales: Record<string, number>;
     }) => request<{ id: number }>('/api/tratamientos/cerrado', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-    crearAvance: (data: {
-      operadorID: number;
-      pacienteID: number;
-      unidadID: number | null;
+    agregarAvance: (id: number, data: {
       fecha: string;
-      tratPredID: number | null;
-      monto: number | null;
-      tratamientoPadreID: number;
+      unidadID?: number | null;
+      pago?: number | null;
       materiales?: Record<string, number>;
-    }) => request<{ id: number }>('/api/tratamientos/avance', {
+    }) => request<{ id: number }>(`/api/tratamientos/${id}/avances`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -153,8 +150,12 @@ export const api = {
       body: JSON.stringify({ abono, fecha }),
     }),
     pagos: (id: number) => request<Pago[]>(`/api/tratamientos/${id}/pagos`),
-    avances: (id: number) => request<Tratamiento[]>(`/api/tratamientos/${id}/avances`),
-    candidatosPadre: (pacienteID: number) => request<Tratamiento[]>(`/api/tratamientos/candidatos-padre?pacienteID=${pacienteID}`),
+    avances: (id: number) => request<TratamientoAvance[]>(`/api/tratamientos/${id}/avances`),
+    anularAvance: (avanceID: number, motivo: string) => request<{ ok: boolean }>(`/api/tratamientos/avances/${avanceID}/anular`, {
+      method: 'POST',
+      body: JSON.stringify({ motivo }),
+    }),
+    consolidado: (id: number) => request<ConsolidadoTratamiento>(`/api/tratamientos/${id}/consolidado`),
     cerradosPorPagar: () => request<Tratamiento[]>('/api/tratamientos/cerrados-por-pagar'),
     editarPago: (pagoID: number, monto: number, fecha?: string) => request<{ ok: boolean }>(`/api/tratamientos/pagos/${pagoID}`, {
       method: 'PUT',

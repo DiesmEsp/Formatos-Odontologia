@@ -24,4 +24,13 @@ test.describe('Flujos criticos', () => {
     await page.click('a[href="/catalogos"]');
     await expect(page.locator('.tab')).toHaveCount(6);
   });
+
+  test('Crear tratamiento ya no ofrece el tipo Avance', async ({ page }) => {
+    await page.goto('/');
+    await page.click('a[href="/tratamientos"]');
+    await page.getByRole('button', { name: 'Nuevo tratamiento (manual)' }).click();
+    await expect(page.getByRole('button', { name: 'Avance' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Común' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continuo' })).toBeVisible();
+  });
 });

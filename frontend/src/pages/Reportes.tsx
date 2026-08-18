@@ -159,7 +159,6 @@ export default function Reportes() {
             <option value="">Todos los tipos</option>
             <option value="NORMAL">Normal</option>
             <option value="CONTINUO">Continuo</option>
-            <option value="AVANCE">Avance</option>
           </select>
           <span className="text-muted text-sm">Filtros de "Consumo por Tratamiento"</span>
         </div>

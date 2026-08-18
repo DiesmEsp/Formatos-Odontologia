@@ -8,7 +8,7 @@ import { MaterialTable, type MaterialRow } from '../../components/MaterialTable'
 import { CrearPacienteOnTheFly } from './CrearPacienteOnTheFly';
 import { CrearOperadorOnTheFly } from './CrearOperadorOnTheFly';
 import { hoyISO, nombreCompleto } from '../../lib/format';
-import type { Tratamiento, Unidad } from '../../api/types';
+import type { Unidad } from '../../api/types';
 
 export function CrearTratamientoModal({
   unidad, unidadesList, onClose, onSuccess, addToast,
@@ -26,7 +26,6 @@ export function CrearTratamientoModal({
   const [qTrat, setQTrat] = useState('');
   const [showNewPaciente, setShowNewPaciente] = useState(false);
   const [showNewOperador, setShowNewOperador] = useState(false);
-  const [tratamientoPadreId, setTratamientoPadreId] = useState<number | null>(null);
   const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
   const materialRowsRef = useRef<MaterialRow[]>([]);
 
@@ -34,20 +33,13 @@ export function CrearTratamientoModal({
   const operadores = useApi(() => api.catalogos.operadores.listar(qOpe || undefined), [qOpe]);
   const tratsPred = useApi(() => api.catalogos.tratamientosPred.listar(qTrat || undefined), [qTrat]);
   const materiales = useApi(() => api.catalogos.materiales.listar());
-  const candidatosPadre = useApi(
-    () => (pacienteId ? api.tratamientos.candidatosPadre(pacienteId) : Promise.resolve([] as Tratamiento[])),
-    [pacienteId],
-  );
 
   const pOptions: SearchableOption[] = (pacientes.data ?? []).map((p) => ({ id: p.pacienteID, label: nombreCompleto(p.nombres, p.apellidos) }));
   const oOptions: SearchableOption[] = (operadores.data ?? []).map((o) => ({ id: o.operadorID, label: nombreCompleto(o.nombres, o.apellidos), badge: o.grado }));
   const tOptions: SearchableOption[] = (tratsPred.data ?? []).map((t) => ({ id: t.tratPredID, label: t.nombreTratamiento, extra: t.montoSugerido != null ? `S/ ${t.montoSugerido.toFixed(2)}` : undefined }));
-  const padreOptions: SearchableOption[] = (candidatosPadre.data ?? [])
-    .map((t) => ({ id: t.tratamientoID, label: `#${t.tratamientoID} - ${t.nombreTratamiento}`, badge: t.estado }));
 
   const handlePacienteChange = (id: number | null) => {
     setPacienteId(id);
-    setTratamientoPadreId(null);
   };
 
   const handleTratChange = async (id: number | null) => {
@@ -140,7 +132,6 @@ export function CrearTratamientoModal({
 
   const handleGuardar = async () => {
     if (!operadorId || !pacienteId) { addToast('error', 'Seleccione paciente y operador'); return; }
-    if (tipo === 'AVANCE' && !tratamientoPadreId) { addToast('error', 'Seleccione el tratamiento padre'); return; }
     const montoVal = montoStr === '' ? null : Number(montoStr);
     const materialesMap: Record<string, number> = {};
     for (const row of materialRowsRef.current) {
@@ -150,19 +141,11 @@ export function CrearTratamientoModal({
     }
     setSaving(true);
     try {
-      if (tipo === 'AVANCE') {
-        await api.tratamientos.crearAvance({
-          operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
-          tratPredID: tratPredId, monto: montoVal, tratamientoPadreID: tratamientoPadreId!,
-          materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
-        });
-      } else {
-        await api.tratamientos.crear({
-          operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
-          tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
-          materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
-        });
-      }
+      await api.tratamientos.crear({
+        operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
+        tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
+        materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
+      });
       addToast('success', 'Tratamiento creado correctamente');
       onSuccess();
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al crear tratamiento'); }
@@ -215,22 +198,15 @@ export function CrearTratamientoModal({
             <div className="form-group">
               <label className="form-label">Tipo</label>
               <div className="flex gap-8">
-                {(['NORMAL', 'CONTINUO', 'AVANCE'] as const).map((t) => (
+                {(['NORMAL', 'CONTINUO'] as const).map((t) => (
                   <button key={t} type="button"
                     className={`btn ${tipo === t ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => handleTipoChange(t)}>
-                    {t === 'NORMAL' ? 'Común' : t === 'CONTINUO' ? 'Continuo' : 'Avance'}
+                    {t === 'NORMAL' ? 'Común' : 'Continuo'}
                   </button>
                 ))}
               </div>
             </div>
-
-            {tipo === 'AVANCE' && (
-              <div className="form-group">
-                <label className="form-label">Tratamiento padre</label>
-                <SearchableCombo options={padreOptions} value={tratamientoPadreId} onChange={setTratamientoPadreId} placeholder={pacienteId ? 'Buscar tratamiento padre...' : 'Seleccione primero un paciente'} disabled={!pacienteId} loading={!!pacienteId && candidatosPadre.loading} />
-              </div>
-            )}
 
             <div className="form-group">
               <label className="form-label">Materiales</label>
