@@ -8,18 +8,25 @@ import { MaterialTable, type MaterialRow } from '../../components/MaterialTable'
 import { CrearPacienteOnTheFly } from './CrearPacienteOnTheFly';
 import { CrearOperadorOnTheFly } from './CrearOperadorOnTheFly';
 import { hoyISO, nombreCompleto } from '../../lib/format';
-import type { Unidad } from '../../api/types';
+import type { Tratamiento, Unidad } from '../../api/types';
 
 export function CrearTratamientoModal({
-  unidad, unidadesList, onClose, onSuccess, addToast,
-}: { unidad: Unidad | null; unidadesList: Unidad[]; onClose: () => void; onSuccess: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
+  unidad, unidadesList, tratamientoPadre, onClose, onSuccess, addToast,
+}: {
+  unidad: Unidad | null;
+  unidadesList: Unidad[];
+  tratamientoPadre?: Tratamiento | null;
+  onClose: () => void;
+  onSuccess: () => void;
+  addToast: ReturnType<typeof useToast>['addToast'];
+}) {
   const [fecha, setFecha] = useState(hoyISO());
-  const [pacienteId, setPacienteId] = useState<number | null>(null);
-  const [operadorId, setOperadorId] = useState<number | null>(null);
+  const [pacienteId, setPacienteId] = useState<number | null>(tratamientoPadre?.pacienteID ?? null);
+  const [operadorId, setOperadorId] = useState<number | null>(tratamientoPadre?.operadorID ?? null);
   const [tratPredId, setTratPredId] = useState<number | null>(null);
-  const [unidadId, setUnidadId] = useState<number | null>(unidad?.unidadID ?? null);
+  const [unidadId, setUnidadId] = useState<number | null>(unidad?.unidadID ?? tratamientoPadre?.unidadID ?? null);
   const [montoStr, setMontoStr] = useState<string>('');
-  const [tipo, setTipo] = useState<string>('NORMAL');
+  const [tipo, setTipo] = useState<string>(tratamientoPadre ? 'CONTINUO' : 'NORMAL');
   const [saving, setSaving] = useState(false);
   const [qPac, setQPac] = useState('');
   const [qOpe, setQOpe] = useState('');
@@ -144,6 +151,7 @@ export function CrearTratamientoModal({
       await api.tratamientos.crear({
         operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
         tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
+        tratamientoPadreID: tratamientoPadre?.tratamientoID ?? null,
         materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
       });
       addToast('success', 'Tratamiento creado correctamente');
@@ -157,10 +165,15 @@ export function CrearTratamientoModal({
       <div className="dialog-overlay" onClick={onClose}>
         <div className="dialog-pane mw-560" onClick={(e) => e.stopPropagation()}>
           <div className="dialog-header">
-            <h3 className="dialog-title">Crear Tratamiento</h3>
+            <h3 className="dialog-title">{tratamientoPadre ? 'Crear Tratamiento Continuo' : 'Crear Tratamiento'}</h3>
             <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
           </div>
           <div className="dialog-body">
+            {tratamientoPadre && (
+              <div className="alert-banner alert-info mb-16">
+                <span>Continuación del tratamiento #{tratamientoPadre.tratamientoID} ({tratamientoPadre.nombreTratamiento})</span>
+              </div>
+            )}
             {unidad ? (
               <div className="form-group"><label className="form-label">Unidad</label><input className="text-field w-full" value={`Unidad ${unidad.unidadNro}`} readOnly /></div>
             ) : (
@@ -201,11 +214,13 @@ export function CrearTratamientoModal({
                 {(['NORMAL', 'CONTINUO'] as const).map((t) => (
                   <button key={t} type="button"
                     className={`btn ${tipo === t ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => handleTipoChange(t)}>
+                    onClick={() => handleTipoChange(t)}
+                    disabled={!!tratamientoPadre}>
                     {t === 'NORMAL' ? 'Común' : 'Continuo'}
                   </button>
                 ))}
               </div>
+              {tratamientoPadre && <span className="text-muted text-sm">Tipo fijado en Continuo para la continuación del tratamiento.</span>}
             </div>
 
             <div className="form-group">

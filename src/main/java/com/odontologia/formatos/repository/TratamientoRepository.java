@@ -19,8 +19,8 @@ public class TratamientoRepository {
 
     public int insert(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "INSERT INTO Tratamiento (OperadorID, PacienteID, UnidadID, Fecha, NombreTratamiento, "
-                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, MontoAnterior, ClinicaID) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, MontoAnterior, TratamientoPadreID, ClinicaID) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -44,7 +44,12 @@ public class TratamientoRepository {
             } else {
                 ps.setNull(12, java.sql.Types.REAL);
             }
-            ps.setInt(13, tratamiento.getClinicaID());
+            if (tratamiento.getTratamientoPadreID() != null) {
+                ps.setInt(13, tratamiento.getTratamientoPadreID());
+            } else {
+                ps.setNull(13, java.sql.Types.INTEGER);
+            }
+            ps.setInt(14, tratamiento.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -66,7 +71,7 @@ public class TratamientoRepository {
     public void update(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "UPDATE Tratamiento SET OperadorID = ?, PacienteID = ?, UnidadID = ?, Fecha = ?, "
                 + "NombreTratamiento = ?, Monto = ?, Tipo = ?, EstadoPago = ?, MontoPagado = ?, "
-                + "Estado = ?, CerradoEn = ?, MontoAnterior = ?, ClinicaID = ? WHERE TratamientoID = ?";
+                + "Estado = ?, CerradoEn = ?, MontoAnterior = ?, TratamientoPadreID = ?, ClinicaID = ? WHERE TratamientoID = ?";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -90,8 +95,13 @@ public class TratamientoRepository {
             } else {
                 ps.setNull(12, java.sql.Types.REAL);
             }
-            ps.setInt(13, tratamiento.getClinicaID());
-            ps.setInt(14, tratamiento.getTratamientoID());
+            if (tratamiento.getTratamientoPadreID() != null) {
+                ps.setInt(13, tratamiento.getTratamientoPadreID());
+            } else {
+                ps.setNull(13, java.sql.Types.INTEGER);
+            }
+            ps.setInt(14, tratamiento.getClinicaID());
+            ps.setInt(15, tratamiento.getTratamientoID());
             ps.executeUpdate();
         } finally {
             if (cerrarConexion) {
@@ -184,6 +194,8 @@ public class TratamientoRepository {
         t.setCerradoEn(rs.getString("CerradoEn"));
         double montoAnterior = rs.getDouble("MontoAnterior");
         t.setMontoAnterior(rs.wasNull() ? null : montoAnterior);
+        int padre = rs.getInt("TratamientoPadreID");
+        t.setTratamientoPadreID(rs.wasNull() ? null : padre);
         t.setClinicaID(rs.getInt("ClinicaID"));
         return t;
     }

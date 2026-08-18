@@ -82,6 +82,7 @@ export interface Tratamiento {
   estado: string;
   cerradoEn: string | null;
   montoAnterior: number | null;
+  tratamientoPadreID?: number | null;
 }
 
 export interface TratamientoAvance {
@@ -185,6 +186,7 @@ export interface CrearTratamientoDTO {
   tratPredID: number | null;
   monto: number | null;
   tipo: string;
+  tratamientoPadreID?: number | null;
   materiales?: Record<string, number>;
 }
 

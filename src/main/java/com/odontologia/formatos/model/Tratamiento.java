@@ -15,6 +15,7 @@ public class Tratamiento {
     private String estado;
     private String cerradoEn;
     private Double montoAnterior;
+    private Integer tratamientoPadreID;
     private int clinicaID = 1;
 
     public Tratamiento() {
@@ -122,6 +123,14 @@ public class Tratamiento {
 
     public void setMontoAnterior(Double montoAnterior) {
         this.montoAnterior = montoAnterior;
+    }
+
+    public Integer getTratamientoPadreID() {
+        return tratamientoPadreID;
+    }
+
+    public void setTratamientoPadreID(Integer tratamientoPadreID) {
+        this.tratamientoPadreID = tratamientoPadreID;
     }
 
     public int getClinicaID() {

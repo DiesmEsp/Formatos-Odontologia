@@ -92,6 +92,7 @@ export default function Tratamientos() {
           tratamiento={detalleTratamiento}
           operadorNombre={operadorNombreMap.get(detalleTratamiento.operadorID)}
           pacienteNombre={pacienteNombreMap.get(detalleTratamiento.pacienteID)}
+          unidadesList={unidadesList}
           onClose={() => { setDetalleTratamiento(null); tratamientos.refetch(); }}
           addToast={addToast}
         />

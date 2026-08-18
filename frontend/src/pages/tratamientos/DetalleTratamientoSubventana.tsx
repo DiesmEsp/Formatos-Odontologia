@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus } from 'lucide-react';
+import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus, GitBranch } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { useToast } from '../../hooks/useToast';
 import { api } from '../../api';
@@ -8,16 +8,18 @@ import { Badge } from '../../components/Badge';
 import { MaterialTable, type MaterialRow } from '../../components/MaterialTable';
 import { RegistrarPagoModal } from '../../components/RegistrarPagoModal';
 import { RegistrarAvanceModal } from '../../components/RegistrarAvanceModal';
+import { CrearTratamientoModal } from './CrearTratamientoModal';
 import { formatMonto } from '../../lib/format';
-import type { Tratamiento, Pago, TratamientoAvance, ConsolidadoTratamiento } from '../../api/types';
+import type { Tratamiento, Pago, TratamientoAvance, ConsolidadoTratamiento, Unidad } from '../../api/types';
 
 export function DetalleTratamientoSubventana({
-  tratamiento: initialTrat, operadorNombre, pacienteNombre, onClose, addToast,
-}: { tratamiento: Tratamiento; operadorNombre?: string; pacienteNombre?: string; onClose: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
+  tratamiento: initialTrat, operadorNombre, pacienteNombre, unidadesList, onClose, addToast,
+}: { tratamiento: Tratamiento; operadorNombre?: string; pacienteNombre?: string; unidadesList: Unidad[]; onClose: () => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
   const [tratamiento, setTratamiento] = useState<Tratamiento>(initialTrat);
   const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
   const [showPago, setShowPago] = useState(false);
   const [showAvance, setShowAvance] = useState(false);
+  const [showCrearContinuo, setShowCrearContinuo] = useState(false);
   const [showAnular, setShowAnular] = useState(false);
   const [showAnularAvance, setShowAnularAvance] = useState<TratamientoAvance | null>(null);
   const [terminandoAvance, setTerminandoAvance] = useState<number | null>(null);
@@ -299,6 +301,7 @@ export function DetalleTratamientoSubventana({
                   <button className="btn btn-success" onClick={handleCerrar} disabled={saving}>Cerrar tratamiento</button>
                   <button className="btn btn-primary" onClick={() => setShowPago(true)}><DollarSign size={14} /> Registrar pago</button>
                   <button className="btn btn-secondary" onClick={() => setShowAvance(true)}><Plus size={14} /> Registrar avance</button>
+                  <button className="btn btn-secondary" onClick={() => setShowCrearContinuo(true)}><GitBranch size={14} /> Crear CONTINUO</button>
                   <button className="btn btn-secondary" onClick={handleCambiarTipo}><ArrowLeftRight size={14} /> {tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'}</button>
                   <button className="btn btn-danger" onClick={() => setShowAnular(true)}><AlertTriangle size={14} /> Anular</button>
                 </>
@@ -308,6 +311,7 @@ export function DetalleTratamientoSubventana({
                   <button className="btn btn-secondary" onClick={handleReabrir}><RotateCcw size={14} /> Reabrir</button>
                   <button className="btn btn-primary" onClick={() => setShowPago(true)}><DollarSign size={14} /> Registrar pago</button>
                   <button className="btn btn-secondary" onClick={() => setShowAvance(true)}><Plus size={14} /> Registrar avance</button>
+                  <button className="btn btn-secondary" onClick={() => setShowCrearContinuo(true)}><GitBranch size={14} /> Crear CONTINUO</button>
                   <button className="btn btn-danger" onClick={() => setShowAnular(true)}><AlertTriangle size={14} /> Anular</button>
                 </>
               )}
@@ -335,6 +339,16 @@ export function DetalleTratamientoSubventana({
             await cargarDatos();
             setShowAvance(false);
           }}
+          addToast={addToast}
+        />
+      )}
+      {showCrearContinuo && (
+        <CrearTratamientoModal
+          unidad={null}
+          unidadesList={unidadesList}
+          tratamientoPadre={tratamiento}
+          onClose={() => setShowCrearContinuo(false)}
+          onSuccess={() => { setShowCrearContinuo(false); cargarDatos(); }}
           addToast={addToast}
         />
       )}

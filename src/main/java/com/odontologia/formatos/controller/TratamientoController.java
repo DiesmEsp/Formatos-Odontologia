@@ -70,6 +70,7 @@ public class TratamientoController {
             try {
                 int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
                         rawMateriales != null ? materiales : null,
+                        tratamientoPadreID,
                         ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {

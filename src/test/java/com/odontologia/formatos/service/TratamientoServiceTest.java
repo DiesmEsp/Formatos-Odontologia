@@ -472,12 +472,51 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
-    void agregarAvanceSobreCerradoArrojaError() throws SQLException {
+    void crearContinuoConPadrePersistePadreID() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        int continuo = service.crear(operadorID, pacienteID, 1, "2026-08-04", null, null, "CONTINUO",
+                null, padre, 1);
+
+        Tratamiento t = tratamientoRepository.findById(continuo);
+        assertEquals(padre, (int) t.getTratamientoPadreID());
+    }
+
+    @Test
+    void crearContinuoConPadreCerradoFunciona() throws SQLException {
         int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
         service.cerrar(padre);
 
-        assertThrows(NegocioException.class,
-                () -> service.agregarAvance(padre, "2026-08-04", null, null, null));
+        int continuo = service.crear(operadorID, pacienteID, 1, "2026-08-04", null, null, "CONTINUO",
+                null, padre, 1);
+
+        assertTrue(continuo > 0);
+    }
+
+    @Test
+    void crearContinuoConPadreAnuladoArrojaError() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.anular(padre, "prueba");
+
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-04", null, null, "CONTINUO",
+                        null, padre, 1));
+    }
+
+    @Test
+    void crearContinuoConPadreInexistenteArrojaError() throws SQLException {
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-04", null, null, "CONTINUO",
+                        null, 99999, 1));
+    }
+
+    @Test
+    void agregarAvanceSobreCerradoFunciona() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(padre);
+
+        int avanceID = service.agregarAvance(padre, "2026-08-04", null, null, null);
+        assertTrue(avanceID > 0);
     }
 
     @Test

@@ -66,6 +66,14 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Map<Integer, Double> materiales, int clinicaID) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
+                materiales, null, clinicaID);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, Double monto, String tipo,
+                     Map<Integer, Double> materiales, Integer tratamientoPadreID,
+                     int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
@@ -73,6 +81,9 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
+        if (tratamientoPadreID != null) {
+            validarPadreParaContinuo(tratamientoPadreID);
+        }
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -83,6 +94,7 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             tratamiento.setTipo(tipoNormalizado);
             tratamiento.setEstado("ABIERTO");
             tratamiento.setCerradoEn(null);
+            tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setClinicaID(clinicaID);
 
             List<TratamientoPredefinidoMaterial> sugeridos = List.of();
@@ -242,9 +254,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         }
         if ("ANULADO".equals(t.getEstado())) {
             throw new NegocioException("No se puede agregar un avance a un tratamiento anulado.");
-        }
-        if (!"ABIERTO".equals(t.getEstado())) {
-            throw new NegocioException("Solo se pueden agregar avances a tratamientos en estado ABIERTO.");
         }
         if ("CONTINUO".equals(t.getTipo())) {
             throw new NegocioException("Un tratamiento continuo no admite avances.");
@@ -761,6 +770,19 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         }
         if (!"ABIERTO".equals(t.getEstado())) {
             throw new NegocioException("El tratamiento no está abierto; no se pueden modificar sus materiales.");
+        }
+    }
+
+    private void validarPadreParaContinuo(int tratamientoPadreID) throws SQLException {
+        Tratamiento padre = repository.findById(tratamientoPadreID);
+        if (padre == null) {
+            throw new NegocioException("El tratamiento padre no existe.");
+        }
+        if ("ANULADO".equals(padre.getEstado())) {
+            throw new NegocioException("No se puede crear un tratamiento continuo a partir de un tratamiento anulado.");
+        }
+        if (!"ABIERTO".equals(padre.getEstado()) && !"CERRADO".equals(padre.getEstado())) {
+            throw new NegocioException("El tratamiento padre debe estar abierto o cerrado.");
         }
     }
 
