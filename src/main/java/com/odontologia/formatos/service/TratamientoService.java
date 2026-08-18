@@ -26,6 +26,7 @@ import com.odontologia.formatos.util.TransaccionBD;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -169,6 +170,14 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
 
     public List<Tratamiento> cerrados(int clinicaID) throws SQLException {
         return repository.findByEstado("CERRADO", clinicaID);
+    }
+
+    public List<Tratamiento> todos() throws SQLException {
+        return todos(1);
+    }
+
+    public List<Tratamiento> todos(int clinicaID) throws SQLException {
+        return repository.findByEstados(Arrays.asList("ABIERTO", "CERRADO"), clinicaID);
     }
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
@@ -477,6 +486,12 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         if (tipoNormalizado.equals(t.getTipo())) {
             throw new NegocioException("El tratamiento ya es de tipo " + tipoNormalizado + ".");
         }
+        double totalPagado = pagoRepository.sumByTratamiento(tratamientoID);
+        if (totalPagado > EPSILON) {
+            throw new NegocioException("El tratamiento tiene pagos registrados (S/ "
+                    + String.format("%.2f", totalPagado)
+                    + "). No se puede cambiar el tipo hasta que los pagos sean anulados.");
+        }
 
         TransaccionBD.ejecutar(con -> {
             t.setTipo(tipoNormalizado);
@@ -516,16 +531,21 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             }
 
             if (continuo) {
+                t.setMontoAnterior(t.getMonto());
                 t.setMonto(0);
                 t.setMontoPagado(0);
                 t.setEstadoPago("PAGADO");
             } else {
+                Double montoAnteriorBackup = t.getMontoAnterior();
                 if (dto.monto != null) {
                     if (dto.monto < 0) {
                         throw new NegocioException("El monto del tratamiento no puede ser negativo.");
                     }
                     t.setMonto(dto.monto);
+                } else if (t.getMonto() <= EPSILON && montoAnteriorBackup != null) {
+                    t.setMonto(montoAnteriorBackup);
                 }
+                t.setMontoAnterior(null);
                 if (dto.montoPagado != null) {
                     if (dto.montoPagado < 0) {
                         throw new NegocioException("El monto pagado no puede ser negativo.");

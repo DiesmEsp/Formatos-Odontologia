@@ -137,6 +137,31 @@ public class TratamientoRepository {
         return lista;
     }
 
+    public List<Tratamiento> findByEstados(List<String> estados, int clinicaID) throws SQLException {
+        List<Tratamiento> lista = new ArrayList<>();
+        if (estados == null || estados.isEmpty()) return lista;
+        StringBuilder sb = new StringBuilder(
+                "SELECT * FROM Tratamiento WHERE ClinicaID = ? AND Estado IN (");
+        for (int i = 0; i < estados.size(); i++) {
+            if (i > 0) sb.append(',');
+            sb.append('?');
+        }
+        sb.append(") ORDER BY Fecha DESC, TratamientoID DESC");
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sb.toString())) {
+            ps.setInt(1, clinicaID);
+            for (int i = 0; i < estados.size(); i++) {
+                ps.setString(2 + i, estados.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
     public List<Tratamiento> findByUnidad(int unidadID) throws SQLException {
         List<Tratamiento> lista = new ArrayList<>();
         String sql = "SELECT * FROM Tratamiento WHERE UnidadID = ? ORDER BY Fecha DESC, TratamientoID DESC";

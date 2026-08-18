@@ -24,6 +24,10 @@ public class TratamientoController {
             ctx.json(service.cerrados(ControllerUtil.clinicaID(ctx)));
         });
 
+        app.get("/api/tratamientos/todos", ctx -> {
+            ctx.json(service.todos(ControllerUtil.clinicaID(ctx)));
+        });
+
         app.get("/api/tratamientos/cerrados-por-pagar", ctx -> {
             ctx.json(service.cerradosConSaldo(ControllerUtil.clinicaID(ctx)));
         });

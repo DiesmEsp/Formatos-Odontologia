@@ -693,6 +693,74 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         assertEquals("PENDIENTE", t.getEstadoPago());
     }
 
+    @Test
+    void cambiarTipoConPagosArrojaError() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.registrarPago(id, 40.0);
+
+        assertThrows(NegocioException.class, () -> service.cambiarTipo(id, "CONTINUO"));
+    }
+
+    @Test
+    void cambiarTipoSinPagosFunciona() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        service.cambiarTipo(id, "CONTINUO");
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("CONTINUO", t.getTipo());
+        assertEquals(100.0, t.getMontoAnterior(), 0.001);
+    }
+
+    @Test
+    void editarRetroactivoNormalAContinuoGuardaMontoAnterior() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.tipo = "CONTINUO";
+        service.editarRetroactivo(id, dto);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("CONTINUO", t.getTipo());
+        assertEquals(100.0, t.getMontoAnterior(), 0.001);
+        assertEquals(0.0, t.getMonto(), 0.001);
+        assertEquals("PAGADO", t.getEstadoPago());
+    }
+
+    @Test
+    void editarRetroactivoContinuoANormalRestauraMonto() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        TratamientoService.EditarRetroactivoDto primero = new TratamientoService.EditarRetroactivoDto();
+        primero.tipo = "CONTINUO";
+        service.editarRetroactivo(id, primero);
+
+        TratamientoService.EditarRetroactivoDto segundo = new TratamientoService.EditarRetroactivoDto();
+        segundo.tipo = "NORMAL";
+        service.editarRetroactivo(id, segundo);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("NORMAL", t.getTipo());
+        assertEquals(100.0, t.getMonto(), 0.001);
+        assertNull(t.getMontoAnterior());
+    }
+
+    @Test
+    void servicioTodosRetornaAbiertoYCerrado() throws SQLException {
+        int abierto = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        int cerrado = service.crear(operadorID, pacienteID, 1, "2026-08-04", null, 200.0, "NORMAL");
+        service.cerrar(cerrado);
+
+        List<Tratamiento> lista = service.todos();
+
+        boolean tieneAbierto = lista.stream().anyMatch((t) -> t.getTratamientoID() == abierto);
+        boolean tieneCerrado = lista.stream().anyMatch((t) -> t.getTratamientoID() == cerrado);
+        assertTrue(tieneAbierto);
+        assertTrue(tieneCerrado);
+    }
+
     private int crearMaterial(String nombre, String unidad) throws SQLException {
         Materiales m = new Materiales();
         m.setNombre(nombre);
