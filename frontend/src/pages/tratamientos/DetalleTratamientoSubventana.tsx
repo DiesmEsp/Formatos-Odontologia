@@ -21,6 +21,7 @@ export function DetalleTratamientoSubventana({
   const [showAvance, setShowAvance] = useState(false);
   const [showCrearContinuo, setShowCrearContinuo] = useState(false);
   const [showAnular, setShowAnular] = useState(false);
+  const [showCambiarTipo, setShowCambiarTipo] = useState(false);
   const [showAnularAvance, setShowAnularAvance] = useState<TratamientoAvance | null>(null);
   const [terminandoAvance, setTerminandoAvance] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -206,7 +207,8 @@ export function DetalleTratamientoSubventana({
   const handleAnularAvance = async (motivo?: string) => { if (!showAnularAvance || !motivo) return; try { await api.tratamientos.anularAvance(showAnularAvance.avanceID, motivo); addToast('success', 'Avance anulado'); await cargarDatos(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular avance'); } setShowAnularAvance(null); };
   const handleTerminarAvance = async (avanceID: number) => { setTerminandoAvance(avanceID); try { await api.tratamientos.terminarAvance(avanceID); addToast('success', 'Avance terminado'); await cargarDatos(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al terminar avance'); } setTerminandoAvance(null); };
   const handleReabrir = async () => { try { await api.tratamientos.reabrir(tratamiento.tratamientoID); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', 'Tratamiento reabierto'); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al reabrir'); } };
-  const handleCambiarTipo = async () => { const nuevo = tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'; try { await api.tratamientos.cambiarTipo(tratamiento.tratamientoID, nuevo); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', `Tipo cambiado a ${nuevo}`); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cambiar tipo'); } };
+  const handleSolicitarCambiarTipo = () => { setShowCambiarTipo(true); };
+  const handleConfirmarCambioTipo = async () => { const nuevo = tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'; try { await api.tratamientos.cambiarTipo(tratamiento.tratamientoID, nuevo); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', `Tipo cambiado a ${nuevo}`); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cambiar tipo'); } setShowCambiarTipo(false); };
 
   const getEstadoVariant = (e: string) => e === 'CERRADO' ? 'success' : e === 'ANULADO' ? 'danger' : 'info';
   const saldo = tratamiento.monto - tratamiento.montoPagado;
@@ -302,7 +304,7 @@ export function DetalleTratamientoSubventana({
                   <button className="btn btn-primary" onClick={() => setShowPago(true)}><DollarSign size={14} /> Registrar pago</button>
                   <button className="btn btn-secondary" onClick={() => setShowAvance(true)}><Plus size={14} /> Registrar avance</button>
                   <button className="btn btn-secondary" onClick={() => setShowCrearContinuo(true)}><GitBranch size={14} /> Crear CONTINUO</button>
-                  <button className="btn btn-secondary" onClick={handleCambiarTipo}><ArrowLeftRight size={14} /> {tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'}</button>
+                  <button className="btn btn-secondary" onClick={handleSolicitarCambiarTipo}><ArrowLeftRight size={14} /> {tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'}</button>
                   <button className="btn btn-danger" onClick={() => setShowAnular(true)}><AlertTriangle size={14} /> Anular</button>
                 </>
               )}
@@ -354,6 +356,15 @@ export function DetalleTratamientoSubventana({
       )}
       <ConfirmDialog open={showAnular} title="Anular tratamiento" message={`Confirme que desea anular el tratamiento #${tratamiento.tratamientoID}.`} confirmLabel="Si, anular" variant="danger" requireMotivo onConfirm={handleAnular} onCancel={() => setShowAnular(false)} />
       <ConfirmDialog open={!!showAnularAvance} title="Anular avance" message={showAnularAvance ? `Confirme que desea anular el avance #${showAnularAvance.avanceID} (${showAnularAvance.fecha}). El pago asociado, si existe, será eliminado.` : ''} confirmLabel="Si, anular" variant="danger" requireMotivo onConfirm={handleAnularAvance} onCancel={() => setShowAnularAvance(null)} />
+      <ConfirmDialog
+        open={showCambiarTipo}
+        title="Cambiar tipo de tratamiento"
+        message={`¿Cambiar el tipo de ${tratamiento.tipo} a ${tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'}?\n\nTenga en cuenta que el cambio de tipo reinicia el estado de pago y el monto pagado. Si el tratamiento tiene pagos registrados, la operación será rechazada.`}
+        confirmLabel="Si, cambiar"
+        variant="danger"
+        onConfirm={handleConfirmarCambioTipo}
+        onCancel={() => setShowCambiarTipo(false)}
+      />
     </>
   );
 }
