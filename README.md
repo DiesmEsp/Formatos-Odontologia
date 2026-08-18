@@ -120,7 +120,7 @@ Formatos-Odontologia/
 │   │   ├── service/                # Business logic
 │   │   └── util/                   # Logging, errors, transactions
 │   ├── main/resources/
-│   │   └── db/migration/           # Flyway migrations (V1-V12)
+│   │   └── db/migration/           # Flyway migrations (V1 schema, V2 seed)
 │   └── test/                       # JUnit tests
 ├── frontend/
 │   ├── electron/                   # main.ts, preload.ts
