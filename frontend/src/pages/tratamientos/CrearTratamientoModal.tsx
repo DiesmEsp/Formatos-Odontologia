@@ -98,6 +98,9 @@ export function CrearTratamientoModal({
     try {
       const t = await api.tratamientos.buscarPorId(id);
       setAvanceTratamiento(t);
+      if (t.unidadID && !unidad) {
+        setUnidadId(t.unidadID);
+      }
     } catch (err) {
       addToast('error', err instanceof Error ? err.message : 'No se pudo cargar el tratamiento');
       setAvanceTratamiento(null);
@@ -308,6 +311,17 @@ export function CrearTratamientoModal({
                         </div>
                       )}
                     </div>
+                  </div>
+                )}
+                {unidad ? (
+                  <div className="form-group"><label className="form-label">Unidad</label><input className="text-field w-full" value={`Unidad ${unidad.unidadNro}`} readOnly /></div>
+                ) : (
+                  <div className="form-group">
+                    <label className="form-label">Unidad (opcional)</label>
+                    <select className="combo-box w-full" value={unidadId ?? ''} onChange={(e) => setUnidadId(e.target.value === '' ? null : Number(e.target.value))}>
+                      <option value="">Sin unidad</option>
+                      {unidadesList.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
+                    </select>
                   </div>
                 )}
               </>

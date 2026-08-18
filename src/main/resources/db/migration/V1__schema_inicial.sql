@@ -118,6 +118,7 @@ CREATE TABLE Tratamiento (
                      CHECK (Estado IN ('ABIERTO','CERRADO','ANULADO')),
     CerradoEn        TEXT,
     MontoAnterior    REAL,
+    TratamientoPadreID INTEGER REFERENCES Tratamiento (TratamientoID),
     ClinicaID        INTEGER NOT NULL DEFAULT 1
 );
 
@@ -133,6 +134,7 @@ CREATE TABLE Materiales_List (
 CREATE TABLE Tratamiento_Avance (
     AvanceID      INTEGER PRIMARY KEY AUTOINCREMENT,
     TratamientoID INTEGER NOT NULL REFERENCES Tratamiento (TratamientoID),
+    Numero        INTEGER NOT NULL DEFAULT 0,
     Fecha         TEXT    NOT NULL,
     UnidadID      INTEGER REFERENCES Unidad (UnidadID) ON DELETE SET NULL,
     Estado        TEXT    NOT NULL DEFAULT 'ACTIVO'
@@ -221,6 +223,7 @@ CREATE INDEX idx_tratamiento_operador      ON Tratamiento (OperadorID);
 CREATE INDEX idx_tratamiento_clinica       ON Tratamiento (ClinicaID, Estado);
 CREATE INDEX idx_tratamiento_estado        ON Tratamiento (Estado);
 CREATE INDEX idx_tratamiento_unidad_estado ON Tratamiento (UnidadID, Estado);
+CREATE INDEX idx_tratamiento_padre        ON Tratamiento (TratamientoPadreID);
 
 CREATE INDEX idx_asistencia_fecha          ON Asistencia (Fecha);
 CREATE INDEX idx_asistencia_clinica        ON Asistencia (ClinicaID);

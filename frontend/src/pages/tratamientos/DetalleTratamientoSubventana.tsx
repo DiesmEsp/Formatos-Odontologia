@@ -257,7 +257,7 @@ export function DetalleTratamientoSubventana({
                 <ul className="material-list">
                   {avances.map((a) => (
                     <li key={a.avanceID} className="material-list-item">
-                      <span className="material-list-name">#{a.avanceID} - {a.fecha}</span>
+                      <span className="material-list-name">Avance #{a.numero} - {a.fecha}</span>
                       <Badge variant={a.estado === 'ANULADO' ? 'danger' : a.estado === 'TERMINADO' ? 'success' : 'info'}>{a.estado}</Badge>
                       {a.estado === 'ACTIVO' && (
                         <>

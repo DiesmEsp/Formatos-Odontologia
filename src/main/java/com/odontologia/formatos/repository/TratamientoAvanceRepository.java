@@ -14,16 +14,18 @@ import java.util.List;
 public class TratamientoAvanceRepository {
 
     public int insert(Connection con, TratamientoAvance avance) throws SQLException {
-        String sql = "INSERT INTO Tratamiento_Avance (TratamientoID, Fecha, UnidadID) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Tratamiento_Avance (TratamientoID, Numero, Fecha, UnidadID) VALUES (?, "
+                + "(SELECT COALESCE(MAX(Numero), 0) + 1 FROM Tratamiento_Avance WHERE TratamientoID = ?), ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, avance.getTratamientoID());
-            ps.setString(2, avance.getFecha());
+            ps.setInt(2, avance.getTratamientoID());
+            ps.setString(3, avance.getFecha());
             if (avance.getUnidadID() != null) {
-                ps.setInt(3, avance.getUnidadID());
+                ps.setInt(4, avance.getUnidadID());
             } else {
-                ps.setNull(3, java.sql.Types.INTEGER);
+                ps.setNull(4, java.sql.Types.INTEGER);
             }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -121,6 +123,7 @@ public class TratamientoAvanceRepository {
         TratamientoAvance a = new TratamientoAvance();
         a.setAvanceID(rs.getInt("AvanceID"));
         a.setTratamientoID(rs.getInt("TratamientoID"));
+        a.setNumero(rs.getInt("Numero"));
         a.setFecha(rs.getString("Fecha"));
         int unidad = rs.getInt("UnidadID");
         a.setUnidadID(rs.wasNull() ? null : unidad);

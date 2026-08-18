@@ -88,6 +88,7 @@ export interface Tratamiento {
 export interface TratamientoAvance {
   avanceID: number;
   tratamientoID: number;
+  numero: number;
   fecha: string;
   unidadID: number | null;
   estado: string;

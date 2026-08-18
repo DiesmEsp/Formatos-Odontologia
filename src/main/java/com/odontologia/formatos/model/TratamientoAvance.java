@@ -4,6 +4,7 @@ public class TratamientoAvance {
 
     private int avanceID;
     private int tratamientoID;
+    private int numero;
     private String fecha;
     private Integer unidadID;
     private String estado;
@@ -26,6 +27,14 @@ public class TratamientoAvance {
 
     public void setTratamientoID(int tratamientoID) {
         this.tratamientoID = tratamientoID;
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     public String getFecha() {
