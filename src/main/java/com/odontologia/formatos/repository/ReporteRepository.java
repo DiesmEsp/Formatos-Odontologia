@@ -34,6 +34,12 @@ public class ReporteRepository {
                 + "  JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
                 + "  WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "  UNION ALL "
+                + "  SELECT mla.MaterialID AS MaterialID, mla.Cantidad AS cant "
+                + "  FROM Materiales_List_Avance mla "
+                + "  JOIN Tratamiento_Avance a ON a.AvanceID = mla.AvanceID "
+                + "  JOIN Tratamiento t ON t.TratamientoID = a.TratamientoID "
+                + "  WHERE a.Estado = 'ACTIVO' AND t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
+                + "  UNION ALL "
                 + "  SELECT ma.MaterialesID AS MaterialID, ma.Cantidad AS cant "
                 + "  FROM Materiales_Asistencia ma "
                 + "  JOIN Asistencia a ON a.AsistenciaID = ma.AsistenciaID "
@@ -51,6 +57,8 @@ public class ReporteRepository {
             ps.setInt(2, clinicaID);
             ps.setString(3, patron);
             ps.setInt(4, clinicaID);
+            ps.setString(5, patron);
+            ps.setInt(6, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaMaterial(
@@ -149,14 +157,23 @@ public class ReporteRepository {
         String sql = "SELECT o.OperadorID, o.Nombres || ' ' || o.Apellidos AS Especialista, "
                 + "o.Grado, o.Tipo, m.MaterialID, m.Nombre AS Material, "
                 + "COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
-                + "SUM(ml.Cantidad * COALESCE(uc.Factor, 1)) AS Cantidad "
-                + "FROM Materiales_List ml "
-                + "JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
-                + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
-                + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
+                + "SUM(consumo.Cantidad * COALESCE(uc.Factor, 1)) AS Cantidad "
+                + "FROM ( "
+                + "  SELECT ml.MaterialID AS MaterialID, ml.Cantidad AS Cantidad, t.OperadorID AS OperadorID "
+                + "  FROM Materiales_List ml "
+                + "  JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
+                + "  WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
+                + "  UNION ALL "
+                + "  SELECT mla.MaterialID AS MaterialID, mla.Cantidad AS Cantidad, t.OperadorID AS OperadorID "
+                + "  FROM Materiales_List_Avance mla "
+                + "  JOIN Tratamiento_Avance a ON a.AvanceID = mla.AvanceID "
+                + "  JOIN Tratamiento t ON t.TratamientoID = a.TratamientoID "
+                + "  WHERE a.Estado = 'ACTIVO' AND t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
+                + ") consumo "
+                + "JOIN Operadores o ON o.OperadorID = consumo.OperadorID "
+                + "JOIN Materiales m ON m.MaterialID = consumo.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID "
                 + "  AND uc.UnidadEmpaque = m.Unidad "
-                + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? "
                 + "GROUP BY o.OperadorID, o.Nombres, o.Apellidos, o.Grado, o.Tipo, "
                 + "m.MaterialID, m.Nombre, COALESCE(uc.UnidadBase, m.Unidad) "
                 + "ORDER BY o.Apellidos, o.Nombres, m.Nombre";
@@ -165,6 +182,8 @@ public class ReporteRepository {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, patronMes(anio, mes));
             ps.setInt(2, clinicaID);
+            ps.setString(3, patronMes(anio, mes));
+            ps.setInt(4, clinicaID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     lista.add(new FilaEspecialista(
@@ -315,11 +334,19 @@ public class ReporteRepository {
                 "SELECT t.TratamientoID, t.NombreTratamiento, t.Fecha, "
                 + "o.Nombres || ' ' || o.Apellidos AS Operador, o.Grado, o.Tipo, "
                 + "m.Nombre AS Material, COALESCE(uc.UnidadBase, m.Unidad) AS Unidad, "
-                + "ml.Cantidad * COALESCE(uc.Factor, 1) AS Cantidad "
-                + "FROM Materiales_List ml "
-                + "JOIN Tratamiento t ON t.TratamientoID = ml.TratamientoID "
+                + "consumo.Cantidad * COALESCE(uc.Factor, 1) AS Cantidad "
+                + "FROM ( "
+                + "  SELECT ml.MaterialID AS MaterialID, ml.Cantidad AS Cantidad, ml.TratamientoID AS TratamientoID "
+                + "  FROM Materiales_List ml "
+                + "  UNION ALL "
+                + "  SELECT mla.MaterialID AS MaterialID, mla.Cantidad AS Cantidad, a.TratamientoID AS TratamientoID "
+                + "  FROM Materiales_List_Avance mla "
+                + "  JOIN Tratamiento_Avance a ON a.AvanceID = mla.AvanceID "
+                + "  WHERE a.Estado = 'ACTIVO' "
+                + ") consumo "
+                + "JOIN Tratamiento t ON t.TratamientoID = consumo.TratamientoID "
                 + "JOIN Operadores o ON o.OperadorID = t.OperadorID "
-                + "JOIN Materiales m ON m.MaterialID = ml.MaterialID "
+                + "JOIN Materiales m ON m.MaterialID = consumo.MaterialID "
                 + "LEFT JOIN Unidad_Conversion uc ON uc.MaterialID = m.MaterialID AND uc.UnidadEmpaque = m.Unidad "
                 + "WHERE t.Estado = 'CERRADO' AND t.Fecha LIKE ? AND t.ClinicaID = ? ");
         if (operadorID != null) {

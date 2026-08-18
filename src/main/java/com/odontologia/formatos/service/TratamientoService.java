@@ -1,16 +1,20 @@
 package com.odontologia.formatos.service;
 
+import com.odontologia.formatos.model.MaterialAvance;
 import com.odontologia.formatos.model.Pago;
 import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.model.Tratamiento;
+import com.odontologia.formatos.model.TratamientoAvance;
 import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.model.TratamientoPredefinido;
 import com.odontologia.formatos.model.TratamientoPredefinidoMaterial;
+import com.odontologia.formatos.repository.MaterialAvanceRepository;
 import com.odontologia.formatos.repository.MaterialRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
 import com.odontologia.formatos.repository.PagoRepository;
 import com.odontologia.formatos.repository.RegistroAnulacionRepository;
+import com.odontologia.formatos.repository.TratamientoAvanceRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoPredefinidoRepository;
@@ -44,29 +48,23 @@ public class TratamientoService {
     private final MaterialRepository materialRepositoryCatalogo = new MaterialRepository();
     private final RegistroAnulacionRepository anulacionRepository = new RegistroAnulacionRepository();
     private final PagoRepository pagoRepository = new PagoRepository();
+    private final TratamientoAvanceRepository avanceRepository = new TratamientoAvanceRepository();
+    private final MaterialAvanceRepository materialAvanceRepository = new MaterialAvanceRepository();
 
 public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                  Integer tratPredID, Double monto, String tipo) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, null, 1);
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, 1);
     }
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Map<Integer, Double> materiales) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, null, materiales, 1);
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo, materiales, 1);
     }
 
     public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
-                     Integer tratamientoPadreID, Map<Integer, Double> materiales) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
-                tratamientoPadreID, materiales, 1);
-    }
-
-    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
-                     Integer tratPredID, Double monto, String tipo,
-                     Integer tratamientoPadreID, Map<Integer, Double> materiales,
-                     int clinicaID) throws SQLException {
+                     Map<Integer, Double> materiales, int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
@@ -74,7 +72,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID, clinicaID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -83,7 +80,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             tratamiento.setUnidadID(unidadID);
             tratamiento.setFecha(fecha);
             tratamiento.setTipo(tipoNormalizado);
-            tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("ABIERTO");
             tratamiento.setCerradoEn(null);
             tratamiento.setClinicaID(clinicaID);
@@ -164,24 +160,16 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Map<Integer, Double> materiales) throws SQLException {
-        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, null, materiales, 1);
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, materiales, 1);
     }
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
-                            Double monto, String tipo, Integer tratamientoPadreID,
-                            Map<Integer, Double> materiales) throws SQLException {
-        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo,
-                tratamientoPadreID, materiales, 1);
-    }
-
-    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
-                            Double monto, String tipo, Integer tratamientoPadreID,
-                            Map<Integer, Double> materiales, int clinicaID) throws SQLException {
+                            Double monto, String tipo, Map<Integer, Double> materiales,
+                            int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
-        validarPadre(tratamientoPadreID, tipoNormalizado, pacienteID, clinicaID);
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -190,7 +178,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             tratamiento.setUnidadID(null);
             tratamiento.setFecha(fecha);
             tratamiento.setTipo(tipoNormalizado);
-            tratamiento.setTratamientoPadreID(tratamientoPadreID);
             tratamiento.setEstado("CERRADO");
             tratamiento.setCerradoEn(timestampLocal());
             tratamiento.setClinicaID(clinicaID);
@@ -245,18 +232,105 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         return repository.findByUnidad(unidadID);
     }
 
-    public int crearAvance(int operadorID, int pacienteID, Integer unidadID, String fecha,
-                           Integer tratPredID, Double monto, Integer tratamientoPadreID,
-                           Map<Integer, Double> materiales) throws SQLException {
-        return crearAvance(operadorID, pacienteID, unidadID, fecha, tratPredID, monto,
-                tratamientoPadreID, materiales, 1);
+    public int agregarAvance(int tratamientoID, String fecha, Integer unidadID,
+                             Map<Integer, Double> materiales, Double pago) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        if ("ANULADO".equals(t.getEstado())) {
+            throw new NegocioException("No se puede agregar un avance a un tratamiento anulado.");
+        }
+        if ("CONTINUO".equals(t.getTipo())) {
+            throw new NegocioException("Un tratamiento continuo no admite avances.");
+        }
+        validarFecha(fecha);
+        if (unidadID != null && unidadRepository.findById(unidadID) == null) {
+            throw new NegocioException("La unidad de tratamiento seleccionada no existe.");
+        }
+
+        return TransaccionBD.ejecutarConResultado(con -> {
+            TratamientoAvance avance = new TratamientoAvance();
+            avance.setTratamientoID(tratamientoID);
+            avance.setFecha(fecha);
+            avance.setUnidadID(unidadID);
+            int avanceID = avanceRepository.insert(con, avance);
+
+            if (materiales != null) {
+                for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
+                    if (entrada.getValue() == null || entrada.getValue() <= 0) {
+                        continue;
+                    }
+                    validarMaterialExiste(entrada.getKey());
+                    MaterialAvance item = new MaterialAvance();
+                    item.setAvanceID(avanceID);
+                    item.setMaterialID(entrada.getKey());
+                    item.setCantidad(entrada.getValue());
+                    materialAvanceRepository.insert(con, item);
+                }
+            }
+
+            if (pago != null && pago > 0) {
+                if (pagoRepository.sumByTratamiento(con, tratamientoID) + pago > t.getMonto() + EPSILON) {
+                    throw new NegocioException("El pago supera el monto total del tratamiento.");
+                }
+                Pago nuevoPago = new Pago();
+                nuevoPago.setTratamientoID(tratamientoID);
+                nuevoPago.setAvanceID(avanceID);
+                nuevoPago.setFecha(fechaHoy());
+                nuevoPago.setMonto(pago);
+                pagoRepository.insert(con, nuevoPago);
+                recalcularPagos(con, t);
+            }
+
+            return avanceID;
+        });
     }
 
-    public int crearAvance(int operadorID, int pacienteID, Integer unidadID, String fecha,
-                           Integer tratPredID, Double monto, Integer tratamientoPadreID,
-                           Map<Integer, Double> materiales, int clinicaID) throws SQLException {
-        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, "AVANCE",
-                tratamientoPadreID, materiales, clinicaID);
+    public List<TratamientoAvance> listarAvances(int tratamientoID) throws SQLException {
+        return avanceRepository.findByTratamiento(tratamientoID);
+    }
+
+    public void anularAvance(int avanceID, String motivo) throws SQLException {
+        if (motivo == null || motivo.isBlank()) {
+            throw new NegocioException("Debe indicar el motivo de la anulación.");
+        }
+        TratamientoAvance avance = avanceRepository.findById(avanceID);
+        if (avance == null) {
+            throw new NegocioException("El avance no existe.");
+        }
+        if ("ANULADO".equals(avance.getEstado())) {
+            throw new NegocioException("El avance ya está anulado.");
+        }
+
+        TransaccionBD.ejecutar(con -> {
+            avanceRepository.anular(con, avanceID);
+            pagoRepository.deleteByAvanceID(con, avanceID);
+            Tratamiento t = repository.findById(avance.getTratamientoID());
+            if (t != null) {
+                recalcularPagos(con, t);
+            }
+
+            RegistroAnulacion r = new RegistroAnulacion();
+            r.setTablaAfectada("Tratamiento_Avance");
+            r.setIdRegistroAnulado(avanceID);
+            r.setMotivo(motivo);
+            r.setUsuario("SYSTEM");
+            r.setClinicaID(t != null ? t.getClinicaID() : 1);
+            anulacionRepository.insert(con, r);
+        });
+    }
+
+    public ConsolidadoDto obtenerConsolidado(int tratamientoID) throws SQLException {
+        Tratamiento t = repository.findById(tratamientoID);
+        if (t == null) {
+            throw new NegocioException("El tratamiento no existe.");
+        }
+        ConsolidadoDto dto = new ConsolidadoDto();
+        dto.tratamiento = t;
+        dto.materiales = materialAvanceRepository.consolidarPorTratamiento(tratamientoID);
+        dto.pagos = pagoRepository.findByTratamiento(tratamientoID);
+        return dto;
     }
 
     public void agregarMaterial(int tratamientoID, int materialID, double cantidad) throws SQLException {
@@ -370,9 +444,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             throw new NegocioException("Solo se puede cambiar el tipo en tratamientos abiertos.");
         }
         String tipoNormalizado = normalizarTipo(tipo);
-        if ("AVANCE".equals(tipoNormalizado) || "AVANCE".equals(t.getTipo())) {
-            throw new NegocioException("Un tratamiento AVANCE no puede cambiar de tipo.");
-        }
         if (tipoNormalizado.equals(t.getTipo())) {
             throw new NegocioException("El tratamiento ya es de tipo " + tipoNormalizado + ".");
         }
@@ -625,18 +696,6 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         return pagoRepository.findByTratamiento(tratamientoID);
     }
 
-    public List<Tratamiento> avancesDe(int tratamientoID) throws SQLException {
-        return repository.findAvances(tratamientoID);
-    }
-
-    public List<Tratamiento> candidatosPadre(int pacienteID) throws SQLException {
-        return candidatosPadre(pacienteID, 1);
-    }
-
-    public List<Tratamiento> candidatosPadre(int pacienteID, int clinicaID) throws SQLException {
-        return repository.findCandidatosPadre(pacienteID, clinicaID);
-    }
-
     public boolean requiereAdvertenciaPago(Tratamiento t) {
         if ("CONTINUO".equals(t.getTipo())) {
             return false;
@@ -708,34 +767,10 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             return "NORMAL";
         }
         String t = tipo.trim().toUpperCase();
-        if (!t.equals("NORMAL") && !t.equals("CONTINUO") && !t.equals("AVANCE")) {
-            throw new NegocioException("El tipo de tratamiento debe ser NORMAL, CONTINUO o AVANCE.");
+        if (!t.equals("NORMAL") && !t.equals("CONTINUO")) {
+            throw new NegocioException("El tipo de tratamiento debe ser NORMAL o CONTINUO.");
         }
         return t;
-    }
-
-    private void validarPadre(Integer tratamientoPadreID, String tipoNormalizado, int pacienteID,
-                              int clinicaID) throws SQLException {
-        if ("AVANCE".equals(tipoNormalizado)) {
-            if (tratamientoPadreID == null) {
-                throw new NegocioException("Un tratamiento AVANCE debe indicar un tratamiento padre.");
-            }
-            Tratamiento padre = repository.findById(tratamientoPadreID);
-            if (padre == null) {
-                throw new NegocioException("El tratamiento padre no existe.");
-            }
-            if ("AVANCE".equals(padre.getTipo())) {
-                throw new NegocioException("El tratamiento padre no puede ser un avance.");
-            }
-            if (padre.getPacienteID() != pacienteID) {
-                throw new NegocioException("El tratamiento padre debe pertenecer al mismo paciente.");
-            }
-            if (padre.getClinicaID() != clinicaID) {
-                throw new NegocioException("El tratamiento padre debe pertenecer a la misma clínica.");
-            }
-        } else if (tratamientoPadreID != null) {
-            throw new NegocioException("Solo los tratamientos AVANCE pueden tener un tratamiento padre.");
-        }
     }
 
     private String fechaHoy() {
@@ -766,5 +801,11 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         public Integer operadorID;
         public Integer pacienteID;
         public Map<Integer, Double> cantidadesMateriales;
+    }
+
+    public static class ConsolidadoDto {
+        public Tratamiento tratamiento;
+        public List<MaterialAvanceRepository.MaterialConsolidado> materiales;
+        public List<Pago> pagos;
     }
 }
