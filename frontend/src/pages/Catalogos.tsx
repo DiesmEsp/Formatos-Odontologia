@@ -534,21 +534,40 @@ function TabTratamientosRealizados() {
 }
 
 function TratamientoMaterialesDetalle({ tratamientoID }: { tratamientoID: number }) {
-  const detalle = useApi(() => api.tratamientos.materialesConNombre(tratamientoID), [tratamientoID]);
-  const mats = detalle.data ?? [];
+  const consolidado = useApi(() => api.tratamientos.consolidado(tratamientoID), [tratamientoID]);
+  const avances = useApi(() => api.tratamientos.avances(tratamientoID), [tratamientoID]);
+  const data = consolidado.data;
+  const avanceList = avances.data ?? [];
   return (
     <div style={{ padding: "4px 0" }}>
-      {mats.length === 0 ? (
-        <span className="mat-empty">Sin materiales registrados</span>
-      ) : (
-        <ul className="material-list">
-          {mats.map((m) => (
-            <li key={m.materialesListID} className="material-list-item">
-              <span className="material-list-name">{m.nombreMaterial}</span>
-              <span className="material-list-cant">{m.cantidad}</span>
-            </li>
-          ))}
-        </ul>
+      {data && data.materiales.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Materiales consolidados</span>
+          <ul className="material-list">
+            {data.materiales.map((m) => (
+              <li key={m.materialID} className="material-list-item">
+                <span className="material-list-name">{m.nombreMaterial}</span>
+                <span className="material-list-cant">{m.cantidad} {m.unidad}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {avanceList.length > 0 && (
+        <div>
+          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Avances</span>
+          <ul className="material-list">
+            {avanceList.map((a) => (
+              <li key={a.avanceID} className="material-list-item">
+                <span className="material-list-name">#{a.avanceID} - {a.fecha}</span>
+                <Badge variant={a.estado === 'ANULADO' ? 'danger' : a.estado === 'TERMINADO' ? 'success' : 'info'}>{a.estado}</Badge>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {(!data || data.materiales.length === 0) && avanceList.length === 0 && (
+        <span className="mat-empty">Sin materiales ni avances registrados</span>
       )}
     </div>
   );
