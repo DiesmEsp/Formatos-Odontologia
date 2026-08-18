@@ -75,7 +75,7 @@ public class MaterialRepository {
 
     public List<Materiales> findAll() throws SQLException {
         List<Materiales> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Materiales ORDER BY Nombre";
+        String sql = "SELECT * FROM Materiales WHERE Estado = 1 ORDER BY Nombre";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -88,7 +88,7 @@ public class MaterialRepository {
 
     public List<Materiales> buscarPorTexto(String texto) throws SQLException {
         List<Materiales> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Materiales WHERE Nombre LIKE ? ORDER BY Nombre";
+        String sql = "SELECT * FROM Materiales WHERE Estado = 1 AND Nombre LIKE ? ORDER BY Nombre";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, "%" + texto + "%");

@@ -1,6 +1,7 @@
 package com.odontologia.formatos.service;
 
 import com.odontologia.formatos.model.MaterialAvance;
+import com.odontologia.formatos.model.Materiales;
 import com.odontologia.formatos.model.Pago;
 import com.odontologia.formatos.model.RegistroAnulacion;
 import com.odontologia.formatos.model.Tratamiento;
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class TratamientoService {
 
-    private static final double EPSILON = 0.005;
+    private static final double EPSILON = 0.0001;
 
     private final TratamientoRepository repository = new TratamientoRepository();
     private final TratamientoMaterialRepository materialRepository = new TratamientoMaterialRepository();
@@ -217,6 +218,7 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                     if (entrada.getValue() == null || entrada.getValue() <= 0) {
                         continue;
                     }
+                    validarMaterialExiste(entrada.getKey());
                     TratamientoMaterial item = new TratamientoMaterial();
                     item.setTratamientoID(tratamientoID);
                     item.setMaterialID(entrada.getKey());
@@ -240,6 +242,9 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         }
         if ("ANULADO".equals(t.getEstado())) {
             throw new NegocioException("No se puede agregar un avance a un tratamiento anulado.");
+        }
+        if (!"ABIERTO".equals(t.getEstado())) {
+            throw new NegocioException("Solo se pueden agregar avances a tratamientos en estado ABIERTO.");
         }
         if ("CONTINUO".equals(t.getTipo())) {
             throw new NegocioException("Un tratamiento continuo no admite avances.");
@@ -289,6 +294,22 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
 
     public List<TratamientoAvance> listarAvances(int tratamientoID) throws SQLException {
         return avanceRepository.findByTratamiento(tratamientoID);
+    }
+
+    public void terminarAvance(int avanceID) throws SQLException {
+        TratamientoAvance avance = avanceRepository.findById(avanceID);
+        if (avance == null) {
+            throw new NegocioException("El avance no existe.");
+        }
+        if ("TERMINADO".equals(avance.getEstado())) {
+            throw new NegocioException("El avance ya está terminado.");
+        }
+        if ("ANULADO".equals(avance.getEstado())) {
+            throw new NegocioException("No se puede terminar un avance anulado.");
+        }
+        TransaccionBD.ejecutar(con -> {
+            avanceRepository.terminar(con, avanceID);
+        });
     }
 
     public void anularAvance(int avanceID, String motivo) throws SQLException {
@@ -614,6 +635,11 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         if (t == null) {
             throw new NegocioException("El tratamiento del pago no existe.");
         }
+        double totalSinPago = pagoRepository.sumByTratamiento(t.getTratamientoID()) - pago.getMonto();
+        double nuevoPagado = totalSinPago + monto;
+        if (nuevoPagado > t.getMonto() + EPSILON) {
+            throw new NegocioException("El pago editado supera el monto total del tratamiento.");
+        }
         TransaccionBD.ejecutar(con -> {
             pago.setMonto(monto);
             if (fecha != null) {
@@ -751,8 +777,12 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
     }
 
     private void validarMaterialExiste(int materialID) throws SQLException {
-        if (materialRepositoryCatalogo.findById(materialID) == null) {
+        Materiales m = materialRepositoryCatalogo.findById(materialID);
+        if (m == null) {
             throw new NegocioException("El material seleccionado no existe.");
+        }
+        if (m.getEstado() != 1) {
+            throw new NegocioException("El material '" + m.getNombre() + "' está inactivo y no puede usarse.");
         }
     }
 

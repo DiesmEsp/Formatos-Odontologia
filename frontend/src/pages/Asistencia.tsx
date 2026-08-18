@@ -308,10 +308,18 @@ export default function Asistencia() {
     }));
     setMaterialRows(defaultMats);
     materialRowsRef.current = defaultMats;
-    for (const dm of defaultMats) {
+    const materialesMap: Record<number, number> = {};
+    for (const dm of defaults) {
       if (dm.materialId) {
-        try { await api.asistencia.acumularMaterial(asistencia.asistenciaID, { materialId: dm.materialId, cantidad: dm.cantidad }); } catch (err) { console.error('Error al acumular material:', err); }
+        materialesMap[dm.materialId] = dm.cantidad;
       }
+    }
+    try {
+      await api.asistencia.reemplazarMateriales(asistencia.asistenciaID, materialesMap);
+    } catch (err) {
+      console.error('Error al reemplazar materiales:', err);
+      addToast('error', err instanceof Error ? err.message : 'Error al restaurar materiales');
+      return;
     }
     originalRowsRef.current = defaultMats.map((r) => ({ ...r }));
     setDirty(false);

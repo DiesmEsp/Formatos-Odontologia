@@ -472,13 +472,12 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
-    void agregarAvancePermitidoSobreCerrado() throws SQLException {
+    void agregarAvanceSobreCerradoArrojaError() throws SQLException {
         int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
         service.cerrar(padre);
 
-        int avanceID = service.agregarAvance(padre, "2026-08-04", null, null, null);
-
-        assertEquals(1, service.listarAvances(padre).size());
+        assertThrows(NegocioException.class,
+                () -> service.agregarAvance(padre, "2026-08-04", null, null, null));
     }
 
     @Test

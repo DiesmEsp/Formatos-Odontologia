@@ -19,10 +19,10 @@ export function RegistrarPagoModal({
   const [abono, setAbono] = useState(0);
   const [fecha, setFecha] = useState(hoyISO());
   const [saving, setSaving] = useState(false);
-  const saldo = tratamiento.monto - tratamiento.montoPagado;
+  const saldo = Math.max(0, tratamiento.monto - tratamiento.montoPagado);
 
   const handleGuardar = async () => {
-    if (abono <= 0) return;
+    if (abono <= 0 || abono > saldo) return;
     setSaving(true);
     try {
       await api.tratamientos.registrarPago(tratamiento.tratamientoID, abono, fecha);
@@ -49,11 +49,15 @@ export function RegistrarPagoModal({
             <div className="sv-row"><span className="sv-label">Saldo</span><span className={`num ${saldo > 0 ? 'text-danger' : 'text-success'}`}>{formatMonto(saldo)}</span></div>
           </div>
           <div className="form-group"><label className="form-label">Fecha</label><input type="date" className="text-field w-full" value={fecha} onChange={(e) => setFecha(e.target.value)} /></div>
-          <div className="form-group"><label className="form-label">Monto a abonar</label><input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} step="0.01" /></div>
+          <div className="form-group">
+            <label className="form-label">Monto a abonar</label>
+            <input type="number" className="text-field w-full" value={abono} onChange={(e) => setAbono(Number(e.target.value))} min={0.01} max={saldo} step="0.01" />
+            {abono > saldo && <span className="text-danger" style={{fontSize:'0.8rem'}}>No puede exceder el saldo ({formatMonto(saldo)})</span>}
+          </div>
         </div>
         <div className="dialog-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" onClick={handleGuardar} disabled={saving || abono <= 0}>{saving ? 'Guardando...' : 'Registrar'}</button>
+          <button className="btn btn-primary" onClick={handleGuardar} disabled={saving || abono <= 0 || abono > saldo}>{saving ? 'Guardando...' : 'Registrar'}</button>
         </div>
       </div>
     </div>
