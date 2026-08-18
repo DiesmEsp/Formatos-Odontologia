@@ -155,6 +155,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ motivo }),
     }),
+    terminarAvance: (avanceID: number) => request<{ ok: boolean }>(`/api/tratamientos/avances/${avanceID}/terminar`, {
+      method: 'POST',
+    }),
     consolidado: (id: number) => request<ConsolidadoTratamiento>(`/api/tratamientos/${id}/consolidado`),
     cerradosPorPagar: () => request<Tratamiento[]>('/api/tratamientos/cerrados-por-pagar'),
     editarPago: (pagoID: number, monto: number, fecha?: string) => request<{ ok: boolean }>(`/api/tratamientos/pagos/${pagoID}`, {

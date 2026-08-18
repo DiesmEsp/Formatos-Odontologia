@@ -79,6 +79,44 @@ public class TratamientoAvanceRepository {
         }
     }
 
+    public void terminar(Connection con, int avanceID) throws SQLException {
+        String sql = "UPDATE Tratamiento_Avance SET Estado = 'TERMINADO' WHERE AvanceID = ?";
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, avanceID);
+            ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
+        }
+    }
+
+    public TratamientoAvance findActivoByUnidad(int unidadID) throws SQLException {
+        String sql = "SELECT * FROM Tratamiento_Avance WHERE UnidadID = ? AND Estado = 'ACTIVO' LIMIT 1";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, unidadID);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rowToModel(rs) : null;
+            }
+        }
+    }
+
+    public List<TratamientoAvance> findActivos() throws SQLException {
+        List<TratamientoAvance> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Tratamiento_Avance WHERE Estado = 'ACTIVO' ORDER BY Fecha, AvanceID";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                lista.add(rowToModel(rs));
+            }
+        }
+        return lista;
+    }
+
     private TratamientoAvance rowToModel(ResultSet rs) throws SQLException {
         TratamientoAvance a = new TratamientoAvance();
         a.setAvanceID(rs.getInt("AvanceID"));

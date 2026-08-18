@@ -20,6 +20,7 @@ export function DetalleTratamientoSubventana({
   const [showAvance, setShowAvance] = useState(false);
   const [showAnular, setShowAnular] = useState(false);
   const [showAnularAvance, setShowAnularAvance] = useState<TratamientoAvance | null>(null);
+  const [terminandoAvance, setTerminandoAvance] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [savingMat, setSavingMat] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -201,6 +202,7 @@ export function DetalleTratamientoSubventana({
   const handleCerrar = async () => { setSaving(true); try { await api.tratamientos.cerrar(tratamiento.tratamientoID); addToast('success', 'Tratamiento cerrado'); onClose(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cerrar'); } finally { setSaving(false); } };
   const handleAnular = async (motivo?: string) => { if (!motivo) return; try { await api.tratamientos.anular(tratamiento.tratamientoID, motivo); addToast('success', 'Tratamiento anulado'); onClose(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular'); } setShowAnular(false); };
   const handleAnularAvance = async (motivo?: string) => { if (!showAnularAvance || !motivo) return; try { await api.tratamientos.anularAvance(showAnularAvance.avanceID, motivo); addToast('success', 'Avance anulado'); await cargarDatos(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al anular avance'); } setShowAnularAvance(null); };
+  const handleTerminarAvance = async (avanceID: number) => { setTerminandoAvance(avanceID); try { await api.tratamientos.terminarAvance(avanceID); addToast('success', 'Avance terminado'); await cargarDatos(); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al terminar avance'); } setTerminandoAvance(null); };
   const handleReabrir = async () => { try { await api.tratamientos.reabrir(tratamiento.tratamientoID); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', 'Tratamiento reabierto'); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al reabrir'); } };
   const handleCambiarTipo = async () => { const nuevo = tratamiento.tipo === 'NORMAL' ? 'CONTINUO' : 'NORMAL'; try { await api.tratamientos.cambiarTipo(tratamiento.tratamientoID, nuevo); const t = await api.tratamientos.buscarPorId(tratamiento.tratamientoID); setTratamiento(t); addToast('success', `Tipo cambiado a ${nuevo}`); } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al cambiar tipo'); } };
 
@@ -252,9 +254,14 @@ export function DetalleTratamientoSubventana({
                   {avances.map((a) => (
                     <li key={a.avanceID} className="material-list-item">
                       <span className="material-list-name">#{a.avanceID} - {a.fecha}</span>
-                      <Badge variant={a.estado === 'ANULADO' ? 'danger' : 'info'}>{a.estado}</Badge>
+                      <Badge variant={a.estado === 'ANULADO' ? 'danger' : a.estado === 'TERMINADO' ? 'success' : 'info'}>{a.estado}</Badge>
                       {a.estado === 'ACTIVO' && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => setShowAnularAvance(a)}><AlertTriangle size={14} /></button>
+                        <>
+                          <button className="btn btn-ghost btn-sm" onClick={() => handleTerminarAvance(a.avanceID)} disabled={terminandoAvance === a.avanceID} title="Terminar avance">
+                            <RotateCcw size={14} />
+                          </button>
+                          <button className="btn btn-ghost btn-sm" onClick={() => setShowAnularAvance(a)}><AlertTriangle size={14} /></button>
+                        </>
                       )}
                     </li>
                   ))}

@@ -145,6 +145,16 @@ public class TratamientoController {
             }
         });
 
+        app.post("/api/tratamientos/avances/{avanceID}/terminar", ctx -> {
+            int avanceID = ControllerUtil.parseIdPathParam(ctx, "avanceID");
+            try {
+                service.terminarAvance(avanceID);
+                ctx.json(Map.of("ok", true));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.post("/api/tratamientos/{id}/cerrar", ctx -> {
             int id = ControllerUtil.parseIdPathParam(ctx, "id");
             try {
