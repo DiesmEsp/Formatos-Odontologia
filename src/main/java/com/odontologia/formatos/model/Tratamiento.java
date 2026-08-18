@@ -14,7 +14,6 @@ public class Tratamiento {
     private double montoPagado;
     private String estado;
     private String cerradoEn;
-    private Integer tratamientoPadreID;
     private Double montoAnterior;
     private int clinicaID = 1;
 
@@ -115,14 +114,6 @@ public class Tratamiento {
 
     public void setCerradoEn(String cerradoEn) {
         this.cerradoEn = cerradoEn;
-    }
-
-    public Integer getTratamientoPadreID() {
-        return tratamientoPadreID;
-    }
-
-    public void setTratamientoPadreID(Integer tratamientoPadreID) {
-        this.tratamientoPadreID = tratamientoPadreID;
     }
 
     public Double getMontoAnterior() {

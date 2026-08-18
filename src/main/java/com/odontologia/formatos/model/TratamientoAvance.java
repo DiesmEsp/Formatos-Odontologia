@@ -1,23 +1,23 @@
 package com.odontologia.formatos.model;
 
-public class Pago {
+public class TratamientoAvance {
 
-    private int pagoID;
+    private int avanceID;
     private int tratamientoID;
-    private Integer avanceID;
     private String fecha;
-    private double monto;
+    private Integer unidadID;
+    private String estado;
     private String timestamp;
 
-    public Pago() {
+    public TratamientoAvance() {
     }
 
-    public int getPagoID() {
-        return pagoID;
+    public int getAvanceID() {
+        return avanceID;
     }
 
-    public void setPagoID(int pagoID) {
-        this.pagoID = pagoID;
+    public void setAvanceID(int avanceID) {
+        this.avanceID = avanceID;
     }
 
     public int getTratamientoID() {
@@ -28,14 +28,6 @@ public class Pago {
         this.tratamientoID = tratamientoID;
     }
 
-    public Integer getAvanceID() {
-        return avanceID;
-    }
-
-    public void setAvanceID(Integer avanceID) {
-        this.avanceID = avanceID;
-    }
-
     public String getFecha() {
         return fecha;
     }
@@ -44,12 +36,20 @@ public class Pago {
         this.fecha = fecha;
     }
 
-    public double getMonto() {
-        return monto;
+    public Integer getUnidadID() {
+        return unidadID;
     }
 
-    public void setMonto(double monto) {
-        this.monto = monto;
+    public void setUnidadID(Integer unidadID) {
+        this.unidadID = unidadID;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public String getTimestamp() {

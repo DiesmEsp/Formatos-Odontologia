@@ -19,8 +19,8 @@ public class TratamientoRepository {
 
     public int insert(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "INSERT INTO Tratamiento (OperadorID, PacienteID, UnidadID, Fecha, NombreTratamiento, "
-                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, TratamientoPadreID, MontoAnterior, ClinicaID) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "Monto, Tipo, EstadoPago, MontoPagado, Estado, CerradoEn, MontoAnterior, ClinicaID) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,17 +39,12 @@ public class TratamientoRepository {
             ps.setDouble(9, tratamiento.getMontoPagado());
             ps.setString(10, tratamiento.getEstado());
             ps.setString(11, tratamiento.getCerradoEn());
-            if (tratamiento.getTratamientoPadreID() != null) {
-                ps.setInt(12, tratamiento.getTratamientoPadreID());
-            } else {
-                ps.setNull(12, java.sql.Types.INTEGER);
-            }
             if (tratamiento.getMontoAnterior() != null) {
-                ps.setDouble(13, tratamiento.getMontoAnterior());
+                ps.setDouble(12, tratamiento.getMontoAnterior());
             } else {
-                ps.setNull(13, java.sql.Types.REAL);
+                ps.setNull(12, java.sql.Types.REAL);
             }
-            ps.setInt(14, tratamiento.getClinicaID());
+            ps.setInt(13, tratamiento.getClinicaID());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -71,7 +66,7 @@ public class TratamientoRepository {
     public void update(Connection con, Tratamiento tratamiento) throws SQLException {
         String sql = "UPDATE Tratamiento SET OperadorID = ?, PacienteID = ?, UnidadID = ?, Fecha = ?, "
                 + "NombreTratamiento = ?, Monto = ?, Tipo = ?, EstadoPago = ?, MontoPagado = ?, "
-                + "Estado = ?, CerradoEn = ?, TratamientoPadreID = ?, MontoAnterior = ?, ClinicaID = ? WHERE TratamientoID = ?";
+                + "Estado = ?, CerradoEn = ?, MontoAnterior = ?, ClinicaID = ? WHERE TratamientoID = ?";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -90,18 +85,13 @@ public class TratamientoRepository {
             ps.setDouble(9, tratamiento.getMontoPagado());
             ps.setString(10, tratamiento.getEstado());
             ps.setString(11, tratamiento.getCerradoEn());
-            if (tratamiento.getTratamientoPadreID() != null) {
-                ps.setInt(12, tratamiento.getTratamientoPadreID());
-            } else {
-                ps.setNull(12, java.sql.Types.INTEGER);
-            }
             if (tratamiento.getMontoAnterior() != null) {
-                ps.setDouble(13, tratamiento.getMontoAnterior());
+                ps.setDouble(12, tratamiento.getMontoAnterior());
             } else {
-                ps.setNull(13, java.sql.Types.REAL);
+                ps.setNull(12, java.sql.Types.REAL);
             }
-            ps.setInt(14, tratamiento.getClinicaID());
-            ps.setInt(15, tratamiento.getTratamientoID());
+            ps.setInt(13, tratamiento.getClinicaID());
+            ps.setInt(14, tratamiento.getTratamientoID());
             ps.executeUpdate();
         } finally {
             if (cerrarConexion) {
@@ -192,32 +182,15 @@ public class TratamientoRepository {
         t.setMontoPagado(rs.getDouble("MontoPagado"));
         t.setEstado(rs.getString("Estado"));
         t.setCerradoEn(rs.getString("CerradoEn"));
-        int padre = rs.getInt("TratamientoPadreID");
-        t.setTratamientoPadreID(rs.wasNull() ? null : padre);
         double montoAnterior = rs.getDouble("MontoAnterior");
         t.setMontoAnterior(rs.wasNull() ? null : montoAnterior);
         t.setClinicaID(rs.getInt("ClinicaID"));
         return t;
     }
 
-    public List<Tratamiento> findAvances(int tratamientoPadreID) throws SQLException {
-        List<Tratamiento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Tratamiento WHERE TratamientoPadreID = ? ORDER BY Fecha, TratamientoID";
-        try (Connection con = ConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, tratamientoPadreID);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(rowToModel(rs));
-                }
-            }
-        }
-        return lista;
-    }
-
     public List<Tratamiento> findCandidatosPadre(int pacienteID, int clinicaID) throws SQLException {
         List<Tratamiento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Tratamiento WHERE PacienteID = ? AND ClinicaID = ? AND Tipo != 'AVANCE' "
+        String sql = "SELECT * FROM Tratamiento WHERE PacienteID = ? AND ClinicaID = ? "
                 + "AND Estado IN ('ABIERTO', 'CERRADO') ORDER BY Fecha DESC, TratamientoID DESC";
         try (Connection con = ConnectionManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

@@ -18,13 +18,18 @@ public class PagoRepository {
     }
 
     public int insert(Connection con, Pago pago) throws SQLException {
-        String sql = "INSERT INTO Pago (TratamientoID, Fecha, Monto) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Pago (TratamientoID, Fecha, Monto, AvanceID) VALUES (?, ?, ?, ?)";
         boolean cerrarConexion = con == null;
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, pago.getTratamientoID());
             ps.setString(2, pago.getFecha());
             ps.setDouble(3, pago.getMonto());
+            if (pago.getAvanceID() != null) {
+                ps.setInt(4, pago.getAvanceID());
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -69,6 +74,20 @@ public class PagoRepository {
         Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, pagoID);
+            ps.executeUpdate();
+        } finally {
+            if (cerrarConexion) {
+                conexion.close();
+            }
+        }
+    }
+
+    public void deleteByAvanceID(Connection con, int avanceID) throws SQLException {
+        String sql = "DELETE FROM Pago WHERE AvanceID = ?";
+        boolean cerrarConexion = con == null;
+        Connection conexion = cerrarConexion ? ConnectionManager.getInstance().getConnection() : con;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, avanceID);
             ps.executeUpdate();
         } finally {
             if (cerrarConexion) {
@@ -127,6 +146,8 @@ public class PagoRepository {
         Pago p = new Pago();
         p.setPagoID(rs.getInt("PagoID"));
         p.setTratamientoID(rs.getInt("TratamientoID"));
+        int avanceID = rs.getInt("AvanceID");
+        p.setAvanceID(rs.wasNull() ? null : avanceID);
         p.setFecha(rs.getString("Fecha"));
         p.setMonto(rs.getDouble("Monto"));
         p.setTimestamp(rs.getString("Timestamp"));
