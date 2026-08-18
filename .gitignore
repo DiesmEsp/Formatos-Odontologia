@@ -25,6 +25,9 @@ frontend/build-resources/
 # Planificación (documentos de trabajo locales)
 planning/
 
+# Guia local del agente (solo para el entorno de desarrollo del autor)
+AGENTS.md
+
 # Archivos fuente de datos clínicos (contienen datos personales de pacientes)
 Docs/Db_Create/
 Docs/materiales.csv
