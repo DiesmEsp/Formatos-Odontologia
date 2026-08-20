@@ -75,15 +75,41 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                      Integer tratPredID, Double monto, String tipo,
                      Map<Integer, Double> materiales, Integer tratamientoPadreID,
                      int clinicaID) throws SQLException {
+        String nombreTratamiento = tratPredID != null ? null : "Tratamiento general";
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID,
+                nombreTratamiento, monto, tipo, materiales, tratamientoPadreID, clinicaID);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, String nombreTratamiento, Double monto, String tipo,
+                     Map<Integer, Double> materiales, Integer tratamientoPadreID,
+                     int clinicaID) throws SQLException {
+        return crear(operadorID, pacienteID, unidadID, fecha, tratPredID, nombreTratamiento, monto, tipo,
+                materiales, tratamientoPadreID, null, clinicaID);
+    }
+
+    public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
+                     Integer tratPredID, String nombreTratamiento, Double monto, String tipo,
+                     Map<Integer, Double> materiales, Integer tratamientoPadreID,
+                     Double montoPagado, int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         if (unidadID != null && unidadRepository.findById(unidadID) == null) {
             throw new NegocioException("La unidad de tratamiento seleccionada no existe.");
         }
+        if (tratamientoPadreID == null && unidadID != null && repository.existeOtroAbiertoEnUnidad(unidadID, 0)) {
+            throw new NegocioException("La unidad ya está ocupada por otro tratamiento activo.");
+        }
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
         if (tratamientoPadreID != null) {
             validarPadreParaContinuo(tratamientoPadreID);
+        }
+
+        boolean tienePlantilla = tratPredID != null;
+        boolean tieneNombre = nombreTratamiento != null && !nombreTratamiento.isBlank();
+        if (!tienePlantilla && !tieneNombre) {
+            throw new NegocioException("Debe seleccionar un tipo de tratamiento o indicar un nombre.");
         }
 
         return TransaccionBD.ejecutarConResultado(con -> {
@@ -99,13 +125,14 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             tratamiento.setClinicaID(clinicaID);
 
             List<TratamientoPredefinidoMaterial> sugeridos = List.of();
-            if (tratPredID != null) {
-                sugeridos = cargarPlantilla(tratamiento, tratPredID, monto);
+            if (tienePlantilla) {
+                sugeridos = cargarPlantilla(tratamiento, tratPredID, monto,
+                        tieneNombre ? nombreTratamiento.trim() : null);
             } else {
-                tratamiento.setNombreTratamiento(tratamiento.getNombreTratamiento() != null
-                        ? tratamiento.getNombreTratamiento() : "Tratamiento general");
+                tratamiento.setNombreTratamiento(nombreTratamiento.trim());
             }
 
+            double pagadoReal = 0.0;
             if ("CONTINUO".equals(tipoNormalizado)) {
                 tratamiento.setMonto(0);
                 tratamiento.setEstadoPago("PAGADO");
@@ -115,13 +142,29 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                 if (montoReal < 0) {
                     throw new NegocioException("El monto del tratamiento no puede ser negativo.");
                 }
+                pagadoReal = montoPagado != null ? montoPagado : 0.0;
+                if (pagadoReal < 0) {
+                    throw new NegocioException("El monto pagado no puede ser negativo.");
+                }
+                if (pagadoReal > montoReal + EPSILON) {
+                    throw new NegocioException("El monto pagado no puede superar el monto total.");
+                }
                 tratamiento.setMonto(montoReal);
-                tratamiento.setEstadoPago("PENDIENTE");
-                tratamiento.setMontoPagado(0);
+                tratamiento.setMontoPagado(pagadoReal);
+                tratamiento.setEstadoPago(derivarEstadoPago(pagadoReal, montoReal));
             }
 
             int tratamientoID = repository.insert(con, tratamiento);
             tratamiento.setTratamientoID(tratamientoID);
+
+            if (pagadoReal > EPSILON) {
+                Pago pago = new Pago();
+                pago.setTratamientoID(tratamientoID);
+                pago.setFecha(fecha);
+                pago.setMonto(pagadoReal);
+                pagoRepository.insert(con, pago);
+                recalcularPagos(con, tratamiento);
+            }
 
             if (materiales != null) {
                 for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
@@ -182,16 +225,38 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Map<Integer, Double> materiales) throws SQLException {
-        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo, materiales, 1);
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, null, tipo, materiales, 1);
     }
 
     public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
                             Double monto, String tipo, Map<Integer, Double> materiales,
                             int clinicaID) throws SQLException {
+        String nombreTratamiento = tratPredID != null ? null : "Tratamiento general";
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID,
+                nombreTratamiento, monto, null, tipo, materiales, clinicaID);
+    }
+
+    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
+                            Double monto, Double montoPagado, String tipo,
+                            Map<Integer, Double> materiales, int clinicaID) throws SQLException {
+        String nombreTratamiento = tratPredID != null ? null : "Tratamiento general";
+        return crearCerrado(operadorID, pacienteID, fecha, tratPredID,
+                nombreTratamiento, monto, montoPagado, tipo, materiales, clinicaID);
+    }
+
+    public int crearCerrado(int operadorID, int pacienteID, String fecha, Integer tratPredID,
+                            String nombreTratamiento, Double monto, Double montoPagado, String tipo,
+                            Map<Integer, Double> materiales, int clinicaID) throws SQLException {
         validarEspecialista(operadorID);
         validarPaciente(pacienteID);
         validarFecha(fecha);
         String tipoNormalizado = normalizarTipo(tipo);
+
+        boolean tienePlantilla = tratPredID != null;
+        boolean tieneNombre = nombreTratamiento != null && !nombreTratamiento.isBlank();
+        if (!tienePlantilla && !tieneNombre) {
+            throw new NegocioException("Debe seleccionar un tipo de tratamiento o indicar un nombre.");
+        }
 
         return TransaccionBD.ejecutarConResultado(con -> {
             Tratamiento tratamiento = new Tratamiento();
@@ -204,19 +269,24 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
             tratamiento.setCerradoEn(timestampLocal());
             tratamiento.setClinicaID(clinicaID);
 
-            if (tratPredID != null) {
+            if (tienePlantilla) {
                 TratamientoPredefinido predefinido = predefinidoRepository.findById(tratPredID);
                 if (predefinido == null) {
                     throw new NegocioException("El tipo de tratamiento seleccionado no existe.");
                 }
-                tratamiento.setNombreTratamiento(predefinido.getNombreTratamiento());
+                if (tieneNombre) {
+                    tratamiento.setNombreTratamiento(nombreTratamiento.trim());
+                } else {
+                    tratamiento.setNombreTratamiento(predefinido.getNombreTratamiento());
+                }
                 if (monto == null && predefinido.getMontoSugerido() != null) {
                     tratamiento.setMonto(predefinido.getMontoSugerido());
                 }
             } else {
-                tratamiento.setNombreTratamiento("Tratamiento general");
+                tratamiento.setNombreTratamiento(nombreTratamiento.trim());
             }
 
+            double pagadoReal = 0.0;
             if ("CONTINUO".equals(tipoNormalizado)) {
                 tratamiento.setMonto(0);
                 tratamiento.setEstadoPago("PAGADO");
@@ -226,13 +296,29 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                 if (montoReal < 0) {
                     throw new NegocioException("El monto del tratamiento no puede ser negativo.");
                 }
+                pagadoReal = montoPagado != null ? montoPagado : 0.0;
+                if (pagadoReal < 0) {
+                    throw new NegocioException("El monto pagado no puede ser negativo.");
+                }
+                if (pagadoReal > montoReal + EPSILON) {
+                    throw new NegocioException("El monto pagado no puede superar el monto total.");
+                }
                 tratamiento.setMonto(montoReal);
-                tratamiento.setEstadoPago("PAGADO");
-                tratamiento.setMontoPagado(montoReal);
+                tratamiento.setMontoPagado(pagadoReal);
+                tratamiento.setEstadoPago(derivarEstadoPago(pagadoReal, montoReal));
             }
 
             int tratamientoID = repository.insert(con, tratamiento);
             tratamiento.setTratamientoID(tratamientoID);
+
+            if (pagadoReal > EPSILON) {
+                Pago pago = new Pago();
+                pago.setTratamientoID(tratamientoID);
+                pago.setFecha(fecha);
+                pago.setMonto(pagadoReal);
+                pagoRepository.insert(con, pago);
+                recalcularPagos(con, tratamiento);
+            }
 
             if (materiales != null) {
                 for (Map.Entry<Integer, Double> entrada : materiales.entrySet()) {
@@ -563,7 +649,10 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                 t.setFecha(dto.fecha);
             }
             if (dto.nombreTratamiento != null) {
-                t.setNombreTratamiento(dto.nombreTratamiento);
+                if (dto.nombreTratamiento.isBlank()) {
+                    throw new NegocioException("El nombre del tratamiento no puede estar vacío.");
+                }
+                t.setNombreTratamiento(dto.nombreTratamiento.trim());
             }
             if (dto.operadorID != null) {
                 validarEspecialista(dto.operadorID);
@@ -709,7 +798,10 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                 t.setFecha(dto.fecha);
             }
             if (dto.nombreTratamiento != null) {
-                t.setNombreTratamiento(dto.nombreTratamiento);
+                if (dto.nombreTratamiento.isBlank()) {
+                    throw new NegocioException("El nombre del tratamiento no puede estar vacío.");
+                }
+                t.setNombreTratamiento(dto.nombreTratamiento.trim());
             }
             if (dto.operadorID != null) {
                 validarEspecialista(dto.operadorID);
@@ -725,6 +817,9 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
                 }
                 if ("CONTINUO".equals(t.getTipo())) {
                     throw new NegocioException("Un tratamiento continuo no tiene monto editable.");
+                }
+                if (dto.monto + EPSILON < t.getMontoPagado()) {
+                    throw new NegocioException("El monto del tratamiento no puede ser menor que el monto ya pagado.");
                 }
                 t.setMonto(dto.monto);
                 t.setEstadoPago(derivarEstadoPago(t.getMontoPagado(), dto.monto));
@@ -766,12 +861,16 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
     }
 
     private List<TratamientoPredefinidoMaterial> cargarPlantilla(Tratamiento tratamiento, int tratPredID,
-                                                                  Double monto) throws SQLException {
+                                                                  Double monto, String nombreOverride) throws SQLException {
         TratamientoPredefinido predefinido = predefinidoRepository.findById(tratPredID);
         if (predefinido == null) {
             throw new NegocioException("El tipo de tratamiento seleccionado no existe.");
         }
-        tratamiento.setNombreTratamiento(predefinido.getNombreTratamiento());
+        if (nombreOverride != null && !nombreOverride.isBlank()) {
+            tratamiento.setNombreTratamiento(nombreOverride.trim());
+        } else {
+            tratamiento.setNombreTratamiento(predefinido.getNombreTratamiento());
+        }
         if ("NORMAL".equals(tratamiento.getTipo())) {
             double montoReal = monto != null ? monto
                     : (predefinido.getMontoSugerido() != null ? predefinido.getMontoSugerido() : 0);

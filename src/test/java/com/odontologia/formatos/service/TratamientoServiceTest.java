@@ -81,12 +81,59 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void crearEnCursoConPagoInicialCreaRegistroPago() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, "Tratamiento general",
+                200.0, "NORMAL", null, null, 100.0, 1);
+
+        List<Pago> pagos = service.pagosDe(id);
+        assertEquals(1, pagos.size());
+        assertEquals(100.0, pagos.get(0).getMonto(), 0.001);
+        assertEquals("2026-08-03", pagos.get(0).getFecha());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("ABIERTO", t.getEstado());
+        assertEquals(100.0, t.getMontoPagado(), 0.001);
+        assertEquals("PARCIAL", t.getEstadoPago());
+    }
+
+    @Test
+    void crearEnCursoConPagoInicialLuegoAbonoNoPierdePagoInicial() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, "Tratamiento general",
+                200.0, "NORMAL", null, null, 100.0, 1);
+
+        service.registrarPago(id, 50.0);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(150.0, t.getMontoPagado(), 0.001);
+        assertEquals("PARCIAL", t.getEstadoPago());
+        assertEquals(2, service.pagosDe(id).size());
+    }
+
+    @Test
+    void crearEnCursoSinPagoInicialNoCreaPago() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 200.0, "NORMAL");
+
+        assertEquals(0, service.pagosDe(id).size());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(0.0, t.getMontoPagado(), 0.001);
+        assertEquals("PENDIENTE", t.getEstadoPago());
+    }
+
+    @Test
+    void crearEnCursoRechazaPagoMayorAlMonto() {
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-03", null, "Tratamiento general",
+                        100.0, "NORMAL", null, null, 150.0, 1));
+    }
+
+    @Test
     void crearCerradoConMateriales() throws SQLException {
         Map<Integer, Double> materiales = new HashMap<>();
         materiales.put(1, 2.0);
         materiales.put(2, 3.0);
 
-        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 120.0, "NORMAL", materiales);
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 120.0, 120.0, "NORMAL", materiales, 1);
 
         Tratamiento t = tratamientoRepository.findById(id);
         assertEquals("CERRADO", t.getEstado());
@@ -96,6 +143,69 @@ class TratamientoServiceTest extends BaseRepositoryTest {
 
         List<TratamientoMaterialRepository.MaterialConCantidad> mats = service.materialesConNombre(id);
         assertEquals(2, mats.size());
+    }
+
+    @Test
+    void crearCerradoSinPagoQuedaPendiente() throws SQLException {
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 200.0, "NORMAL", Map.of());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("CERRADO", t.getEstado());
+        assertEquals(200.0, t.getMonto(), 0.001);
+        assertEquals("PENDIENTE", t.getEstadoPago());
+        assertEquals(0.0, t.getMontoPagado(), 0.001);
+    }
+
+    @Test
+    void crearCerradoConPagoParcial() throws SQLException {
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 200.0, 100.0, "NORMAL", Map.of(), 1);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("CERRADO", t.getEstado());
+        assertEquals(200.0, t.getMonto(), 0.001);
+        assertEquals("PARCIAL", t.getEstadoPago());
+        assertEquals(100.0, t.getMontoPagado(), 0.001);
+    }
+
+    @Test
+    void crearCerradoRechazaPagoMayorAlMonto() {
+        assertThrows(NegocioException.class, () ->
+                service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 100.0, 150.0, "NORMAL", Map.of(), 1));
+    }
+
+    @Test
+    void crearCerradoConPagoInicialCreaRegistroPago() throws SQLException {
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 200.0, 100.0, "NORMAL", Map.of(), 1);
+
+        List<Pago> pagos = service.pagosDe(id);
+        assertEquals(1, pagos.size());
+        assertEquals(100.0, pagos.get(0).getMonto(), 0.001);
+        assertEquals("2026-08-01", pagos.get(0).getFecha());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(100.0, t.getMontoPagado(), 0.001);
+    }
+
+    @Test
+    void crearCerradoConPagoInicialLuegoAbonoNoPierdePagoInicial() throws SQLException {
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 200.0, 100.0, "NORMAL", Map.of(), 1);
+
+        service.registrarPago(id, 50.0);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(150.0, t.getMontoPagado(), 0.001);
+        assertEquals("PARCIAL", t.getEstadoPago());
+        assertEquals(2, service.pagosDe(id).size());
+    }
+
+    @Test
+    void crearCerradoSinPagoInicialNoCreaPago() throws SQLException {
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", null, 200.0, "NORMAL", Map.of());
+
+        assertEquals(0, service.pagosDe(id).size());
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals(0.0, t.getMontoPagado(), 0.001);
     }
 
     @Test
@@ -375,6 +485,24 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         int id2 = service.crear(operadorID, pacienteID, 1, "2026-08-05", null, 50.0, "NORMAL");
 
         assertThrows(NegocioException.class, () -> service.reabrir(id1));
+    }
+
+    @Test
+    void crearRechazaUnidadOcupadaPorOtroActivo() throws SQLException {
+        service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        assertThrows(NegocioException.class,
+                () -> service.crear(operadorID, pacienteID, 1, "2026-08-05", null, 50.0, "NORMAL"));
+    }
+
+    @Test
+    void crearPermiteMismaUnidadTrasCerrar() throws SQLException {
+        int id1 = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id1);
+
+        int id2 = service.crear(operadorID, pacienteID, 1, "2026-08-05", null, 50.0, "NORMAL");
+
+        assertTrue(id2 > 0);
     }
 
     @Test
@@ -750,7 +878,7 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     @Test
     void servicioTodosRetornaAbiertoYCerrado() throws SQLException {
         int abierto = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
-        int cerrado = service.crear(operadorID, pacienteID, 1, "2026-08-04", null, 200.0, "NORMAL");
+        int cerrado = service.crear(operadorID, pacienteID, null, "2026-08-04", null, 200.0, "NORMAL");
         service.cerrar(cerrado);
 
         List<Tratamiento> lista = service.todos();
@@ -759,6 +887,107 @@ class TratamientoServiceTest extends BaseRepositoryTest {
         boolean tieneCerrado = lista.stream().anyMatch((t) -> t.getTratamientoID() == cerrado);
         assertTrue(tieneAbierto);
         assertTrue(tieneCerrado);
+    }
+
+    @Test
+    void crearConPlantillaYNombreLibreSobrescribe() throws SQLException {
+        int predID = crearPlantillaConMateriales();
+
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", predID,
+                "Nombre personalizado", 100.0, "NORMAL", null, null, 1);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Nombre personalizado", t.getNombreTratamiento());
+        assertEquals(100.0, t.getMonto(), 0.001);
+        List<TratamientoMaterialRepository.MaterialConCantidad> mats = service.materialesConNombre(id);
+        assertEquals(2, mats.size());
+    }
+
+    @Test
+    void crearSinPlantillaConNombreLibreUsaNombre() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null,
+                "Extraccion de muela", 80.0, "NORMAL", null, null, 1);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Extraccion de muela", t.getNombreTratamiento());
+        assertEquals(80.0, t.getMonto(), 0.001);
+    }
+
+    @Test
+    void crearSinPlantillaSinNombreLanzaNegocioException() {
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-03", null,
+                        null, 100.0, "NORMAL", null, null, 1));
+    }
+
+    @Test
+    void crearSinPlantillaConNombreVacioLanzaNegocioException() {
+        assertThrows(NegocioException.class, () ->
+                service.crear(operadorID, pacienteID, 1, "2026-08-03", null,
+                        "   ", 100.0, "NORMAL", null, null, 1));
+    }
+
+    @Test
+    void crearCerradoConPlantillaYNombreLibreSobrescribe() throws SQLException {
+        int predID = crearPlantillaConMateriales();
+
+        int id = service.crearCerrado(operadorID, pacienteID, "2026-08-01", predID,
+                "Nombre personalizado cerrado", 100.0, null, "NORMAL", Map.of(), 1);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Nombre personalizado cerrado", t.getNombreTratamiento());
+        assertEquals(100.0, t.getMonto(), 0.001);
+    }
+
+    @Test
+    void crearCerradoSinPlantillaSinNombreLanzaNegocioException() {
+        assertThrows(NegocioException.class, () ->
+                service.crearCerrado(operadorID, pacienteID, "2026-08-01", null,
+                        null, 100.0, null, "NORMAL", Map.of(), 1));
+    }
+
+    @Test
+    void editarEnCursoConMontoMenorAPagadoLanzaError() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.registrarPago(id, 60.0);
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.monto = 50.0;
+        assertThrows(NegocioException.class, () -> service.editarEnCurso(id, dto));
+    }
+
+    @Test
+    void editarEnCursoCambiaNombreTratamiento() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.nombreTratamiento = "Nombre corregido";
+        service.editarEnCurso(id, dto);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Nombre corregido", t.getNombreTratamiento());
+    }
+
+    @Test
+    void editarEnCursoConNombreVacioLanzaError() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.nombreTratamiento = "   ";
+        assertThrows(NegocioException.class, () -> service.editarEnCurso(id, dto));
+    }
+
+    @Test
+    void editarRetroactivoCambiaNombreTratamiento() throws SQLException {
+        int id = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        service.cerrar(id);
+
+        TratamientoService.EditarRetroactivoDto dto = new TratamientoService.EditarRetroactivoDto();
+        dto.nombreTratamiento = "Nombre retroactivo";
+        service.editarRetroactivo(id, dto);
+
+        Tratamiento t = tratamientoRepository.findById(id);
+        assertEquals("Nombre retroactivo", t.getNombreTratamiento());
     }
 
     private int crearMaterial(String nombre, String unidad) throws SQLException {

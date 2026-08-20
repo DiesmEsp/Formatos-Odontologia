@@ -56,8 +56,11 @@ public class TratamientoController {
             String fecha = (String) body.get("fecha");
             Integer tratPredID = body.get("tratPredID") != null
                     ? ((Number) body.get("tratPredID")).intValue() : null;
+            String nombreTratamiento = (String) body.get("nombreTratamiento");
             Double monto = body.get("monto") != null
                     ? ((Number) body.get("monto")).doubleValue() : null;
+            Double montoPagado = body.get("montoPagado") != null
+                    ? ((Number) body.get("montoPagado")).doubleValue() : null;
             String tipo = (String) body.get("tipo");
             Integer tratamientoPadreID = body.get("tratamientoPadreID") != null
                     ? ((Number) body.get("tratamientoPadreID")).intValue() : null;
@@ -72,9 +75,10 @@ public class TratamientoController {
             }
 
             try {
-                int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, monto, tipo,
+                int id = service.crear(operadorID, pacienteID, unidadID, fecha, tratPredID, nombreTratamiento, monto, tipo,
                         rawMateriales != null ? materiales : null,
                         tratamientoPadreID,
+                        montoPagado,
                         ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
@@ -89,8 +93,11 @@ public class TratamientoController {
             String fecha = (String) body.get("fecha");
             Integer tratPredID = body.get("tratPredID") != null
                     ? ((Number) body.get("tratPredID")).intValue() : null;
+            String nombreTratamiento = (String) body.get("nombreTratamiento");
             Double monto = body.get("monto") != null
                     ? ((Number) body.get("monto")).doubleValue() : null;
+            Double montoPagado = body.get("montoPagado") != null
+                    ? ((Number) body.get("montoPagado")).doubleValue() : null;
             String tipo = (String) body.get("tipo");
 
             Map<Integer, Double> materiales = new HashMap<>();
@@ -103,7 +110,7 @@ public class TratamientoController {
             }
 
             try {
-                int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, monto, tipo,
+                int id = service.crearCerrado(operadorID, pacienteID, fecha, tratPredID, nombreTratamiento, monto, montoPagado, tipo,
                         materiales, ControllerUtil.clinicaID(ctx));
                 ctx.status(201).json(Map.of("id", id));
             } catch (NegocioException e) {
