@@ -3,10 +3,12 @@ package com.odontologia.formatos.service;
 import com.odontologia.formatos.model.Asistencia;
 import com.odontologia.formatos.model.AsistenciaMaterial;
 import com.odontologia.formatos.model.Docente;
+import com.odontologia.formatos.model.MaterialAvance;
 import com.odontologia.formatos.model.Materiales;
 import com.odontologia.formatos.model.Operador;
 import com.odontologia.formatos.model.Paciente;
 import com.odontologia.formatos.model.Tratamiento;
+import com.odontologia.formatos.model.TratamientoAvance;
 import com.odontologia.formatos.model.TratamientoMaterial;
 import com.odontologia.formatos.model.UnidadConversion;
 import com.odontologia.formatos.repository.AsistenciaMaterialRepository;
@@ -14,11 +16,13 @@ import com.odontologia.formatos.repository.AsistenciaRepository;
 import com.odontologia.formatos.repository.BaseRepositoryTest;
 import com.odontologia.formatos.repository.DocenteRepository;
 import com.odontologia.formatos.repository.MaterialRepository;
+import com.odontologia.formatos.repository.MaterialAvanceRepository;
 import com.odontologia.formatos.repository.OperadorRepository;
 import com.odontologia.formatos.repository.PacienteRepository;
 import com.odontologia.formatos.repository.ReporteRepository;
 import com.odontologia.formatos.repository.TratamientoMaterialRepository;
 import com.odontologia.formatos.repository.TratamientoRepository;
+import com.odontologia.formatos.repository.TratamientoAvanceRepository;
 import com.odontologia.formatos.repository.UnidadConversionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +46,8 @@ class ReporteServiceTest extends BaseRepositoryTest {
     private final PacienteRepository pacienteRepository = new PacienteRepository();
     private final TratamientoRepository tratamientoRepository = new TratamientoRepository();
     private final TratamientoMaterialRepository tratamientoMaterialRepository = new TratamientoMaterialRepository();
+    private final TratamientoAvanceRepository tratamientoAvanceRepository = new TratamientoAvanceRepository();
+    private final MaterialAvanceRepository materialAvanceRepository = new MaterialAvanceRepository();
     private final DocenteRepository docenteRepository = new DocenteRepository();
     private final AsistenciaRepository asistenciaRepository = new AsistenciaRepository();
     private final AsistenciaMaterialRepository asistenciaMaterialRepository = new AsistenciaMaterialRepository();
@@ -169,6 +175,40 @@ class ReporteServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void avanceSeContabilizaEnMesDelAvanceNoDelTratamiento() throws SQLException {
+        int guante = insertarMaterial("Guante prueba", "par");
+
+        Tratamiento t = new Tratamiento();
+        t.setOperadorID(operadorID);
+        t.setPacienteID(pacienteID);
+        t.setUnidadID(null);
+        t.setFecha("2024-10-01");
+        t.setNombreTratamiento("Tratamiento avances");
+        t.setMonto(100.0);
+        t.setTipo("CONTINUO");
+        t.setEstadoPago("PENDIENTE");
+        t.setMontoPagado(0);
+        t.setEstado("CERRADO");
+        t.setCerradoEn("2026-01-01 10:00:00");
+        t.setClinicaID(1);
+        int tratamientoID = tratamientoRepository.insert(t);
+
+        int avanceOct = insertarAvance(tratamientoID, "2024-10-20");
+        insertarConsumoAvance(avanceOct, guante, 2.0);
+
+        int avanceNov = insertarAvance(tratamientoID, "2024-11-10");
+        insertarConsumoAvance(avanceNov, guante, 3.0);
+
+        assertEquals(2.0, fila(service.materiales(2024, 10), guante).cantidadTotal(), 0.001);
+        assertEquals(3.0, fila(service.materiales(2024, 11), guante).cantidadTotal(), 0.001);
+
+        ReporteRepository.FilaEspecialista espOct = filaEspecialista(service.especialista(2024, 10), guante);
+        ReporteRepository.FilaEspecialista espNov = filaEspecialista(service.especialista(2024, 11), guante);
+        assertEquals(2.0, espOct.getCantidad(), 0.001);
+        assertEquals(3.0, espNov.getCantidad(), 0.001);
+    }
+
+    @Test
     void ingresosPorTratamiento() throws SQLException {
         List<ReporteRepository.FilaIngresoTratamiento> filas = service.ingresosPorTratamiento(2024, 10);
 
@@ -264,6 +304,22 @@ class ReporteServiceTest extends BaseRepositoryTest {
         item.setMaterialID(materialID);
         item.setCantidad(cantidad);
         tratamientoMaterialRepository.insert(item);
+    }
+
+    private int insertarAvance(int tratamientoID, String fecha) throws SQLException {
+        TratamientoAvance a = new TratamientoAvance();
+        a.setTratamientoID(tratamientoID);
+        a.setFecha(fecha);
+        a.setUnidadID(null);
+        return tratamientoAvanceRepository.insert(null, a);
+    }
+
+    private void insertarConsumoAvance(int avanceID, int materialID, double cantidad) throws SQLException {
+        MaterialAvance item = new MaterialAvance();
+        item.setAvanceID(avanceID);
+        item.setMaterialID(materialID);
+        item.setCantidad(cantidad);
+        materialAvanceRepository.insert(null, item);
     }
 
     private void insertarAsistencia(String fecha, String estado, boolean conMateriales) throws SQLException {
