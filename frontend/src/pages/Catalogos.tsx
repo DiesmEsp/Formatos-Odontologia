@@ -579,6 +579,7 @@ function RegistrarRealizadoModal({ onClose, onSuccess, addToast }: { onClose: ()
   const [operadorId, setOperadorId] = useState<number | null>(null);
   const [tratPredId, setTratPredId] = useState<number | null>(null);
   const [montoStr, setMontoStr] = useState("");
+  const [pagadoStr, setPagadoStr] = useState("");
   const [tipo, setTipo] = useState("NORMAL");
   const [matRows, setMatRows] = useState<MaterialRow[]>([]);
   const [saving, setSaving] = useState(false);
@@ -622,6 +623,7 @@ function RegistrarRealizadoModal({ onClose, onSuccess, addToast }: { onClose: ()
         fecha,
         tratPredID: tratPredId,
         monto: tipo === "CONTINUO" ? null : (montoStr === "" ? null : Number(montoStr)),
+        montoPagado: tipo === "CONTINUO" ? null : (pagadoStr === "" ? 0 : Number(pagadoStr)),
         tipo,
         materiales: materialesMap,
       });
@@ -654,6 +656,10 @@ function RegistrarRealizadoModal({ onClose, onSuccess, addToast }: { onClose: ()
             <div className="form-group">
               <label className="form-label">Monto total</label>
               <input type="text" inputMode="decimal" className="text-field w-full" value={montoStr} onChange={(e) => setMontoStr(e.target.value.replace(/[^0-9.]/g, ""))} disabled={tipo === "CONTINUO"} placeholder="0.00" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Monto pagado</label>
+              <input type="text" inputMode="decimal" className="text-field w-full" value={pagadoStr} onChange={(e) => setPagadoStr(e.target.value.replace(/[^0-9.]/g, ""))} disabled={tipo === "CONTINUO"} placeholder="0.00" />
             </div>
           </div>
           <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 14, marginTop: 4 }}>

@@ -17,7 +17,7 @@ interface SearchableComboProps {
   placeholder?: string;
   disabled?: boolean;
   allowCreate?: boolean;
-  onCreateNew?: () => void;
+  onCreateNew?: (query: string) => void;
   onSearch?: (query: string) => void;
   loading?: boolean;
   className?: string;
@@ -128,13 +128,13 @@ export function SearchableCombo({
       {!loading && filteredOptions.length === 0 && allowCreate && onCreateNew && query.trim() && (
         <div style={{ padding: '12px', textAlign: 'center' }}>
           <span className="text-muted text-sm" style={{ display: 'block', marginBottom: 8 }}>Sin resultados</span>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setOpen(false); const q = query; setQuery(''); onCreateNew(q); }}>
             <Plus size={14} /> Crear &quot;{query}&quot;
           </button>
         </div>
       )}
       {!loading && allowCreate && onCreateNew && filteredOptions.length > 0 && (
-        <button type="button" className="combo-option combo-option-create" onClick={() => { setOpen(false); setQuery(''); onCreateNew(); }}>
+        <button type="button" className="combo-option combo-option-create" onClick={() => { setOpen(false); onCreateNew(''); }}>
           <Plus size={14} />
           <span>Crear nuevo</span>
         </button>

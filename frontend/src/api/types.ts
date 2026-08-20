@@ -185,7 +185,9 @@ export interface CrearTratamientoDTO {
   unidadID: number | null;
   fecha: string;
   tratPredID: number | null;
+  nombreTratamiento?: string | null;
   monto: number | null;
+  montoPagado?: number | null;
   tipo: string;
   tratamientoPadreID?: number | null;
   materiales?: Record<string, number>;
@@ -201,6 +203,14 @@ export interface EditarTratamientoDTO {
   operadorID: number | null;
   pacienteID: number | null;
   cantidadesMateriales: Record<string, number>;
+}
+
+export interface EditarTratamientoCabeceraDTO {
+  nombreTratamiento: string;
+  monto: number | null;
+  fecha: string;
+  operadorID: number | null;
+  pacienteID: number | null;
 }
 
 export interface DashboardKpis {

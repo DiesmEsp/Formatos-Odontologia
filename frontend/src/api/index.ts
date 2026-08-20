@@ -16,6 +16,7 @@ import type {
   DashboardKpis,
   Docente,
   EditarTratamientoDTO,
+  EditarTratamientoCabeceraDTO,
   IngresoMensual,
   MaterialCantidadDTO,
   Materiales,
@@ -125,6 +126,7 @@ export const api = {
       fecha: string;
       tratPredID: number | null;
       monto: number | null;
+      montoPagado?: number | null;
       tipo: string;
       materiales: Record<string, number>;
     }) => request<{ id: number }>('/api/tratamientos/cerrado', {
@@ -168,7 +170,7 @@ export const api = {
     eliminarPago: (pagoID: number) => request<void>(`/api/tratamientos/pagos/${pagoID}`, {
       method: 'DELETE',
     }),
-    editarEnCurso: (id: number, dto: { monto?: number | null; fecha?: string; nombreTratamiento?: string; operadorID?: number | null; pacienteID?: number | null }) =>
+    editarEnCurso: (id: number, dto: EditarTratamientoCabeceraDTO) =>
       request<{ ok: boolean }>(`/api/tratamientos/${id}`, {
         method: 'PUT',
         body: JSON.stringify(dto),

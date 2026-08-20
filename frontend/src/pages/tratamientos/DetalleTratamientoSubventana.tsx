@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus, GitBranch } from 'lucide-react';
+import { X, DollarSign, RotateCcw, AlertTriangle, ArrowLeftRight, Plus, GitBranch, Pencil } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { useToast } from '../../hooks/useToast';
 import { api } from '../../api';
@@ -9,6 +9,7 @@ import { MaterialTable, type MaterialRow } from '../../components/MaterialTable'
 import { RegistrarPagoModal } from '../../components/RegistrarPagoModal';
 import { RegistrarAvanceModal } from '../../components/RegistrarAvanceModal';
 import { CrearTratamientoModal } from './CrearTratamientoModal';
+import { EditarTratamientoModal } from './EditarTratamientoModal';
 import { formatMonto } from '../../lib/format';
 import type { Tratamiento, Pago, TratamientoAvance, ConsolidadoTratamiento, Unidad } from '../../api/types';
 
@@ -22,6 +23,7 @@ export function DetalleTratamientoSubventana({
   const [showCrearContinuo, setShowCrearContinuo] = useState(false);
   const [showAnular, setShowAnular] = useState(false);
   const [showCambiarTipo, setShowCambiarTipo] = useState(false);
+  const [showEditar, setShowEditar] = useState(false);
   const [showAnularAvance, setShowAnularAvance] = useState<TratamientoAvance | null>(null);
   const [terminandoAvance, setTerminandoAvance] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -222,6 +224,11 @@ export function DetalleTratamientoSubventana({
             <div><h3 className="dialog-title">Detalle de Tratamiento #{tratamiento.tratamientoID}</h3></div>
             <div className="flex flex-center gap-8">
               <Badge variant={getEstadoVariant(tratamiento.estado)}>{tratamiento.estado}</Badge>
+              {tratamiento.estado !== 'ANULADO' && (
+                <button className="btn btn-secondary btn-sm" onClick={() => setShowEditar(true)} title="Editar tratamiento">
+                  <Pencil size={14} /> Editar
+                </button>
+              )}
               <button className="btn btn-ghost btn-sm" onClick={handleClose}><X size={18} /></button>
             </div>
           </div>
@@ -351,6 +358,14 @@ export function DetalleTratamientoSubventana({
           tratamientoPadre={tratamiento}
           onClose={() => setShowCrearContinuo(false)}
           onSuccess={() => { setShowCrearContinuo(false); cargarDatos(); }}
+          addToast={addToast}
+        />
+      )}
+      {showEditar && (
+        <EditarTratamientoModal
+          tratamiento={tratamiento}
+          onClose={() => setShowEditar(false)}
+          onSuccess={async () => { setShowEditar(false); await cargarDatos(); }}
           addToast={addToast}
         />
       )}

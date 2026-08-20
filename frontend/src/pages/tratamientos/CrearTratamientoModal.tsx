@@ -14,10 +14,11 @@ import type { Tratamiento, Unidad } from '../../api/types';
 type TipoTratamiento = 'NORMAL' | 'CONTINUO' | 'AVANCE';
 
 export function CrearTratamientoModal({
-  unidad, unidadesList, tratamientoPadre, onClose, onSuccess, addToast,
+  unidad, unidadesList, unidadesOcupadas, tratamientoPadre, onClose, onSuccess, addToast,
 }: {
   unidad: Unidad | null;
   unidadesList: Unidad[];
+  unidadesOcupadas?: number[];
   tratamientoPadre?: Tratamiento | null;
   onClose: () => void;
   onSuccess: () => void;
@@ -27,6 +28,7 @@ export function CrearTratamientoModal({
   const [pacienteId, setPacienteId] = useState<number | null>(tratamientoPadre?.pacienteID ?? null);
   const [operadorId, setOperadorId] = useState<number | null>(tratamientoPadre?.operadorID ?? null);
   const [tratPredId, setTratPredId] = useState<number | null>(null);
+  const [nombreTratamiento, setNombreTratamiento] = useState<string>('');
   const [unidadId, setUnidadId] = useState<number | null>(unidad?.unidadID ?? tratamientoPadre?.unidadID ?? null);
   const [montoStr, setMontoStr] = useState<string>('');
   const [pagoStr, setPagoStr] = useState<string>('');
@@ -61,6 +63,10 @@ export function CrearTratamientoModal({
       extra: `${t.estado} · S/ ${(t.monto - t.montoPagado).toFixed(2)}`,
     }));
 
+  const unidadesLibres = (unidadesOcupadas?.length ?? 0) > 0
+    ? unidadesList.filter((u) => !unidadesOcupadas!.includes(u.unidadID))
+    : unidadesList;
+
   const handlePacienteChange = (id: number | null) => {
     setPacienteId(id);
   };
@@ -68,6 +74,7 @@ export function CrearTratamientoModal({
   const handleTratChange = async (id: number | null) => {
     setTratPredId(id);
     if (id) {
+      setNombreTratamiento('');
       const tp = tratsPred.data?.find((t) => t.tratPredID === id);
       if (tp?.montoSugerido != null && tipo !== 'CONTINUO') setMontoStr(String(tp.montoSugerido));
       try {
@@ -88,6 +95,13 @@ export function CrearTratamientoModal({
       setMaterialRows([]);
       materialRowsRef.current = [];
     }
+  };
+
+  const handleCrearTratamientoLibre = (query: string) => {
+    setTratPredId(null);
+    setNombreTratamiento(query.trim());
+    setMaterialRows([]);
+    materialRowsRef.current = [];
   };
 
   const handleAvanceTratChange = async (id: number | null) => {
@@ -188,11 +202,16 @@ export function CrearTratamientoModal({
     }
     if (!operadorId || !pacienteId) { addToast('error', 'Seleccione paciente y operador'); return; }
     const montoVal = montoStr === '' ? null : Number(montoStr);
+    const nombreTrim = nombreTratamiento.trim();
     setSaving(true);
     try {
       await api.tratamientos.crear({
         operadorID: operadorId, pacienteID: pacienteId, unidadID: unidadId, fecha,
-        tratPredID: tratPredId, monto: tipo === 'CONTINUO' ? null : montoVal, tipo,
+        tratPredID: tratPredId,
+        nombreTratamiento: tratPredId == null ? (nombreTrim || null) : null,
+        monto: tipo === 'CONTINUO' ? null : montoVal,
+        montoPagado: tipo === 'CONTINUO' ? null : (pagoStr === '' ? 0 : Number(pagoStr)),
+        tipo,
         tratamientoPadreID: tratamientoPadre?.tratamientoID ?? null,
         materiales: Object.keys(buildMaterialesMap()).length > 0 ? buildMaterialesMap() : undefined,
       });
@@ -320,7 +339,7 @@ export function CrearTratamientoModal({
                     <label className="form-label">Unidad (opcional)</label>
                     <select className="combo-box w-full" value={unidadId ?? ''} onChange={(e) => setUnidadId(e.target.value === '' ? null : Number(e.target.value))}>
                       <option value="">Sin unidad</option>
-                      {unidadesList.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
+                      {unidadesLibres.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
                     </select>
                   </div>
                 )}
@@ -334,7 +353,7 @@ export function CrearTratamientoModal({
                     <label className="form-label">Unidad (opcional)</label>
                     <select className="combo-box w-full" value={unidadId ?? ''} onChange={(e) => setUnidadId(e.target.value === '' ? null : Number(e.target.value))}>
                       <option value="">Sin unidad</option>
-                      {unidadesList.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
+                      {unidadesLibres.map((u) => <option key={u.unidadID} value={u.unidadID}>Unidad {u.unidadNro}</option>)}
                     </select>
                   </div>
                 )}
@@ -352,7 +371,21 @@ export function CrearTratamientoModal({
                   <button className="btn btn-ghost btn-sm btn-inline-add" onClick={() => setShowNewOperador(true)}>+ Nuevo operador</button>
                 </div>
 
-                <div className="form-group"><label className="form-label">Tipo de tratamiento</label><SearchableCombo options={tOptions} value={tratPredId} onChange={handleTratChange} onSearch={setQTrat} placeholder="Buscar tratamiento..." /></div>
+                <div className="form-group">
+                  <label className="form-label">Tipo de tratamiento</label>
+                  <SearchableCombo
+                    options={tOptions}
+                    value={tratPredId}
+                    onChange={handleTratChange}
+                    onSearch={setQTrat}
+                    onCreateNew={handleCrearTratamientoLibre}
+                    allowCreate
+                    placeholder={nombreTratamiento ? `Tratamiento libre: ${nombreTratamiento}` : 'Buscar o escribir tratamiento...'}
+                  />
+                  {nombreTratamiento && tratPredId == null && (
+                    <span className="text-muted text-sm">Usando nombre libre. Si elige un predefinido se sobrescribirá.</span>
+                  )}
+                </div>
 
                 <div className="form-group">
                   <label className="form-label">Monto total</label>

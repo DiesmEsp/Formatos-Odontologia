@@ -95,4 +95,16 @@ describe('SearchableCombo', () => {
     fireEvent.change(input, { target: { value: 'Nuevo' } });
     expect(screen.getByText('Crear "Nuevo"')).toBeInTheDocument();
   });
+
+  it('pasa el query a onCreateNew al hacer clic en crear', () => {
+    const onCreateNew = vi.fn();
+    render(
+      <SearchableCombo options={[]} value={null} onChange={vi.fn()} allowCreate onCreateNew={onCreateNew} />
+    );
+    fireEvent.click(document.querySelector('.search-box')!);
+    const input = document.querySelector('.search-box-input')!;
+    fireEvent.change(input, { target: { value: 'Mi tratamiento' } });
+    fireEvent.click(screen.getByText('Crear "Mi tratamiento"'));
+    expect(onCreateNew).toHaveBeenCalledWith('Mi tratamiento');
+  });
 });

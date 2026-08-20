@@ -23,6 +23,12 @@ export default function Tratamientos() {
   const tratamientosActivos = tratamientos.data ?? [];
   const unidadesList = unidades.data ?? [];
 
+  const unidadesOcupadas = Array.from(new Set(
+    tratamientosActivos
+      .filter((t) => t.estado !== 'CERRADO' && t.estado !== 'ANULADO' && t.unidadID != null)
+      .map((t) => t.unidadID as number),
+  ));
+
   const operadorNombreMap = new Map((operadores.data ?? []).map((o) => [o.operadorID, nombreCompleto(o.nombres, o.apellidos)]));
   const pacienteNombreMap = new Map((pacientes.data ?? []).map((p) => [p.pacienteID, nombreCompleto(p.nombres, p.apellidos)]));
 
@@ -71,6 +77,7 @@ export default function Tratamientos() {
         <CrearTratamientoModal
           unidad={crearUnidad}
           unidadesList={unidadesList}
+          unidadesOcupadas={unidadesOcupadas}
           onClose={() => setCrearUnidad(null)}
           onSuccess={() => { setCrearUnidad(null); tratamientos.refetch(); operadores.refetch(); pacientes.refetch(); }}
           addToast={addToast}
@@ -81,6 +88,7 @@ export default function Tratamientos() {
         <CrearTratamientoModal
           unidad={null}
           unidadesList={unidadesList}
+          unidadesOcupadas={unidadesOcupadas}
           onClose={() => setCrearManual(false)}
           onSuccess={() => { setCrearManual(false); tratamientos.refetch(); operadores.refetch(); pacientes.refetch(); }}
           addToast={addToast}
