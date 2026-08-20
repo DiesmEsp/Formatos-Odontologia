@@ -180,7 +180,6 @@ export function CrearTratamientoModal({
     handleNumericKeyDown(e);
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (montoStr === '' || montoStr.trim() === '') setMontoStr('0');
       (e.target as HTMLInputElement).blur();
     }
   };

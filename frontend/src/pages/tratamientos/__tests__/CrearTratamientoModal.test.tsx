@@ -97,4 +97,13 @@ describe('CrearTratamientoModal', () => {
     expect(opciones).toContain('Unidad 1');
     expect(opciones).toContain('Unidad 2');
   });
+
+  it('no fuerza 0 cuando el monto queda vacio al presionar Enter', () => {
+    renderModal();
+    const montoInput = screen.getAllByPlaceholderText('0.00')[0] as HTMLInputElement;
+    fireEvent.change(montoInput, { target: { value: '5' } });
+    fireEvent.change(montoInput, { target: { value: '' } });
+    fireEvent.keyDown(montoInput, { key: 'Enter' });
+    expect(montoInput.value).toBe('');
+  });
 });
