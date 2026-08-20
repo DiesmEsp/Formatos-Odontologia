@@ -84,7 +84,7 @@ export function CatalogoModal({
         </div>
         <form onSubmit={handleSubmit}>
           <div className="dialog-body">
-            <div style={{ maxHeight: '40vh', overflowY: 'auto', marginBottom: children ? 8 : 0 }}>
+            <div style={{ marginBottom: children ? 8 : 0 }}>
               {fields.map((f) => (
                 <div key={f.key} className="form-group" style={{ marginBottom: 14 }}>
                   <label className="form-label">{f.label}</label>
