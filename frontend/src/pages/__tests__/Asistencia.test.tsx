@@ -52,4 +52,12 @@ describe('Asistencia', () => {
     expect(screen.getByText('Docentes registrados')).toBeInTheDocument();
     expect(screen.getByText('Búsqueda manual')).toBeInTheDocument();
   });
+
+  it('muestra los botones de lista predeterminada sin asistencia abierta', () => {
+    renderAsistencia();
+    const restaurar = screen.getByRole('button', { name: 'Restaurar lista predeterminada' });
+    expect(restaurar).toBeInTheDocument();
+    expect(restaurar).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Editar lista predeterminada' })).toBeEnabled();
+  });
 });

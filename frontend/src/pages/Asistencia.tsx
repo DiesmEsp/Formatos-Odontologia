@@ -434,8 +434,12 @@ export default function Asistencia() {
       </div>
 
       <div className="card mb-20">
-        <div className="card-header">
+        <div className="card-header flex flex-center flex-between">
           <h3 className="card-title">Búsqueda manual</h3>
+          <div className="flex flex-center gap-8">
+            <button className="btn btn-ghost btn-sm" onClick={handleRestaurarDefault} disabled={!asistencia} title={!asistencia ? 'Abra una asistencia para restaurar su lista de materiales' : undefined}>Restaurar lista predeterminada</button>
+            <button className="btn btn-ghost btn-sm" onClick={openEditDefaults}>Editar lista predeterminada</button>
+          </div>
         </div>
         <div className="flex flex-center items-end flex-wrap gap-12">
           <div className="flex-1 mw-400">
@@ -577,8 +581,6 @@ export default function Asistencia() {
                   {savingMat ? 'Guardando...' : 'Guardar materiales'}
                 </button>
               )}
-              <button className="btn btn-ghost btn-sm" onClick={handleRestaurarDefault}>Restaurar lista predeterminada</button>
-              <button className="btn btn-ghost btn-sm" onClick={openEditDefaults}>Editar lista predeterminada</button>
               <button className="btn btn-danger btn-sm" onClick={() => setShowAnular(true)}>Anular asistencia</button>
             </div>
           </div>
