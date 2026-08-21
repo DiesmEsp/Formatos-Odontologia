@@ -103,6 +103,7 @@ public class Main {
         new ReporteController().register(app);
         new DashboardController().register(app);
         new UnidadController().register(app);
+        new ConsumoController().register(app);
 
         app.events(event -> {
             event.serverStarted(() ->
