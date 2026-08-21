@@ -39,7 +39,7 @@ describe('Sidebar', () => {
   it('los links son NavLink con clase sidebar-link', () => {
     renderSidebar();
     const links = document.querySelectorAll('.sidebar-link');
-    expect(links).toHaveLength(8);
+    expect(links).toHaveLength(9);
   });
 
   it('el link activo tiene clase active', () => {

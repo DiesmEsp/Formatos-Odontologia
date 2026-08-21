@@ -14,6 +14,8 @@ import type {
   CrearTratamientoPredDTO,
   ConsolidadoTratamiento,
   AvanceDetalle,
+  ConsumoMaterial,
+  CrearConsumoDTO,
   DashboardKpis,
   Docente,
   EditarTratamientoDTO,
@@ -306,6 +308,19 @@ export const api = {
     tratamientosEstado: () => request<TratamientoEstado[]>('/api/dashboard/tratamientos-estado'),
     topMateriales: () => request<TopMaterial[]>('/api/dashboard/top-materiales'),
     asistenciaHoy: () => request<AsistenciaHoy[]>('/api/dashboard/asistencia-hoy'),
+  },
+
+  consumos: {
+    listar: (anio: number, mes: number) => request<ConsumoMaterial[]>(`/api/consumos?anio=${anio}&mes=${mes}`),
+    crearLote: (items: CrearConsumoDTO[]) => request<{ ids: number[] }>('/api/consumos', {
+      method: 'POST',
+      body: JSON.stringify({ items }),
+    }),
+    actualizar: (id: number, data: CrearConsumoDTO) => request<{ ok: boolean }>(`/api/consumos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    eliminar: (id: number) => request<void>(`/api/consumos/${id}`, { method: 'DELETE' }),
   },
 
   reportes: {

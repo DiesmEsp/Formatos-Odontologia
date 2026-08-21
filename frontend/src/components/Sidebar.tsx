@@ -8,6 +8,7 @@ import {
   Monitor,
   CircleDollarSign,
   Building2,
+  PackageOpen,
 } from 'lucide-react';
 import { ToothMark } from './ToothMark';
 import { nombreClinicaSesion } from '../lib/clinicaStore';
@@ -20,6 +21,7 @@ const ATENCION_ITEMS = [
 
 const GESTION_ITEMS = [
   { to: '/catalogos', icon: Archive, label: 'Catalogos' },
+  { to: '/consumos', icon: PackageOpen, label: 'Materiales Consumidos' },
   { to: '/pagos', icon: CircleDollarSign, label: 'Pagos' },
   { to: '/reportes', icon: FileSpreadsheet, label: 'Reportes' },
   { to: '/unidades', icon: Monitor, label: 'Unidades' },

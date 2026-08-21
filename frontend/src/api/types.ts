@@ -320,6 +320,22 @@ export interface MaterialesRegistrarDTO {
   materiales: Record<string, number>;
 }
 
+export interface ConsumoMaterial {
+  consumoID: number;
+  fecha: string;
+  materialID: number;
+  nombreMaterial: string;
+  unidad: string;
+  cantidad: number;
+}
+
+export interface CrearConsumoDTO {
+  fecha: string;
+  materialId: number;
+  cantidad: number;
+}
+
+
 export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';

@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Tratamientos from './pages/Tratamientos';
 import Asistencia from './pages/Asistencia';
 import Catalogos from './pages/Catalogos';
+import Consumos from './pages/Consumos';
 import Reportes from './pages/Reportes';
 import Unidades from './pages/Unidades';
 import Pagos from './pages/Pagos';
@@ -28,6 +29,7 @@ function AppContent() {
           <Route path="/tratamientos" element={<Tratamientos />} />
           <Route path="/asistencia" element={<Asistencia />} />
           <Route path="/catalogos" element={<Catalogos />} />
+          <Route path="/consumos" element={<Consumos />} />
           <Route path="/reportes" element={<Reportes />} />
           <Route path="/unidades" element={<Unidades />} />
           <Route path="/pagos" element={<Pagos />} />
