@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { SearchableCombo, type SearchableOption } from './SearchableCombo';
 import type { Materiales } from '../api/types';
@@ -38,6 +38,22 @@ export function MaterialTable({
   readOnly = false,
 }: MaterialTableProps) {
   const displayValues = useRef<Record<string, string>>({});
+  const cantidadRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const prevMaterialIds = useRef<Record<string, number | null> | null>(null);
+
+  useEffect(() => {
+    if (prevMaterialIds.current !== null) {
+      for (const row of rows) {
+        const prev = prevMaterialIds.current[row.key];
+        if ((prev === null || prev === undefined) && typeof row.materialId === 'number') {
+          const input = cantidadRefs.current[row.key];
+          input?.focus();
+          input?.select();
+        }
+      }
+    }
+    prevMaterialIds.current = Object.fromEntries(rows.map((r) => [r.key, r.materialId]));
+  }, [rows]);
 
   const getDisplay = useCallback((key: string, cantidad: number): string => {
     if (key in displayValues.current) return displayValues.current[key];
@@ -120,6 +136,7 @@ export function MaterialTable({
             type="text"
             inputMode="decimal"
             className="text-field material-row-input"
+            ref={(el) => { cantidadRefs.current[row.key] = el; }}
             value={getDisplay(row.key, row.cantidad)}
             onChange={(e) => handleInputChange(row.key, e.target.value)}
             onBlur={(e) => handleInputBlur(row.key, e.target.value)}

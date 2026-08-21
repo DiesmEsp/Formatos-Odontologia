@@ -84,4 +84,33 @@ describe('MaterialTable', () => {
     );
     expect(screen.getByText('Sin materiales registrados')).toBeInTheDocument();
   });
+
+  it('enfoca el input de cantidad al seleccionar material', () => {
+    const rows: MaterialRow[] = [{ key: '1', materialId: null, nombreMaterial: '', cantidad: 0 }];
+    const { rerender } = render(
+      <MaterialTable
+        rows={rows} materials={materialesMock}
+        onAdd={vi.fn()} onRemove={vi.fn()} onMaterialChange={vi.fn()} onCantidadChange={vi.fn()}
+      />
+    );
+    rerender(
+      <MaterialTable
+        rows={[{ key: '1', materialId: 1, nombreMaterial: 'Guantes', cantidad: 0 }]} materials={materialesMock}
+        onAdd={vi.fn()} onRemove={vi.fn()} onMaterialChange={vi.fn()} onCantidadChange={vi.fn()}
+      />
+    );
+    const inputs = document.querySelectorAll('.material-row-input');
+    expect(inputs[0]).toBe(document.activeElement);
+  });
+
+  it('no enfoca cantidad al montar con materiales ya asignados', () => {
+    render(
+      <MaterialTable
+        rows={rowsMock} materials={materialesMock}
+        onAdd={vi.fn()} onRemove={vi.fn()} onMaterialChange={vi.fn()} onCantidadChange={vi.fn()}
+      />
+    );
+    const inputs = document.querySelectorAll('.material-row-input');
+    expect(inputs[0]).not.toBe(document.activeElement);
+  });
 });
