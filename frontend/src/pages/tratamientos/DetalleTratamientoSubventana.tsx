@@ -6,6 +6,7 @@ import { api } from '../../api';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { Badge } from '../../components/Badge';
 import { MaterialTable, type MaterialRow } from '../../components/MaterialTable';
+import { AvanceExpandible } from '../../components/AvanceExpandible';
 import { RegistrarPagoModal } from '../../components/RegistrarPagoModal';
 import { RegistrarAvanceModal } from '../../components/RegistrarAvanceModal';
 import { CrearTratamientoModal } from './CrearTratamientoModal';
@@ -263,18 +264,18 @@ export function DetalleTratamientoSubventana({
                 <h4 className="mb-12">Avances</h4>
                 <ul className="material-list">
                   {avances.map((a) => (
-                    <li key={a.avanceID} className="material-list-item">
-                      <span className="material-list-name">Avance #{a.numero} - {a.fecha}</span>
-                      <Badge variant={a.estado === 'ANULADO' ? 'danger' : a.estado === 'TERMINADO' ? 'success' : 'info'}>{a.estado}</Badge>
-                      {a.estado === 'ACTIVO' && (
+                    <AvanceExpandible
+                      key={a.avanceID}
+                      avance={a}
+                      acciones={a.estado === 'ACTIVO' ? (
                         <>
                           <button className="btn btn-ghost btn-sm" onClick={() => handleTerminarAvance(a.avanceID)} disabled={terminandoAvance === a.avanceID} title="Terminar avance">
                             <RotateCcw size={14} />
                           </button>
                           <button className="btn btn-ghost btn-sm" onClick={() => setShowAnularAvance(a)}><AlertTriangle size={14} /></button>
                         </>
-                      )}
-                    </li>
+                      ) : undefined}
+                    />
                   ))}
                 </ul>
               </div>

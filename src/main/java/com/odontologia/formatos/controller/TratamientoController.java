@@ -145,6 +145,15 @@ public class TratamientoController {
             }
         });
 
+        app.get("/api/tratamientos/avances/{avanceID}", ctx -> {
+            int avanceID = ControllerUtil.parseIdPathParam(ctx, "avanceID");
+            try {
+                ctx.json(service.avanceDetalle(avanceID));
+            } catch (NegocioException e) {
+                ctx.status(400).json(Map.of("error", e.getMessage()));
+            }
+        });
+
         app.post("/api/tratamientos/avances/{avanceID}/anular", ctx -> {
             int avanceID = ControllerUtil.parseIdPathParam(ctx, "avanceID");
             var body = ctx.bodyAsClass(Map.class);

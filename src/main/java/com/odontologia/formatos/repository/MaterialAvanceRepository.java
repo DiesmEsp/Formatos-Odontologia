@@ -90,6 +90,29 @@ public class MaterialAvanceRepository {
         return lista;
     }
 
+    public List<MaterialConsolidado> findByAvanceConNombre(int avanceID) throws SQLException {
+        List<MaterialConsolidado> lista = new ArrayList<>();
+        String sql = "SELECT m.MaterialID, m.Nombre, m.Unidad, mla.Cantidad AS Cantidad "
+                + "FROM Materiales_List_Avance mla "
+                + "JOIN Materiales m ON m.MaterialID = mla.MaterialID "
+                + "WHERE mla.AvanceID = ? "
+                + "ORDER BY mla.MaterialesListAvanceID";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, avanceID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new MaterialConsolidado(
+                            rs.getInt("MaterialID"),
+                            rs.getString("Nombre"),
+                            rs.getString("Unidad"),
+                            rs.getDouble("Cantidad")));
+                }
+            }
+        }
+        return lista;
+    }
+
     public static class MaterialConsolidado {
         private final int materialID;
         private final String nombreMaterial;

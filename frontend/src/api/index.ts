@@ -13,6 +13,7 @@ import type {
   CrearTratamientoDTO,
   CrearTratamientoPredDTO,
   ConsolidadoTratamiento,
+  AvanceDetalle,
   DashboardKpis,
   Docente,
   EditarTratamientoDTO,
@@ -154,6 +155,7 @@ export const api = {
     }),
     pagos: (id: number) => request<Pago[]>(`/api/tratamientos/${id}/pagos`),
     avances: (id: number) => request<TratamientoAvance[]>(`/api/tratamientos/${id}/avances`),
+    avanceDetalle: (avanceID: number) => request<AvanceDetalle>(`/api/tratamientos/avances/${avanceID}`),
     anularAvance: (avanceID: number, motivo: string) => request<{ ok: boolean }>(`/api/tratamientos/avances/${avanceID}/anular`, {
       method: 'POST',
       body: JSON.stringify({ motivo }),

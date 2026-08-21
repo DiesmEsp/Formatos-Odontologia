@@ -122,6 +122,21 @@ public class PagoRepository {
         return lista;
     }
 
+    public List<Pago> findByAvanceID(int avanceID) throws SQLException {
+        List<Pago> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Pago WHERE AvanceID = ? ORDER BY Fecha, PagoID";
+        try (Connection con = ConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, avanceID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rowToModel(rs));
+                }
+            }
+        }
+        return lista;
+    }
+
     public double sumByTratamiento(int tratamientoID) throws SQLException {
         return sumByTratamiento(null, tratamientoID);
     }

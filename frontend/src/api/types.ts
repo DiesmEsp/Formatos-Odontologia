@@ -108,6 +108,12 @@ export interface ConsolidadoTratamiento {
   pagos: Pago[];
 }
 
+export interface AvanceDetalle {
+  avance: TratamientoAvance;
+  materiales: MaterialConsolidado[];
+  pagos: Pago[];
+}
+
 export interface Pago {
   pagoID: number;
   tratamientoID: number;

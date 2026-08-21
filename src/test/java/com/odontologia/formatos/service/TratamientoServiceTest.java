@@ -697,6 +697,48 @@ class TratamientoServiceTest extends BaseRepositoryTest {
     }
 
     @Test
+    void avanceDetalleRetornaMaterialesYPagos() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        int mat1 = crearMaterial("Resina", "unidad");
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(mat1, 2.0);
+        int avanceID = service.agregarAvance(padre, "2026-08-04", null, materiales, 40.0);
+
+        TratamientoService.AvanceDetalleDto dto = service.avanceDetalle(avanceID);
+        assertEquals(avanceID, dto.avance.getAvanceID());
+        assertEquals("2026-08-04", dto.avance.getFecha());
+        assertEquals(1, dto.materiales.size());
+        assertEquals("Resina", dto.materiales.get(0).getNombreMaterial());
+        assertEquals(2.0, dto.materiales.get(0).getCantidad(), 0.001);
+        assertEquals("unidad", dto.materiales.get(0).getUnidad());
+        assertEquals(1, dto.pagos.size());
+        assertEquals(40.0, dto.pagos.get(0).getMonto(), 0.001);
+        assertEquals(avanceID, (int) dto.pagos.get(0).getAvanceID());
+    }
+
+    @Test
+    void avanceDetalleDeAnuladoListaMaterialesSinPagos() throws SQLException {
+        int padre = service.crear(operadorID, pacienteID, 1, "2026-08-03", null, 100.0, "NORMAL");
+        int mat1 = crearMaterial("Resina", "unidad");
+
+        Map<Integer, Double> materiales = new HashMap<>();
+        materiales.put(mat1, 2.0);
+        int avanceID = service.agregarAvance(padre, "2026-08-04", null, materiales, 40.0);
+        service.anularAvance(avanceID, "prueba");
+
+        TratamientoService.AvanceDetalleDto dto = service.avanceDetalle(avanceID);
+        assertEquals("ANULADO", dto.avance.getEstado());
+        assertEquals(1, dto.materiales.size());
+        assertEquals(0, dto.pagos.size());
+    }
+
+    @Test
+    void avanceDetalleInexistenteArrojaError() {
+        assertThrows(NegocioException.class, () -> service.avanceDetalle(9999));
+    }
+
+    @Test
     void consolidadoIncluyeBaseYSesiones() throws SQLException {
         int mat1 = crearMaterial("Resina", "unidad");
         Map<Integer, Double> base = new HashMap<>();

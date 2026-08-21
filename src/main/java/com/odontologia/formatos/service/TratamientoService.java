@@ -458,6 +458,18 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
         return dto;
     }
 
+    public AvanceDetalleDto avanceDetalle(int avanceID) throws SQLException {
+        TratamientoAvance avance = avanceRepository.findById(avanceID);
+        if (avance == null) {
+            throw new NegocioException("El avance no existe.");
+        }
+        AvanceDetalleDto dto = new AvanceDetalleDto();
+        dto.avance = avance;
+        dto.materiales = materialAvanceRepository.findByAvanceConNombre(avanceID);
+        dto.pagos = pagoRepository.findByAvanceID(avanceID);
+        return dto;
+    }
+
     public void agregarMaterial(int tratamientoID, int materialID, double cantidad) throws SQLException {
         if (cantidad <= 0) {
             throw new NegocioException("La cantidad del material debe ser mayor a 0.");
@@ -976,6 +988,12 @@ public int crear(int operadorID, int pacienteID, Integer unidadID, String fecha,
 
     public static class ConsolidadoDto {
         public Tratamiento tratamiento;
+        public List<MaterialAvanceRepository.MaterialConsolidado> materiales;
+        public List<Pago> pagos;
+    }
+
+    public static class AvanceDetalleDto {
+        public TratamientoAvance avance;
         public List<MaterialAvanceRepository.MaterialConsolidado> materiales;
         public List<Pago> pagos;
     }
