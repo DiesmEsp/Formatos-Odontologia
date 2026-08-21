@@ -1,19 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
+import { useModalDraft } from '../../hooks/useModalDraft';
 import { api } from '../../api';
 
 const TIPOS_PRE = ['3', '4', '5'];
 const TIPOS_POS = ['R1', 'R2', 'R3'];
 
+interface OperadorDraft {
+  nombres: string;
+  apellidos: string;
+  dni: string;
+  grado: string;
+  tipoOp: string;
+  periodo: number;
+}
+
 export function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClose: () => void; onCreated: (id: number) => void; addToast: ReturnType<typeof useToast>['addToast'] }) {
-  const [nombres, setNombres] = useState('');
-  const [apellidos, setApellidos] = useState('');
-  const [dni, setDni] = useState('');
-  const [grado, setGrado] = useState('PRE');
-  const [tipoOp, setTipoOp] = useState('3');
-  const [periodo, setPeriodo] = useState(new Date().getFullYear());
+  const { draft, saveDraft, clearDraft } = useModalDraft<OperadorDraft>('crear-operador');
+  const [nombres, setNombres] = useState(draft?.nombres ?? '');
+  const [apellidos, setApellidos] = useState(draft?.apellidos ?? '');
+  const [dni, setDni] = useState(draft?.dni ?? '');
+  const [grado, setGrado] = useState(draft?.grado ?? 'PRE');
+  const [tipoOp, setTipoOp] = useState(draft?.tipoOp ?? '3');
+  const [periodo, setPeriodo] = useState(draft?.periodo ?? new Date().getFullYear());
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    saveDraft({ nombres, apellidos, dni, grado, tipoOp, periodo });
+  }, [nombres, apellidos, dni, grado, tipoOp, periodo, saveDraft]);
 
   const tipos = grado === 'PRE' ? TIPOS_PRE : TIPOS_POS;
 
@@ -25,6 +40,7 @@ export function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClos
     try {
       const result = await api.catalogos.operadores.crear({ nombres: nombres.trim(), apellidos: apellidos.trim(), dni: dni.trim() || undefined, grado, tipo: tipoOp, periodo });
       addToast('success', 'Operador creado');
+      clearDraft();
       onCreated(result.id);
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al crear'); }
     finally { setSaving(false); }
@@ -33,7 +49,7 @@ export function CrearOperadorOnTheFly({ onClose, onCreated, addToast }: { onClos
   return (
     <div className="dialog-overlay overlay-top" onClick={onClose}>
       <div className="dialog-pane mw-460" onClick={(e) => e.stopPropagation()}>
-        <div className="dialog-header"><h3 className="dialog-title">Nuevo Operador</h3><button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button></div>
+        <div className="dialog-header"><h3 className="dialog-title">Nuevo Operador</h3><button className="btn btn-ghost btn-sm" onClick={() => { clearDraft(); onClose(); }}><X size={18} /></button></div>
         <div className="dialog-body">
           <div className="form-row">
             <div className="form-group"><label className="form-label">Nombres</label><input className="text-field w-full" value={nombres} onChange={(e) => setNombres(e.target.value)} /></div>

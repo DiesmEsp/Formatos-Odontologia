@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, GitBranch } from 'lucide-react';
 import { useApi } from '../../hooks/useApi';
 import { useToast } from '../../hooks/useToast';
+import { useModalDraft } from '../../hooks/useModalDraft';
 import { api } from '../../api';
 import { SearchableCombo, type SearchableOption } from '../../components/SearchableCombo';
 import { MaterialTable, type MaterialRow } from '../../components/MaterialTable';
@@ -12,6 +13,20 @@ import { hoyISO, nombreCompleto, formatMonto } from '../../lib/format';
 import type { Tratamiento, Unidad } from '../../api/types';
 
 type TipoTratamiento = 'NORMAL' | 'CONTINUO' | 'AVANCE';
+
+interface TratamientoDraft {
+  fecha: string;
+  pacienteId: number | null;
+  operadorId: number | null;
+  tratPredId: number | null;
+  nombreTratamiento: string;
+  unidadId: number | null;
+  montoStr: string;
+  pagoStr: string;
+  tipo: TipoTratamiento;
+  avanceTratamiento: Tratamiento | null;
+  materialRows: MaterialRow[];
+}
 
 export function CrearTratamientoModal({
   unidad, unidadesList, unidadesOcupadas, tratamientoPadre, onClose, onSuccess, addToast,
@@ -24,16 +39,21 @@ export function CrearTratamientoModal({
   onSuccess: () => void;
   addToast: ReturnType<typeof useToast>['addToast'];
 }) {
-  const [fecha, setFecha] = useState(hoyISO());
-  const [pacienteId, setPacienteId] = useState<number | null>(tratamientoPadre?.pacienteID ?? null);
-  const [operadorId, setOperadorId] = useState<number | null>(tratamientoPadre?.operadorID ?? null);
-  const [tratPredId, setTratPredId] = useState<number | null>(null);
-  const [nombreTratamiento, setNombreTratamiento] = useState<string>('');
-  const [unidadId, setUnidadId] = useState<number | null>(unidad?.unidadID ?? tratamientoPadre?.unidadID ?? null);
-  const [montoStr, setMontoStr] = useState<string>('');
-  const [pagoStr, setPagoStr] = useState<string>('');
-  const [tipo, setTipo] = useState<TipoTratamiento>(tratamientoPadre ? 'CONTINUO' : 'NORMAL');
-  const [avanceTratamiento, setAvanceTratamiento] = useState<Tratamiento | null>(null);
+  const draftKey = tratamientoPadre
+    ? `trat-padre-${tratamientoPadre.tratamientoID}`
+    : unidad ? `trat-unidad-${unidad.unidadID}` : 'trat-manual';
+  const { draft, saveDraft, clearDraft } = useModalDraft<TratamientoDraft>(draftKey);
+
+  const [fecha, setFecha] = useState(draft?.fecha ?? hoyISO());
+  const [pacienteId, setPacienteId] = useState<number | null>(draft?.pacienteId ?? tratamientoPadre?.pacienteID ?? null);
+  const [operadorId, setOperadorId] = useState<number | null>(draft?.operadorId ?? tratamientoPadre?.operadorID ?? null);
+  const [tratPredId, setTratPredId] = useState<number | null>(draft?.tratPredId ?? null);
+  const [nombreTratamiento, setNombreTratamiento] = useState<string>(draft?.nombreTratamiento ?? '');
+  const [unidadId, setUnidadId] = useState<number | null>(draft?.unidadId ?? unidad?.unidadID ?? tratamientoPadre?.unidadID ?? null);
+  const [montoStr, setMontoStr] = useState<string>(draft?.montoStr ?? '');
+  const [pagoStr, setPagoStr] = useState<string>(draft?.pagoStr ?? '');
+  const [tipo, setTipo] = useState<TipoTratamiento>(draft?.tipo ?? (tratamientoPadre ? 'CONTINUO' : 'NORMAL'));
+  const [avanceTratamiento, setAvanceTratamiento] = useState<Tratamiento | null>(draft?.avanceTratamiento ?? null);
   const [saving, setSaving] = useState(false);
   const [qPac, setQPac] = useState('');
   const [qOpe, setQOpe] = useState('');
@@ -41,8 +61,12 @@ export function CrearTratamientoModal({
   const [qAvance, setQAvance] = useState('');
   const [showNewPaciente, setShowNewPaciente] = useState(false);
   const [showNewOperador, setShowNewOperador] = useState(false);
-  const [materialRows, setMaterialRows] = useState<MaterialRow[]>([]);
-  const materialRowsRef = useRef<MaterialRow[]>([]);
+  const [materialRows, setMaterialRows] = useState<MaterialRow[]>(draft?.materialRows ?? []);
+  const materialRowsRef = useRef<MaterialRow[]>(draft?.materialRows ?? []);
+
+  useEffect(() => {
+    saveDraft({ fecha, pacienteId, operadorId, tratPredId, nombreTratamiento, unidadId, montoStr, pagoStr, tipo, avanceTratamiento, materialRows });
+  }, [fecha, pacienteId, operadorId, tratPredId, nombreTratamiento, unidadId, montoStr, pagoStr, tipo, avanceTratamiento, materialRows, saveDraft]);
 
   const pacientes = useApi(() => api.catalogos.pacientes.listar(qPac || undefined), [qPac]);
   const operadores = useApi(() => api.catalogos.operadores.listar(qOpe || undefined), [qOpe]);
@@ -215,6 +239,7 @@ export function CrearTratamientoModal({
         materiales: Object.keys(buildMaterialesMap()).length > 0 ? buildMaterialesMap() : undefined,
       });
       addToast('success', 'Tratamiento creado correctamente');
+      clearDraft();
       onSuccess();
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al crear tratamiento'); }
     finally { setSaving(false); }
@@ -240,6 +265,7 @@ export function CrearTratamientoModal({
         materiales: Object.keys(materialesMap).length > 0 ? materialesMap : undefined,
       });
       addToast('success', `Avance registrado sobre el tratamiento #${avanceTratamiento.tratamientoID}`);
+      clearDraft();
       onSuccess();
     } catch (err) { addToast('error', err instanceof Error ? err.message : 'Error al registrar avance'); }
     finally { setSaving(false); }
@@ -258,7 +284,7 @@ export function CrearTratamientoModal({
                 ? 'Registrar Avance sobre Tratamiento Existente'
                 : tratamientoPadre ? 'Crear Tratamiento Continuo' : 'Crear Tratamiento'}
             </h3>
-            <button className="btn btn-ghost btn-sm" onClick={onClose}><X size={18} /></button>
+            <button className="btn btn-ghost btn-sm" onClick={() => { clearDraft(); onClose(); }}><X size={18} /></button>
           </div>
           <div className="dialog-body">
             {tratamientoPadre && (

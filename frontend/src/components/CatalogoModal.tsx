@@ -23,6 +23,8 @@ interface CatalogoModalProps {
   initialValues: Record<string, any>;
   onSave: (values: Record<string, any>) => void;
   onCancel: () => void;
+  onValuesChange?: (values: Record<string, unknown>) => void;
+  onCloseExplicit?: () => void;
   saving?: boolean;
   children?: ReactNode;
   width?: number;
@@ -35,6 +37,8 @@ export function CatalogoModal({
   initialValues,
   onSave,
   onCancel,
+  onValuesChange,
+  onCloseExplicit,
   saving = false,
   children,
   width,
@@ -60,7 +64,19 @@ export function CatalogoModal({
   };
 
   const setField = (key: string, value: any) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
+    setValues((prev) => {
+      const next = { ...prev, [key]: value };
+      onValuesChange?.(next);
+      return next;
+    });
+  };
+
+  const handleExplicitClose = () => {
+    if (onCloseExplicit) {
+      onCloseExplicit();
+      return;
+    }
+    handleCancel();
   };
 
   const handleCancel = () => {
@@ -78,7 +94,7 @@ export function CatalogoModal({
       <div className="dialog-pane" role="dialog" aria-modal="true" aria-labelledby="catalogo-modal-title" onClick={(e) => e.stopPropagation()} style={{ maxWidth: width ?? 480 }}>
         <div className="dialog-header">
           <h3 className="dialog-title" id="catalogo-modal-title">{title}</h3>
-          <button className="btn btn-ghost btn-sm dialog-close" onClick={handleCancel}>
+          <button className="btn btn-ghost btn-sm dialog-close" onClick={handleExplicitClose}>
             <X size={18} />
           </button>
         </div>

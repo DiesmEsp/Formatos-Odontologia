@@ -1,12 +1,14 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useToast } from "../hooks/useToast";
+import { useModalDraft } from "../hooks/useModalDraft";
 import { api } from "../api";
 import { CatalogoTabla, type Column } from "../components/CatalogoTabla";
 import { CatalogoModal } from "../components/CatalogoModal";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { RegistrarPagoModal } from "../components/RegistrarPagoModal";
 import { Badge } from "../components/Badge";
+import { AvanceExpandible } from "../components/AvanceExpandible";
 import { Plus, ChevronDown, Trash2, Pencil, X, DollarSign } from "lucide-react";
 import type {
   Materiales,
@@ -75,6 +77,7 @@ function TabMateriales({ addToast }: { addToast: ReturnType<typeof useToast>["ad
   const [modal, setModal] = useState<{ edit?: Materiales } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Materiales | null>(null);
   const [saving, setSaving] = useState(false);
+  const draft = useModalDraft<Record<string, unknown>>("catalogo-material");
   const data = useApi(() => api.catalogos.materiales.listar(q || undefined), [q]);
   const list = data.data ?? [];
 
@@ -105,6 +108,7 @@ function TabMateriales({ addToast }: { addToast: ReturnType<typeof useToast>["ad
       } else {
         await api.catalogos.materiales.crear({ nombre: values.nombre, unidad: values.unidad });
         addToast("success", "Material creado");
+        draft.clearDraft();
       }
       data.refetch(); setModal(null);
     } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al guardar"); }
@@ -123,7 +127,9 @@ function TabMateriales({ addToast }: { addToast: ReturnType<typeof useToast>["ad
           { key: "unidad", label: "Unidad de medida", type: "text", placeholder: "ej. Caja, Paquete, Unidad" },
           ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
-        initialValues={modal?.edit ? { nombre: modal.edit.nombre, unidad: modal.edit.unidad, estado: String(modal.edit.estado) } : { nombre: "", unidad: "" }}
+        initialValues={modal?.edit ? { nombre: modal.edit.nombre, unidad: modal.edit.unidad, estado: String(modal.edit.estado) } : (draft.draft ?? { nombre: "", unidad: "" })}
+        onValuesChange={modal?.edit ? undefined : draft.saveDraft}
+        onCloseExplicit={() => { draft.clearDraft(); setModal(null); }}
         onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar material" message={`Confirme que desea eliminar "${deleteTarget?.nombre}".`}
         confirmLabel="Eliminar" variant="danger" onConfirm={async () => {
@@ -141,6 +147,7 @@ function TabDocentes({ addToast }: { addToast: ReturnType<typeof useToast>["addT
   const [modal, setModal] = useState<{ edit?: Docente } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Docente | null>(null);
   const [saving, setSaving] = useState(false);
+  const draft = useModalDraft<Record<string, unknown>>("catalogo-docente");
   const data = useApi(() => api.catalogos.docentes.listar(q || undefined), [q]);
   const list = data.data ?? [];
 
@@ -172,6 +179,7 @@ function TabDocentes({ addToast }: { addToast: ReturnType<typeof useToast>["addT
       } else {
         await api.catalogos.docentes.crear({ nombres: values.nombres, apellidos: values.apellidos, telefono: values.telefono });
         addToast("success", "Docente creado");
+        draft.clearDraft();
       }
       data.refetch(); setModal(null);
     } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al guardar"); }
@@ -191,7 +199,9 @@ function TabDocentes({ addToast }: { addToast: ReturnType<typeof useToast>["addT
           { key: "telefono", label: "Telefono", type: "text" },
           ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
-        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, telefono: modal.edit.telefono, estado: String(modal.edit.estado) } : { nombres: "", apellidos: "", telefono: "" }}
+        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, telefono: modal.edit.telefono, estado: String(modal.edit.estado) } : (draft.draft ?? { nombres: "", apellidos: "", telefono: "" })}
+        onValuesChange={modal?.edit ? undefined : draft.saveDraft}
+        onCloseExplicit={() => { draft.clearDraft(); setModal(null); }}
         onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar docente"
         message={`Confirme que desea eliminar a "${deleteTarget?.nombres} ${deleteTarget?.apellidos}".`}
@@ -210,6 +220,7 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
   const [modal, setModal] = useState<{ edit?: Paciente } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Paciente | null>(null);
   const [saving, setSaving] = useState(false);
+  const draft = useModalDraft<Record<string, unknown>>("catalogo-paciente");
   const data = useApi(() => api.catalogos.pacientes.listar(q || undefined), [q]);
   const list = data.data ?? [];
 
@@ -240,6 +251,7 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
       } else {
         await api.catalogos.pacientes.crear({ nombres: values.nombres, apellidos: values.apellidos });
         addToast("success", "Paciente creado");
+        draft.clearDraft();
       }
       data.refetch(); setModal(null);
     } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al guardar"); }
@@ -258,7 +270,9 @@ function TabPacientes({ addToast }: { addToast: ReturnType<typeof useToast>["add
           { key: "apellidos", label: "Apellidos", type: "text" },
           ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
-        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, estado: String(modal.edit.estado) } : { nombres: "", apellidos: "" }}
+        initialValues={modal?.edit ? { nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, estado: String(modal.edit.estado) } : (draft.draft ?? { nombres: "", apellidos: "" })}
+        onValuesChange={modal?.edit ? undefined : draft.saveDraft}
+        onCloseExplicit={() => { draft.clearDraft(); setModal(null); }}
         onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar paciente"
         message={`Confirme que desea eliminar a "${deleteTarget?.nombres} ${deleteTarget?.apellidos}".`}
@@ -277,6 +291,7 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
   const [modal, setModal] = useState<{ edit?: Operador } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Operador | null>(null);
   const [saving, setSaving] = useState(false);
+  const draft = useModalDraft<Record<string, unknown>>("catalogo-operador");
   const data = useApi(() => api.catalogos.operadores.listar(q || undefined), [q]);
   const list = data.data ?? [];
 
@@ -309,6 +324,7 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
       } else {
         await api.catalogos.operadores.crear(payload as any);
         addToast("success", "Operador creado");
+        draft.clearDraft();
       }
       data.refetch(); setModal(null);
     } catch (err) { addToast("error", err instanceof Error ? err.message : "Error al guardar"); }
@@ -336,7 +352,9 @@ function TabOperadores({ addToast }: { addToast: ReturnType<typeof useToast>["ad
         initialValues={modal?.edit ? {
           nombres: modal.edit.nombres, apellidos: modal.edit.apellidos, dni: modal.edit.dni || "",
           grado: modal.edit.grado, tipo: modal.edit.tipo, periodo: String(modal.edit.periodo), estado: String(modal.edit.estado),
-        } : { nombres: "", apellidos: "", dni: "", grado: "", tipo: "", periodo: String(new Date().getFullYear()) }}
+        } : (draft.draft ?? { nombres: "", apellidos: "", dni: "", grado: "", tipo: "", periodo: String(new Date().getFullYear()) })}
+        onValuesChange={modal?.edit ? undefined : draft.saveDraft}
+        onCloseExplicit={() => { draft.clearDraft(); setModal(null); }}
         onSave={handleSave} onCancel={() => setModal(null)} saving={saving} />
       <ConfirmDialog open={!!deleteTarget} title="Eliminar operador"
         message={`Confirme que desea eliminar a "${deleteTarget?.nombres} ${deleteTarget?.apellidos}".`}
@@ -357,6 +375,7 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const [matRows, setMatRows] = useState<MaterialRow[]>([]);
+  const draft = useModalDraft<Record<string, unknown>>("catalogo-tratpred");
   const mats = useApi(() => api.catalogos.materiales.listar());
   const data = useApi(() => api.catalogos.tratamientosPred.listar(q || undefined), [q]);
   const list = data.data ?? [];
@@ -401,6 +420,7 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
         const result = await api.catalogos.tratamientosPred.crear({ nombreTratamiento: values.nombreTratamiento, montoSugerido: monto });
         id = result.id;
         addToast("success", "Tratamiento creado");
+        draft.clearDraft();
       }
       if (matRows.length > 0) {
         const matPayload = matRows.filter((r) => r.materialId != null).map((r) => ({ materialID: r.materialId!, cantidad: r.cantidad }));
@@ -436,7 +456,9 @@ function TabTratamientosPred({ addToast }: { addToast: ReturnType<typeof useToas
           { key: "montoSugerido", label: "Monto sugerido", type: "number", placeholder: "0.00" },
           ...(modal?.edit ? [{ key: "estado", label: "Estado", type: "select" as const, options: [{ label: "Activo", value: "1" }, { label: "Inactivo", value: "0" }] }] : []),
         ]}
-        initialValues={modal?.edit ? { nombreTratamiento: modal.edit.nombreTratamiento, montoSugerido: modal.edit.montoSugerido ?? "", estado: String(modal.edit.estado) } : { nombreTratamiento: "", montoSugerido: "" }}
+        initialValues={modal?.edit ? { nombreTratamiento: modal.edit.nombreTratamiento, montoSugerido: modal.edit.montoSugerido ?? "", estado: String(modal.edit.estado) } : (draft.draft ?? { nombreTratamiento: "", montoSugerido: "" })}
+        onValuesChange={modal?.edit ? undefined : draft.saveDraft}
+        onCloseExplicit={() => { draft.clearDraft(); setModal(null); }}
         onSave={handleSave} onCancel={() => { setModal(null); setMatRows([]); }} saving={saving}
         width={560}
       >
@@ -480,6 +502,8 @@ function MaterialesDetalle({ tratPredID }: { tratPredID: number }) {
 
 function TabTratamientosRealizados() {
   const data = useApi(() => api.tratamientos.cerrados());
+  const pacientes = useApi(() => api.catalogos.pacientes.listar());
+  const operadores = useApi(() => api.catalogos.operadores.listar());
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [registrarOpen, setRegistrarOpen] = useState(false);
   const [editarTarget, setEditarTarget] = useState<Tratamiento | null>(null);
@@ -487,6 +511,9 @@ function TabTratamientosRealizados() {
   const [anularTarget, setAnularTarget] = useState<Tratamiento | null>(null);
   const { addToast } = useToast();
   const list = data.data ?? [];
+
+  const operadorNombreMap = new Map((operadores.data ?? []).map((o) => [o.operadorID, nombreCompleto(o.nombres, o.apellidos)]));
+  const pacienteNombreMap = new Map((pacientes.data ?? []).map((p) => [p.pacienteID, nombreCompleto(p.nombres, p.apellidos)]));
 
   const columns: Column<Tratamiento>[] = [
     { key: "chevron", header: "", width: 36, render: (r) => (
@@ -496,6 +523,8 @@ function TabTratamientosRealizados() {
     )},
     { key: "id", header: "ID", width: 50, render: (r) => <span className="num">{r.tratamientoID}</span>, sortValue: (r) => r.tratamientoID },
     { key: "nombre", header: "Tratamiento", render: (r) => r.nombreTratamiento, sortValue: (r) => r.nombreTratamiento },
+    { key: "paciente", header: "Paciente", width: 150, render: (r) => pacienteNombreMap.get(r.pacienteID) ?? '', sortValue: (r) => pacienteNombreMap.get(r.pacienteID) ?? '' },
+    { key: "operador", header: "Operador", width: 150, render: (r) => operadorNombreMap.get(r.operadorID) ?? '', sortValue: (r) => operadorNombreMap.get(r.operadorID) ?? '' },
     { key: "fecha", header: "Fecha", width: 100, render: (r) => r.fecha, sortValue: (r) => r.fecha },
     { key: "monto", header: "Monto", width: 100, render: (r) => `S/ ${r.monto.toFixed(2)}`, sortValue: (r) => r.monto },
     { key: "estado", header: "Estado", width: 90, render: (r) => {
@@ -521,7 +550,7 @@ function TabTratamientosRealizados() {
       {registrarOpen && <RegistrarRealizadoModal onClose={() => setRegistrarOpen(false)} onSuccess={() => { setRegistrarOpen(false); data.refetch(); }} addToast={addToast} />}
       {editarTarget && <EditarRealizadoModal tratamiento={editarTarget} onClose={() => setEditarTarget(null)} onSuccess={() => { setEditarTarget(null); data.refetch(); }} addToast={addToast} />}
       {pagoTarget && <RegistrarPagoModal tratamiento={pagoTarget} onClose={() => setPagoTarget(null)} onSuccess={() => { setPagoTarget(null); data.refetch(); }} addToast={addToast} />}
-      <ConfirmDialog open={!!anularTarget} title="Anular tratamiento" message={`Confirme que desea anular el tratamiento #${anularTarget?.tratamientoID}.`} confirmLabel="Sí, anular" variant="danger" requireMotivo
+      <ConfirmDialog open={!!anularTarget} title="Anular tratamiento" message={`Confirme que desea anular el tratamiento #${anularTarget?.tratamientoID}.`} confirmLabel="S�, anular" variant="danger" requireMotivo
         onConfirm={async (motivo) => {
           if (!anularTarget || !motivo) return;
           try { await api.tratamientos.anular(anularTarget.tratamientoID, motivo); addToast("success", "Tratamiento anulado"); data.refetch(); }
@@ -558,10 +587,7 @@ function TratamientoMaterialesDetalle({ tratamientoID }: { tratamientoID: number
           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Avances</span>
           <ul className="material-list">
             {avanceList.map((a) => (
-              <li key={a.avanceID} className="material-list-item">
-                <span className="material-list-name">Avance #{a.numero} - {a.fecha}</span>
-                <Badge variant={a.estado === 'ANULADO' ? 'danger' : a.estado === 'TERMINADO' ? 'success' : 'info'}>{a.estado}</Badge>
-              </li>
+              <AvanceExpandible key={a.avanceID} avance={a} />
             ))}
           </ul>
         </div>
